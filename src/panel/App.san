@@ -1,0 +1,106 @@
+<template>
+    <div id="app">
+        <sandevtool-navigation s-ref="nav" />
+        <san-row type="flex">
+            <!--san-col span="12" order="1" class="sd-comp-wrapper">
+                <sandevtool-components />
+            </san-col>
+            <san-col span="12" order="2" class="sd-detail-wrapper"></san-col-->
+            <div class="sd-main-wrapper">
+                <div class="sd-comp-wrapper">
+                    <sandevtool-components />
+                </div>
+                <div class="sd-detail-wrapper">
+
+                </div>
+            </div>
+        </san-row>
+    </div>
+</template>
+
+<script>
+import Messenger from 'chrome-ext-messenger';
+import ChromePromise from 'chrome-promise';
+import Split from 'split.js';
+
+import Grid from 'san-mui/lib/Grid';
+import 'san-mui/lib/Grid/Grid.styl';
+
+import Navigation from './views/navigation.san'
+import Components from './views/components/components.san'
+
+export default {
+
+    components: {
+        'san-col': Grid.Col,
+        'sandevtool-navigation': Navigation,
+        'sandevtool-components': Components
+    },
+
+    initData() {
+        return {
+        }
+    },
+
+    computed: {
+        navTitle() {
+
+        }
+    },
+
+    messages: {
+        'UI:query-san-version-number'(arg) {
+            arg.target.data.set('sanVersion',
+                this[SAN_DEVTOOL]
+                    && this[SAN_DEVTOOL].san
+                    && this[SAN_DEVTOOL].san.version !== '##version##'
+                        ? this[SAN_DEVTOOL].san.version
+                        : '[unknown version]');
+        }
+    },
+
+    toggleMenu() {
+    },
+
+    inited() {
+    },
+
+    created() {
+    },
+
+    attached() {
+        Split(['.sd-comp-wrapper', '.sd-detail-wrapper'], {
+            sizes: [50, 50],
+            minSize: 300
+        });
+
+    }
+
+
+}
+
+</script>
+
+<style lang="stylus">
+
+html, body
+    font-family: Roboto, Lato, sans-serif
+    line-height: 1.5
+    font-size: 14px
+    font-weight: 400
+    margin: 0
+    width: 100%
+    overflow: hidden
+
+.sd-main-wrapper
+    position: absolute
+    top: 56px
+    bottom: 0
+    width: 100%
+    &>*
+        height: 100%
+        float: left
+    .gutter-horizontal
+        background-color: #e1e1e1
+        cursor: ew-resize
+</style>

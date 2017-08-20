@@ -1,0 +1,144 @@
+<template>
+    <div id="navigation">
+        <san-row type="flex">
+            <san-col span="8" order="1">
+                <san-appbar title="San {{sanVersion}}" class="version">
+                    <san-icon-button
+                        s-if="sanVersion !== 'unknown version'"
+                        variants="info raised"
+                        slot="left"
+                        href="https://github.com/ecomfe/san/releases/tag/{{sanVersion}}"
+                        target="_blank"
+                    >
+                        code
+                    </san-icon-button>
+                </san-appbar>
+            </san-col>
+            <san-col span="16" order="2">
+                <section class="main-tabs">
+                    <san-tabs value="{=currentTab=}" on-change="change($event)">
+                        <san-tab
+                            san-for="tab, index in tabs"
+                            value="{{tab.value}}">
+                            <san-icon slot="icon">{{tab.icon}}</san-icon>
+                            <span slot="label">{{tab.label}}</span>
+                        </san-tab>
+                    </san-tabs>
+                </section>
+            </san-col>
+        </san-row>
+    </div>
+</template>
+
+<script>
+import san from 'san';
+import Messenger from 'chrome-ext-messenger';
+import utils from '../../js/common/utils';
+
+import Grid from 'san-mui/lib/Grid';
+import Icon from 'san-mui/lib/Icon';
+import AppBar from 'san-mui/lib/AppBar';
+import {Button, IconButton} from 'san-mui/lib/Button';
+import {IconMenu, MenuItem, Divider} from 'san-mui/lib/Menu';
+import Tabs, {Tab} from 'san-mui/lib/Tabs';
+
+import 'san-mui/lib/Grid/Grid.styl';
+import 'san-mui/lib/AppBar/AppBar.styl';
+import 'san-mui/lib/Button/Button.styl';
+import 'san-mui/lib/Icon/Icon.styl';
+import 'san-mui/lib/Menu/IconMenu.styl';
+import 'san-mui/lib/Menu/MenuItem.styl';
+import 'san-mui/lib/Menu/DropDownMenu.styl';
+import 'san-mui/lib/Tabs/Tabs.styl';
+
+import 'normalize.css';
+
+export default {
+
+    components: {
+        'san-col': Grid.Col,
+        'san-appbar': AppBar,
+        'san-menu-item': MenuItem,
+        'san-icon-menu': IconMenu,
+        'san-menu-divider': Divider,
+        'san-icon-button': IconButton,
+        'san-button': Button,
+        'san-icon': Icon,
+        'san-tabs': Tabs,
+        'san-tab': Tab
+    },
+
+    initData() {
+        return {
+            sanVersion: '',
+            tabs: [
+                {
+                    label: 'Components',
+                    icon: 'widgets',
+                    value: 'components'
+                },
+                {
+                    label: 'Store',
+                    icon: 'settings_backup_restore',
+                    value: 'store'
+                },
+                {
+                    label: 'Reload',
+                    icon: 'refresh',
+                    value: 'reload'
+                }
+            ],
+            currentTab: 'components'
+        }
+    },
+
+    computed: {
+        navTitle() {
+
+        }
+    },
+
+    messages: {
+
+    },
+
+    toggleMenu() {
+    },
+
+    attached() {
+        chrome.devtools.inspectedWindow.eval(
+            'window.' + SAN_DEVTOOL + '.san.version', (res, ex) => {
+                let ver = utils.normalizeVersionNumber(res);
+                ver === 'N/A' && (ver = 'unknown version');
+                this.data.set('sanVersion', ver);
+            }
+        );
+    },
+
+    created() {
+    }
+
+}
+
+</script>
+
+<style lang="stylus">
+.version .sm-appbar-title
+    font-size: 18px
+
+.sm-iconmenu .sm-iconmenu-tooltip
+    width: auto
+
+.main-tabs
+    .sm-tabs
+        .sm-tab
+            flex-flow: row nowrap
+            height: 56px
+            .sm-icon
+                ~ span
+                    margin-top: 0
+                    margin-left: 10px
+        .sm-tabs-bar
+            height: 4px
+
+</style>
