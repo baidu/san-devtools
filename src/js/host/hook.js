@@ -1,8 +1,8 @@
 /**
- * San DevTools
+ * San DevTool
  * Copyright 2017 Ecomfe. All rights reserved.
  *
- * @file Hook the webpage
+ * @file 向页面注入挂钩，__san_devtool__ 为根节点。
  */
 
 export function installSanHook(global) {
@@ -11,8 +11,20 @@ export function installSanHook(global) {
     }
     const sanHook = {
         _listeners: {},
+        // 是否为第一次触发。
+        _initialEmitting: false,
+        // 判断 devtool 面板是否打开。
+        _devtoolPanelCreated: false,
+        // 判定此挂钩的运行上下文。
+        _this: null,
+        // 由 San 传入的 san 对象。
         san: null,
-        tree: {},
+        // 与 devtool 保持同步的组件树。
+        data: {
+            treeData: []
+        },
+        // 记录 San devtool 事件触发列表。
+        history: [],
         sub: (event, func) => {
             sanHook.on(event, func);
             return () => sanHook.off(event, func);
@@ -36,7 +48,13 @@ export function installSanHook(global) {
             }
         },
         emit: (event, data) => {
-            //console.log('emit', event, data, data.el)
+            // 兼容 San 3.1.3 以前的版本。在 3.1.3 之后仅挂在到 window 对象上。
+            if (!sanHook._initialEmitting && event === 'san') {
+                if (sanHook._this === window) {
+                    delete Object.prototype[SAN_DEVTOOL];
+                }
+                sanHook._initialEmitting = true;
+            }
             if (sanHook._listeners[event]) {
                 sanHook._listeners[event].map(func => func(data));
             }
@@ -44,13 +62,33 @@ export function installSanHook(global) {
     };
 
     sanHook.on('san', san => {
-        !sanHook.san && san && (sanHook.san = san);
+        if (!sanHook.san && san) {
+            sanHook.san = san;
+            console.log('San is hooked, version is ' + san.version);
+        };
     });
 
-    // FIXME: try to use buble.
-    window.eval('Object.defineProperty')(Object.prototype, SAN_DEVTOOL, {
+    // FIXME
+    let defineProperty = ({}).constructor.defineProperty;
+    let hookAccessor = {
+        configurable: true,
         get() {
+            sanHook._this = this;
             return sanHook;
+        }
+    };
+    defineProperty(Object.prototype, SAN_DEVTOOL, hookAccessor);
+    defineProperty(window.constructor.prototype, SAN_DEVTOOL, hookAccessor);
+
+    let devtoolPanelCreatedAccessor = {
+        configurable: true,
+        get() {
+            return sanHook._devtoolPanelCreated;
         },
-    });
+        set(value) {
+            sanHook._devtoolPanelCreated = !!value;
+            console.log('devtool panel created');
+        }
+    };
+    defineProperty(sanHook, 'devtoolPanelCreated', devtoolPanelCreatedAccessor);
 }

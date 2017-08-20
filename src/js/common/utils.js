@@ -9,6 +9,7 @@ export default {
 
     normalizeVersionNumber(version) {
         let reg = /^\d+(\.\d+)+(\-\b\w*\b)?$/;
+        console.log('vv', version, !version || typeof version !== 'string');
         if (!version || typeof version !== 'string') {
             return null;
         }
@@ -16,6 +17,45 @@ export default {
             return '';
         }
         return version;
+    },
+
+    isBrowser() {
+        return typeof window !== 'undefined';
+    },
+
+    isContentScript() {
+        return chrome && chrome.extension;
+    },
+
+    isSanComponent(component) {
+        if (!window[SAN_DEVTOOL] || !window[SAN_DEVTOOL].san) {
+            return false;
+        }
+        return component instanceof window[SAN_DEVTOOL].san.Component;
+    },
+
+    getXPath(element) {
+        if (!element) {
+            return '';
+        }
+        if (element.id !== '') {
+            return 'id("' + element.id + '")';
+        }
+        if (element === document.body) {
+            return element.tagName;
+        }
+
+        let c = 0;
+        let siblings = element.parentNode.childNodes;
+        for (let i of siblings) {
+            if (i === element) {
+                return getXPath(element.parentNode) + '/' + element.tagName
+                    + '[' + (ix + 1) + ']';
+            }
+            if (i.nodeType === ELEMENT_NODE && i.tagName === element.tagName) {
+                ix++;
+            }
+        }
     }
 
 };

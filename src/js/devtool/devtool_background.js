@@ -1,5 +1,5 @@
 /**
- * San Devtools
+ * San Devtool
  * Copyright 2017 Ecomfe. All rights reserved.
  *
  * @file Create developer tools panel
@@ -35,7 +35,7 @@ function createDevtoolPanelIfNeeded() {
     );
 }
 
-chrome.devtools.network.onNavigated.addListener(createDevtoolPanelIfNeeded);
+//chrome.devtools.network.onNavigated.addListener(createDevtoolPanelIfNeeded);
 
 let createdCheckInterval = setInterval(createDevtoolPanelIfNeeded, 1000);
 

@@ -17,5 +17,7 @@ export default {
         'comp-updated'
     ],
 
+    subTreeKey: 'treeData'
+
 };
 

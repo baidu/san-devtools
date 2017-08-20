@@ -38,6 +38,7 @@ setTimeout(() => {
     connector.sendMessage('content_script:san_version', {
         from: 'popup:detector'
     }, res => {
+        console.log(res);
         update(res);
     });
 }, 100);
