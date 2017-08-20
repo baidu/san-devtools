@@ -22,14 +22,16 @@
         "scripts": ["js/background/background.min.js"],
         "persistent": false
     },
-    "web_accessible_resources": ["html/devtool/devtool_background.html" ],
+    "web_accessible_resources": [
+        "html/devtool/devtool_background.html",
+        "js/host/host_entry.min.js"
+    ],
     "content_scripts": [{
         "matches": ["<all_urls>"],
         "js": [
             "js/host/invasion.min.js"
         ],
-        "run_at": "document_start",
-        "all_frames": true
+        "run_at": "document_start"
     }],
     "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
     "permissions": [

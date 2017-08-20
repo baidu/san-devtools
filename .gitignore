@@ -1,5 +1,7 @@
-/dist
-node_modules
-npm-debug.log*
-todo-mine.txt
-.sass-cache
+.DS_Store
+node_modules/
+dist/
+npm-debug.log
+*.tar.gz
+output/
+

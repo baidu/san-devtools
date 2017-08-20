@@ -27,7 +27,9 @@ export default {
         'js/host/invasion.min.js'
             : './src/js/host/invasion.js',
         'panel/index.min.js'
-            : './src/panel/index.js'
+            : './src/panel/index.js',
+        'js/host/host_entry.min.js'
+            : './src/js/host/host_entry.js'
     },
     output: {
         path: './dist',
@@ -45,9 +47,7 @@ export default {
                 test: /\.js?$/,
                 loader: 'babel-loader',
                 query: {
-                    plugins: [
-                        'transform-runtime',
-                    ],
+                    plugins: ['transform-runtime'],
                     presets: [
                         ['es2015'],
                         'es2015-script',
@@ -57,12 +57,8 @@ export default {
                 exclude: /node_modules/
             },
             {
-                test: /\.styl$/,
-                loader: 'style-loader!css-loader!stylus-loader'
-            },
-            {
-                test: /\.css$/,
-                loader: 'css-loader'
+                test: /\.(styl|css)$/,
+                loader: 'style-loader!css-loader!stylus-loader?paths=node_modules'
             },
             {
                 test: /\.san$/,
@@ -82,6 +78,15 @@ export default {
                 loader: 'html-loader'
             }
         ],
+        // require
+        unknownContextRegExp: /$^/,
+        unknownContextCritical: false,
+        // require(expr)
+        exprContextRegExp: /$^/,
+        exprContextCritical: false,
+        // require("prefix" + expr + "surfix")
+        wrappedContextRegExp: /$^/,
+        wrappedContextCritical: false
     },
     plugins: [
         new webpack.DefinePlugin({

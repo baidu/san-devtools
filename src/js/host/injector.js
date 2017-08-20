@@ -1,5 +1,5 @@
 /**
- * San DevTools
+ * San DevTool
  * Copyright 2017 Ecomfe. All rights reserved.
  *
  * @file Inject the script to page context.
@@ -17,10 +17,10 @@ function generateCodeString(codeArg, thisArg, mountingKey) {
         case 'string':
             code = /^function/i.test(codeArg)
                 ? '(' + codeArg + ')(' + thisArg + ');' 
-                : '(function(){' + codeArg + '})(' + thisArg + ');'; 
+                : '(function(){' + codeArg + '}).call(' + thisArg + ');'; 
             break;
         case 'function':
-            code = '(' + codeArg.toString() + ')(' + thisArg + ');';
+            code = '(' + codeArg.toString() + ').call(' + thisArg + ');';
             break;
         default:
             break;
@@ -41,6 +41,16 @@ function inject(codeString) {
     return script;
 }
 
+function injectURL(url) {
+    return new Promise(function (resolve, reject) {
+        const script = document.createElement('script');
+        script.src = url;
+        script.onload = resolve;
+        script.onerror = reject;
+        document.documentElement.appendChild(script);
+    });
+}
+
 function mount(codeString) {
 
 }
@@ -50,6 +60,10 @@ export default {
     // Must be run in content script context. 
     fromContentScript(codeArg, thisArg, mountingKey) {
         inject(generateCodeString(codeArg, thisArg, mountingKey));
+    },
+
+    fromContentScriptURL(url) {
+        return injectURL(url);
     },
 
     fromDevtool(code) {
