@@ -32,7 +32,7 @@ function buildHistory(component, root, event) {
     if (!root || !root['history']) {
         return;
     }
-    sanDevtool['history'].push({
+    root['history'].push({
         id: component.id,
         path: component.path,
         timestamp: Date.now(),
@@ -72,7 +72,7 @@ function addSanEventListeners() {
 
             let path = generatePath(component);
             let data = getComponentTreeItemData(component);
-            buildHistory(component);
+            buildHistory(component, sanDevtool, e);
             components.updatePrimitiveTree(data, e, sanDevtool['data']);
             let indexList = components.getIndexListFromPathAndTreeData(path,
                 sanDevtool['data'].treeData);
