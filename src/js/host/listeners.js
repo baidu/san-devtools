@@ -17,14 +17,14 @@ function getComponentTreeItemData(component) {
         id: id,
         text: '<' + componentName + '>',
         secondaryText: id,
-        path: component.path
+        idPath: component.idPath
     };
 }
 
 // 生成组件的路径。
 function generatePath(component) {
-    component.path = components.getComponentPath(component);
-    return component.path;
+    component.idPath = components.getComponentPath(component);
+    return component.idPath;
 }
 
 // 将所有事件信息存入 history 数组，以便后续使用。
@@ -82,12 +82,23 @@ function addSanEventListeners() {
             el['__san_data__'] = component.data.raw;
             el['__san_tree_index__'] = indexList;
 
+            // 为提高效率在 get 的时候才生成数据。
+            if (!el.hasOwnProperty('__san_info__')) {
+                Object.defineProperty(el, '__san_info__', {
+                    get() {
+                        let info = components.serialize(component);
+                        info.idPath = path;
+                        return info;
+                    }
+                });
+            }
+
             // 只有当 devtool 面板创建之后才向 content script 发送组件信息。
             if (sanDevtool.devtoolPanelCreated) {
                 window.postMessage({
                     message: e,
                     id: component.id,
-                    path: path,
+                    idPath: path,
                     //ancestors: ancestors,
                     indexList: indexList,
                     data: data

@@ -1,0 +1,40 @@
+<template>
+    <div>
+        <input type="hidden" value="{{cid}}" />
+        <div id="data_json_viewer">
+        </div>
+    </div>
+</template>
+
+<script>
+import JSONView from 'json-view';
+import 'json-view/devtools.css';
+
+export default {
+
+    attached() {
+        this.pageEval = chrome.devtools.inspectedWindow.eval;
+        this.jsonViewer = new JSONView('data', {
+            'No data': 'Please choose a component.'
+        });
+        this.jsonViewer.expand(true);
+        document.getElementById('data_json_viewer').appendChild(
+            this.jsonViewer.dom);
+        this.watch('cid', value => {
+            this.pageEval(
+                'document.getElementById("' + value + '").__san_data__',
+                (res, ex) => {
+                    this.jsonViewer.value = res;
+                    this.jsonViewer.expand(true);
+                }
+            );
+        });
+    }
+
+}
+</script>
+
+<style lang="stylus">
+
+
+</style>

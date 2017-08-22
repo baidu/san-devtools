@@ -57,8 +57,12 @@ export default {
                 exclude: /node_modules/
             },
             {
-                test: /\.(styl|css)$/,
+                test: /\.styl$/,
                 loader: 'style-loader!css-loader!stylus-loader?paths=node_modules'
+            },
+            {
+                test: /\.css$/,
+                loader: 'style-loader!css-loader'
             },
             {
                 test: /\.san$/,
