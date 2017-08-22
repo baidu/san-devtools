@@ -1,7 +1,7 @@
 <template>
     <div id="navigation">
         <san-row type="flex">
-            <san-col span="8" order="1">
+            <san-col span="12" order="1">
                 <san-appbar title="San {{sanVersion}}" class="version">
                     <san-icon-button
                         s-if="sanVersion !== 'unknown version'"
@@ -12,9 +12,16 @@
                     >
                         code
                     </san-icon-button>
+                    <san-button
+                        variants="primary raised"
+                        slot="right"
+                    >
+                        <san-icon style="margin-right:6px">refresh</san-icon>
+                        Reload
+                    </san-button>
                 </san-appbar>
             </san-col>
-            <san-col span="16" order="2">
+            <san-col span="12" order="2">
                 <section class="main-tabs">
                     <san-tabs value="{=currentTab=}" on-change="change($event)">
                         <san-tab
@@ -78,14 +85,14 @@ export default {
                     value: 'components'
                 },
                 {
+                    label: 'History',
+                    icon: 'history',
+                    value: 'history'
+                },
+                {
                     label: 'Store',
                     icon: 'settings_backup_restore',
                     value: 'store'
-                },
-                {
-                    label: 'Reload',
-                    icon: 'refresh',
-                    value: 'reload'
                 }
             ],
             currentTab: 'components'
