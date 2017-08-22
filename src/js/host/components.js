@@ -58,7 +58,7 @@ function getIndexListFromPathAndTreeData(path, root) {
 function updatePrimitiveTreeDataByPath(root, data, isDeleted) {
     var r = root;
     var owner;
-    var path = data.path;
+    var path = data.idPath;
     for (let [i, e] of path.entries()) {
         var index = this.getIDListFromTreeData(r).indexOf(e);
         if (!isDeleted) {
@@ -119,7 +119,7 @@ function serialize(component, includingParent, keepJSON) {
         tagName: component.tagName,
         xpath: utils.getXPath(component.el),
         subTag: component.subTag,
-        path: [component.id],
+        idPath: [component.id],
         // FIXME:
         data: keepJSON
             ? component.data.raw
@@ -127,6 +127,12 @@ function serialize(component, includingParent, keepJSON) {
         parentComponent: includingParent
             ? serialize(component.parentComponent)
             : undefined,
+        parentComponentId: component.parentComponent
+            ? [component.parentComponent.id]
+            : [],
+        ownerComponentId: component.owner ? [component.owner.id] : [],
+        parentId: component.parent ? [component.parent.id] : [],
+        constructor: component.constructor.name,
         // For TreeView
         text: '<' + (component.subTag || component.constructor.name) + '>',
         secondaryText: component.id

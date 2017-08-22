@@ -1,0 +1,129 @@
+<template>
+    <div>
+        <input type="hidden" value="{{cid}}" />
+        <san-table>
+            <san-tbody>
+                <san-tr san-for="info in infoList">
+                    <san-td>{{info.key}}</san-td>
+                    <san-td s-if="!info.isArray">{{info.value}}
+                        <san-button
+                            s-if="info.key==='ID'"
+                            variants="primary raised"
+                            style="margin-left:5px"
+                            on-click="inspectId(info.value)"
+                        >
+                            <san-icon style="margin-right:6px">search</san-icon>
+                            inspect
+                        </san-button>
+                    </san-td>
+                    <san-td s-else>
+                        <san-button
+                            s-for="id in info.value"
+                            variants="raised primary"
+                            on-click="inspectId(id)"
+                        >{{id}}</san-button>
+                    </san-td>
+                </san-tr>
+            </san-tbody>
+        </san-table>
+    </div>
+</template>
+
+<script>
+import {Table, THead, TFoot, TBody, TR, TD, TH} from 'san-mui/lib/Table';
+import 'san-mui/lib/Table/Table.styl';
+import {Button, IconButton} from 'san-mui/lib/Button';
+import 'san-mui/lib/Button/Button.styl';
+import Icon from 'san-mui/lib/Icon';
+import 'san-mui/lib/Icon/Icon.styl';
+
+export default {
+
+    components: {
+        'san-table': Table,
+        'san-tr': TR,
+        'san-th': TH,
+        'san-td': TD,
+        'san-tbody': TBody,
+        'san-thead': THead,
+        'san-tfoot': TFoot,
+        'san-button': Button,
+        'san-icon-button': IconButton,
+        'san-icon': Icon
+    },
+
+    initData() {
+        return {
+            keyList: [
+                'id',
+                'tagName',
+                'constructor',
+                'subTag',
+                'idPath',
+                'parentComponentId',
+                'ownerComponentId',
+                'parentId'
+            ],
+            infoList: [
+                {key: 'No data', value: 'Please choose a component.'}
+            ]
+        }
+    },
+
+    attached() {
+        this.pageEval = chrome.devtools.inspectedWindow.eval;
+        this.watch('cid', value => {
+            this.generateInfoList(value);
+        });
+    },
+
+    generateInfoList(id) {
+        this.pageEval(
+            'document.getElementById("' + id + '").__san_info__',
+            (res, ex) => {
+                if (!res || typeof res !== 'object') {
+                    return;
+                }
+                let infoList = [];
+                let keyList = this.data.get('keyList');
+                for (let k in res) {
+                    if (keyList.indexOf(k) > -1) {
+                        infoList.push({
+                            key: this.getDescFromCamelCase(k),
+                            value: res[k],
+                            isArray: res[k] instanceof Array
+                        });
+                    }
+                }
+                this.data.set('infoList', infoList);
+
+            }
+        );
+    },
+
+    getDescFromCamelCase(string) {
+        return string.replace(/([A-Z])/g," $1").toLowerCase()
+            .replace(/\b(id|\w)|\s(id|\w)/g, function (m) {
+                return m.toUpperCase();  
+            }
+        );
+    },
+
+    inspectId(id) {
+        this.pageEval('inspect(document.getElementById("' + id + '"))|0');
+    }
+}
+</script>
+
+<style lang="stylus">
+.sm-table
+    tr
+        td
+            height: auto !important
+            white-space: normal !important
+            line-height: 2
+            .sm-button
+                zoom: .6 !important
+                margin-right: 3px
+
+</style>

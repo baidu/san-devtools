@@ -9,7 +9,6 @@ export default {
 
     normalizeVersionNumber(version) {
         let reg = /^\d+(\.\d+)+(\-\b\w*\b)?$/;
-        console.log('vv', version, !version || typeof version !== 'string');
         if (!version || typeof version !== 'string') {
             return null;
         }
@@ -52,7 +51,8 @@ export default {
                 return getXPath(element.parentNode) + '/' + element.tagName
                     + '[' + (ix + 1) + ']';
             }
-            if (i.nodeType === ELEMENT_NODE && i.tagName === element.tagName) {
+            if (i.nodeType === Node.ELEMENT_NODE
+                && i.tagName === element.tagName) {
                 ix++;
             }
         }

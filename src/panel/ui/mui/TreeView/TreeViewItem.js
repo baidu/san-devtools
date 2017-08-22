@@ -422,6 +422,7 @@ export default san.defineComponent({
         }
         if (evt.target.tagName !== 'LABEL' && evt.target.tagName !== 'INPUT') {
             this.fire('click', {event: evt, comp: this});
+            this.dispatch('EVENT:click', {event: evt, comp: this});
         }
 
         (driver === 'EXPAND' || forceSelected) && this.toggleRipple();
@@ -455,6 +456,7 @@ export default san.defineComponent({
         //console.log('click', this, evt);
         //this.parentComponent
         //    && this.parentComponent.fire('click', evt);
+
     },
 
     handleMouseover(evt) {

@@ -16,7 +16,6 @@
                 <san-tree-view-item
                     san-for="item, index in treeData"
                     initiallyOpen="{{!0}}"
-                    primaryTogglesNestedTreeView="{{!0}}"
                     treeData="{=item=}"
                     dataSource="JSON"
                     on-selectedToggle="selectedToggle($event)"
@@ -56,28 +55,18 @@ export default {
 
     messages: {
         'EVENT:mouseover'(arg) {
-            let evt = arg.value;
-            if (!evt || !evt.comp || typeof evt.comp !== 'object') {
-                return;
-            }
-            let data = evt.comp.data.get('secondaryText');
-            if (!data) {
-                return;
-            }
-            this.mouseOverConnection.sendMessage(
-                'content_script:highlight_dom', {id: data}, () => {});
+            let id = this.getComponentIdFromTreeViewItem(arg.value.comp);
+            id && this.mouseOverConnection.sendMessage(
+                'content_script:highlight_dom', {id: id}, () => {});
         },
         'EVENT:mouseout'(arg) {
-            let evt = arg.value;
-            if (!evt || !evt.comp || typeof evt.comp !== 'object') {
-                return;
-            }
-            let data = evt.comp.data.get('secondaryText');
-            if (!data) {
-                return;
-            }
-            this.mouseOutConnection.sendMessage(
-                'content_script:unhighlight_dom', {id: data}, () => {});
+            let id = this.getComponentIdFromTreeViewItem(arg.value.comp);
+            id && this.mouseOutConnection.sendMessage(
+                'content_script:unhighlight_dom', {id: id}, () => {});
+        },
+        'EVENT:click'(arg) {
+            let id = this.getComponentIdFromTreeViewItem(arg.value.comp);
+            id && this.dispatch('UI:current_component_id', id);
         }
     },
 
@@ -207,6 +196,17 @@ export default {
                 break;
             }
         }
+    },
+
+    getComponentIdFromTreeViewItem(comp) {
+        if (!comp || !comp.data) {
+            return '';
+        }
+        let data = comp.data.get('secondaryText');
+        if (!data) {
+            return;
+        }
+        return data;
     },
 
     nestedTreeViewToggle(value) {
