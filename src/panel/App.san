@@ -1,36 +1,22 @@
 <template>
     <div id="app">
-        <sandevtool-navigation s-ref="nav" />
-        <san-row type="flex">
-            <!--san-col span="12" order="1" class="sd-comp-wrapper">
-                <sandevtool-components />
-            </san-col>
-            <san-col span="12" order="2" class="sd-detail-wrapper"></san-col-->
-            <div class="sd-main-wrapper">
-                <div class="sd-comp-wrapper">
-                    <sandevtool-component-tree
-                        cid="{=current_component_id=}"
-                    >
-                    </sandevtool-component-tree>
-                </div>
-                <div class="sd-detail-wrapper">
-                    <div class="ex-panel-wrapper">
-                        <san-expansion-panel title="Basic Information" open="{{!0}}">
-                            <sandevtool-component-basic-info
-                                cid="{{current_component_id}}"
-                            >
-                            </sandevtool-component-basic-info>
-                        </san-expansion-panel>
-                    </div>
-                    <div class="ex-panel-wrapper">
-                        <san-expansion-panel title="Data" open="{{!0}}">
-                            <sandevtool-component-data-viewer
-                                cid="{{current_component_id}}"
-                            >
-                            </sandevtool-component-data-viewer>
-                        </san-expansion-panel>
-                    </div>
-                </div>
+        <sandevtool-navigation s-ref="nav" currentTab="{=currentTab=}" />
+        <san-row type="flex" class="content">
+            <div
+                id="component_containter"
+                class="container {{containerShown.component ? 'show' : ''}}"
+            >
+                <sandevtool-component></sandevtool-component>
+            </div>
+            <div
+                id="store_containter"
+                class="container {{containerShown.store ? 'show' : ''}}"
+            >
+            </div>
+            <div
+                id="history_containter"
+                class="container {{containerShown.history ? 'show' : ''}}"
+            >
             </div>
         </san-row>
     </div>
@@ -38,32 +24,31 @@
 
 <script>
 import Messenger from 'chrome-ext-messenger';
-import Split from 'split.js';
+import {router} from 'san-router';
 
 import Grid from 'san-mui/lib/Grid';
-import ExpansionPanel from 'san-mui/lib/ExpansionPanel';
-import 'san-mui/lib/Grid/Grid.styl';
-import 'san-mui/lib/ExpansionPanel/ExpansionPanel.styl'
 
+import routes from './routes';
 import Navigation from './views/navigation.san';
-import ComponentTree from './views/components/component_tree.san';
-import ComponentBasicInfo from './views/components/component_basic_info.san';
-import ComponentDataViewer from './views/components/component_data_viewer.san';
+import Component from './views/component.san';
 
 export default {
 
     components: {
-        'san-col': Grid.Col,
+        'san-row': Grid.Row,
         'sandevtool-navigation': Navigation,
-        'sandevtool-component-tree': ComponentTree,
-        'sandevtool-component-basic-info': ComponentBasicInfo,
-        'sandevtool-component-data-viewer': ComponentDataViewer,
-        'san-expansion-panel': ExpansionPanel
+        'sandevtool-component': Component
     },
 
     initData() {
         return {
-            current_component_id: ''
+            current_component_id: '',
+            currentTab: 'component',
+            containerShown: {
+                'component': true,
+                'store': false,
+                'history': false
+            }
         }
     },
 
@@ -82,10 +67,7 @@ export default {
                         ? this[SAN_DEVTOOL].san.version
                         : '[unknown version]');
         },
-        'UI:current_component_id'(arg) {
-            console.log(arg.value);
-            this.data.set('current_component_id', arg.value || '');
-        },
+        
     },
 
     toggleMenu() {
@@ -98,12 +80,20 @@ export default {
     },
 
     attached() {
-        window.app = this;
-        Split(['.sd-comp-wrapper', '.sd-detail-wrapper'], {
-            sizes: [50, 50],
-            minSize: 300
-        });
+        /*Object.keys(routes).forEach(rule => router.add({
+            rule,
+            Component: routes[rule],
+            target: '#containter'
+        }));
+        router.start();*/
 
+        this.watch('currentTab', value => {
+            console.log('currentTab', value);
+            Object.keys(this.data.get('containerShown')).forEach(k => {
+                this.data.set('containerShown.' + k, false);
+            });
+            this.data.set('containerShown.' + value, true); 
+        });
     }
 
 
@@ -122,25 +112,15 @@ html, body
     width: 100%
     overflow: hidden
 
-.sd-main-wrapper
+.content
     position: absolute
     top: 56px
     bottom: 0
     width: 100%
-    &>*
+    .container
+        width: 100%
         height: 100%
-        float: left
-    .gutter-horizontal
-        background-color: #e1e1e1
-        cursor: ew-resize
-.sd-detail-wrapper
-    overflow: auto
-.ex-panel-wrapper
-    padding: 0 10px
-    margin: 10px 0
-    box-sizing: border-box
-    width: 100%
-    .sm-expansion-panel
-        &.state-open
-            margin: 0;
+        display: none
+        &.show
+            display: block
 </style>
