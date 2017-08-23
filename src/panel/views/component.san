@@ -1,0 +1,91 @@
+<template>
+    <div class="sd-main-wrapper">
+        <input type="hidden" value="{{cid}}" />
+        <div class="sd-comp-wrapper">
+            <sandevtool-component-tree
+                cid="{=cid=}"
+            >
+            </sandevtool-component-tree>
+        </div>
+        <div class="sd-detail-wrapper">
+            <div class="ex-panel-wrapper">
+                <san-expansion-panel title="Basic Information" open="{{!0}}">
+                    <sandevtool-component-basic-info
+                        cid="{{cid}}"
+                    >
+                    </sandevtool-component-basic-info>
+                </san-expansion-panel>
+            </div>
+            <div class="ex-panel-wrapper">
+                <san-expansion-panel title="Data" open="{{!0}}">
+                    <sandevtool-component-data-viewer
+                        cid="{{cid}}"
+                    >
+                    </sandevtool-component-data-viewer>
+                </san-expansion-panel>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+import Split from 'split.js';
+
+import Grid from 'san-mui/lib/Grid';
+import ExpansionPanel from 'san-mui/lib/ExpansionPanel';
+import 'san-mui/lib/Grid/Grid.styl';
+import 'san-mui/lib/ExpansionPanel/ExpansionPanel.styl'
+
+import ComponentTree from './components/component_tree.san';
+import ComponentBasicInfo from './components/component_basic_info.san';
+import ComponentDataViewer from './components/component_data_viewer.san';
+
+export default {
+
+    components: {
+        'san-col': Grid.Col,
+        'sandevtool-component-tree': ComponentTree,
+        'sandevtool-component-basic-info': ComponentBasicInfo,
+        'sandevtool-component-data-viewer': ComponentDataViewer,
+        'san-expansion-panel': ExpansionPanel
+    },
+
+    messages: {
+        'UI:current_component_id'(arg) {
+            console.log(arg.value);
+            this.data.set('cid', arg.value || '');
+        }
+    },
+
+    attached() {
+        Split(['.sd-comp-wrapper', '.sd-detail-wrapper'], {
+            sizes: [50, 50],
+            minSize: 300
+        });
+
+    }
+
+}
+</script>
+
+<style lang="stylus">
+.sd-main-wrapper
+    height: 100%
+    width: 100%
+    &>*
+        height: 100%
+        float: left
+    .gutter-horizontal
+        background-color: #e1e1e1
+        cursor: ew-resize
+.sd-detail-wrapper
+    overflow: auto
+.ex-panel-wrapper
+    padding: 0 10px
+    margin: 10px 0
+    box-sizing: border-box
+    width: 100%
+    .sm-expansion-panel
+        &.state-open
+            margin: 0;
+</style>
