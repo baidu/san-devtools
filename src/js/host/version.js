@@ -1,5 +1,5 @@
 /**
- * San DevTools
+ * San DevTool
  * Copyright 2017 Ecomfe. All rights reserved.
  *
  * @file 版本号处理。

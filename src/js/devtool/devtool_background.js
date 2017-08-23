@@ -25,7 +25,7 @@ function createDevtoolPanelIfNeeded() {
             chrome.devtools.panels.create(
                 'San',
                 '../../icons/logo128.png',
-                'html/devtool/panel_index.html',
+                'html/devtool/panel_index.html#/component',
                 function (panel) {
                     // panel loaded
                 }

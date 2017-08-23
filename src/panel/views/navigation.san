@@ -1,5 +1,6 @@
 <template>
     <div id="navigation">
+        <input type="hidden" value="{=currentTab=}" />
         <san-row type="flex">
             <san-col span="12" order="1">
                 <san-appbar title="San {{sanVersion}}" class="version">
@@ -13,7 +14,7 @@
                         code
                     </san-icon-button>
                     <san-button
-                        variants="primary raised"
+                        variants="secondery raised"
                         slot="right"
                     >
                         <san-icon style="margin-right:6px">refresh</san-icon>
@@ -80,22 +81,22 @@ export default {
             sanVersion: '',
             tabs: [
                 {
-                    label: 'Components',
+                    label: 'Component',
                     icon: 'widgets',
-                    value: 'components'
-                },
-                {
-                    label: 'History',
-                    icon: 'history',
-                    value: 'history'
+                    value: 'component'
                 },
                 {
                     label: 'Store',
                     icon: 'settings_backup_restore',
                     value: 'store'
+                },
+                {
+                    label: 'History',
+                    icon: 'history',
+                    value: 'history'
                 }
             ],
-            currentTab: 'components'
+            currentTab: 'component'
         }
     },
 
