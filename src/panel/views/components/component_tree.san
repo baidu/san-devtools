@@ -10,7 +10,6 @@
             initiallyOpen="{{!0}}"
             primaryTogglesNestedTreeView="{{!0}}"
             dataSource="JSON"
-            on-nestedItemToggle="nestedItemToggle($event)"
         >
             <div class="sm-tree-view-item-wrapper">
                 <san-tree-view-item
@@ -18,8 +17,6 @@
                     initiallyOpen="{{!0}}"
                     treeData="{=item=}"
                     dataSource="JSON"
-                    on-selectedToggle="selectedToggle($event)"
-                    on-click="click($event)"
                 >
                 </san-tree-view-item>
             </div>
@@ -32,6 +29,7 @@ import Messenger from 'chrome-ext-messenger';
 import Icon from 'san-mui/lib/Icon';
 import Divider from 'san-mui/lib/Divider'
 
+import utils from '../../../js/common/utils';
 import components from '../../../js/host/components';
 import {TreeView, TreeViewItem} from '../../ui/mui/TreeView';
 
@@ -50,6 +48,13 @@ export default {
         'san-divider': Divider
     },
 
+    defaultData() {
+        return {
+            // 默认不对执行代码进行合并处理
+            maxLengthOfExecutionCodeQueue: 1
+        }
+    },
+
     initData() {
     },
 
@@ -60,9 +65,8 @@ export default {
                 'content_script:highlight_dom', {id: id}, () => {});
         },
         'EVENT:mouseout'(arg) {
-            let id = this.getComponentIdFromTreeViewItem(arg.value.comp);
-            id && this.mouseOutConnection.sendMessage(
-                'content_script:unhighlight_dom', {id: id}, () => {});
+            this.mouseOutConnection.sendMessage(
+                'content_script:unhighlight_dom', {}, () => {});
         },
         'EVENT:click'(arg) {
             let id = this.getComponentIdFromTreeViewItem(arg.value.comp);
@@ -71,16 +75,35 @@ export default {
     },
 
     compiled() {
+        window.tree = this;
         this.pageEval = chrome.devtools.inspectedWindow.eval;
         this.messenger = new Messenger();
         this.mouseOverConnection = this.messenger.initConnection(
             'component_item_mouseover', () => {});
         this.mouseOutConnection = this.messenger.initConnection(
             'component_item_mouseout', () => {});
+        this.excutionIndex = 0;
+        this.excutionCodeQueue = [];
+        this.excutionCodeQueueChecker = null;
     },
 
     inited() {
+        // 获取页面当前拥有 _san_XXX 的元素的个数，用来决定是否开启代码合并执行模式，
+        // 以及合并的条数。
+        this.pageEval('(' + utils.getSanIdElementCount.toString() + ')()',
+            (res, ex) => {
+                if (typeof res !== 'number') {
+                    return;
+                }
+                this.count = res;
+                this.data.set('maxLengthOfExecutionCodeQueue',
+                    Math.ceil(res / 1000));
+            }
+        );
+        // 初始化 inspect 高亮 mask。
         this.pageEval('window.' + SAN_DEVTOOL + '.highlighter.init()');
+        // 确保 __san_devtool__.san 已经赋值完毕才开始监听 content script 发来的
+        // component_tree 消息。
         this.pageEval('window.' + SAN_DEVTOOL + '.san', (res, ex) => {
             if (!res) {
                 return;
@@ -88,19 +111,23 @@ export default {
             let connection = this.messenger.initConnection(
                 'component_tree',
                 (message, from, sender, sendResponse) => {
-                    this.updateTreeData(message.message, message.path,
-                        message.data, message.indexList);
+                    // 对于 maxLengthOfExecutionQueue 大于 1 的页面进行代码队列检查。
+                    if (this.data.get('maxLengthOfExecutionCodeQueue') > 1) {
+                        this.dirtyCheckExecutionCodeQueue();
+                    }
+                    // 更新 treeData 组件树。
+                    this.updateTreeData(message.message, message.idPath,
+                        message.data, message.indexList, message.count);
                 }
             );
         });
+        // 通知页面 devtool 面板已经打开，可以开始发送 comp-XXX 消息。
         this.pageEval('window.' + SAN_DEVTOOL + '.devtoolPanelCreated = true');
-
-        this.watch('treeData', value => {
-
-        });
     },
 
     created() {
+        // 面板初始化时一次性从 __san_devtool__.data 中读取整个组件树结构。
+        // FIXME: 组件树很大时的效率问题需要解决。
         this.pageEval('window.' + SAN_DEVTOOL + '.data.treeData', (res, ex) => {
             this.data.set('treeData', res);
         });
@@ -109,6 +136,7 @@ export default {
     attached() {
     },
 
+    // 通过 indexList 获取组件及其父组件的 key 与 data 信息。
     getDataByPathIndexList(list, root) {
         let r = root;
         let res = {
@@ -140,59 +168,115 @@ export default {
         return res;
     },
 
-    updateTreeData(message, path, data, indexList) {
+    // 定时检查合并执行队列里是否还有未执行的代码。
+    // FIXME: 经合理优化后，应取消此检查。
+    dirtyCheckExecutionCodeQueue() {
+        if (!this.excutionCodeQueueChecker) {
+            let max = this.data.get('maxLengthOfExecutionCodeQueue');
+            this.excutionCodeQueueChecker = setInterval(() => {
+                let len = this.excutionCodeQueue.length;
+                if (len > 0 && len <= max) {
+                    this.retrieveComponentDataFromPage(
+                        this.attachToTree.bind(this));
+                    this.excutionCodeQueue.splice(0, len);
+                    this.excutionIndex = 0;
+                }
+            }, 500);
+        }
+    },
+
+    // 将新组件 attach 到 treeData 组件树结构中。
+    attachToTree(data, indexList, root) {
+        const d = this.getDataByPathIndexList(indexList, root);
+        if (!d.parentKey) {
+            d.parentKey = 'treeData';
+        } else {
+            d.parentKey += '.treeData';
+        }
+        if (!d.selfKey) {
+            d.selfKey = 'treeData[' + indexList[0] + ']';
+        }
+        if (this.data.get(d.parentKey) && !data.self) {
+            this.data.push(d.parentKey, data);
+        }
+    },
+
+    // 将组件从 treeData 组件树结构中 detach。
+    detachFromTree(data, indexList, root) {
+        const d = this.getDataByPathIndexList(indexList, root);
+        if (d.self && d.parent) {
+            this.data.splice(
+                d.parentKey + '.treeData', [indexList[indexList.length - 1]]);
+        }
+    },
+
+    // 偷懒的做法，直接从页面上下文的原始组件树中获取数据。此处异步读取与转换页面 context
+    // 的执行结果存在时间损耗。
+    retrieveComponentDataFromPage(callback) {
+        let code = '[' + this.excutionCodeQueue.join(',') + ']';
+        this.pageEval(code, (resList, ex) => {
+            for (let res of resList) {
+                if (!res || typeof res !== 'object') {
+                    return;
+                }
+                let data = res.data;
+                let indexList = res.indexList;
+                if (!data || !indexList) {
+                    return;
+                }
+                callback(data, indexList, this.data.raw);
+            }
+        });
+    },
+
+    // 对于 comp-attached 与 comp-detached 事件更新组件树结构。
+    updateTreeData(message, path, data, indexList, count) {
         if (!data || !path) {
             return;
         }
         if (message !== 'comp-attached' && message !== 'comp-detached') {
             return;
         }
-        let root = {treeData: this.data.get('treeData')};
+        this.count = count;
+        let root = this.data.raw;
         let pathIndexList = components.getIndexListFromPathAndTreeData(
             path, root.treeData);
         let parentPath = path.slice(0, path.length - 1);
+        let max = this.data.get('maxLengthOfExecutionCodeQueue');
+
         switch (message) {
             case 'comp-attached': {
+                // 父组件还未 attached。暂不考虑。
+                if (path.length > 1 && pathIndexList[0] === -1) {
+                    return;
+                }
+
                 for (let [i, p] of path.entries()) {
                     let currentIndexList = indexList.slice(0, i + 1);
                     let code = 'window.' + SAN_DEVTOOL + '.data'; 
                     for (let index of currentIndexList) {
                         code += '.treeData[' + index + ']';
                     }
-                    // 偷懒的做法，直接从页面上下文的原始组件树中获取数据。
-                    (() => {
-                        this.pageEval(code, (res, ex) => {
-                            if (!res || typeof res !== 'object') {
-                                return;
-                            }
-                            const root = {treeData: this.data.get('treeData')};
-                            const data = this.getDataByPathIndexList(
-                                currentIndexList, root);
-                            if (!data.parentKey) {
-                                data.parentKey = 'treeData';
-                            }
-                            if (!data.selfKey) {
-                                data.selfKey = 'treeData['
-                                    + currentIndexList[0] + ']';
-                            }
-                            if (this.data.get(data.parentKey)
-                                && !this.data.get(data.selfKey)) {
-                                this.data.push(data.parentKey, res);
-                            }
-                        });
-                    })(currentIndexList);
+                    if (i < path.length - 1) {
+                        continue;
+                    }
+                    // 执行合并后的代码。
+                    if (this.excutionIndex % max === 0
+                        && this.excutionCodeQueue.length > 0) {
+                        this.retrieveComponentDataFromPage(
+                            this.attachToTree.bind(this));
+                        this.excutionCodeQueue.splice(0,
+                            this.excutionCodeQueue.length);
+                    }
+                    // 合并代码。
+                    this.excutionCodeQueue.push('{data:' + code
+                        + ',indexList:[' + currentIndexList + ']}');
+                    this.excutionIndex++;
                 }
                 break;
             }
             case 'comp-detached': {
-                const d = this.getDataByPathIndexList(pathIndexList, root);
-                if (d.self && d.parent) {
-                    this.data.removeAt(d.parentKey + '.treeData',
-                        pathIndexList[pathIndexList.length - 1]);
-                }
-                break;
-            }
-            case 'comp-updated': {
+                this.detachFromTree(data, pathIndexList, root);
                 break;
             }
         }
@@ -207,18 +291,6 @@ export default {
             return;
         }
         return data;
-    },
-
-    nestedTreeViewToggle(value) {
-        console.log(value ? 'expanding' : 'collapsing');
-    },
-
-    selectedToggle(value, text) {
-        console.log(value ? 'selected' : 'unselected', text);
-    },
-
-    click(evt) {
-        console.log('treeview click', evt);
     }
 }
 </script>

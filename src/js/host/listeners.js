@@ -99,7 +99,6 @@ function addSanEventListeners() {
                     message: e,
                     id: component.id,
                     idPath: path,
-                    //ancestors: ancestors,
                     indexList: indexList,
                     data: data
                 }, '*');
