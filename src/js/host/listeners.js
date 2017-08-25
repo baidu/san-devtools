@@ -59,14 +59,7 @@ function addSanEventListeners() {
         sanDevtool.on(e, (...args) => {
             // 默认第一个参数均为 Component 实例。
             const component = args[0];
-            if (!component) {
-                return;
-            }
-            let el = component.el;
-            if (!el) {
-                return;
-            }
-            if (!el.id) {
+            if (!component || !component.el || !component.el.id) {
                 return;
             }
 
@@ -77,18 +70,19 @@ function addSanEventListeners() {
             let indexList = components.getIndexListFromPathAndTreeData(path,
                 sanDevtool['data'].treeData);
 
-            el['__san_component__'] = component;
-            el['__san_path__'] = path;
-            el['__san_data__'] = component.data.raw;
-            el['__san_tree_index__'] = indexList;
+            component.el['__san_component__'] = component;
+            component.el['__san_path__'] = path;
+            component.el['__san_data__'] = component.data.raw;
+            component.el['__san_tree_index__'] = indexList;
 
             // 为提高效率在 get 的时候才生成数据。
-            if (!el.hasOwnProperty('__san_info__')) {
-                Object.defineProperty(el, '__san_info__', {
+            if (!component.el.hasOwnProperty('__san_info__')) {
+                Object.defineProperty(component.el, '__san_info__', {
                     get() {
-                        let info = components.serialize(component);
-                        info.idPath = path;
-                        return info;
+                        return {
+                            ...components.serialize(component),
+                            idPath: path
+                        };
                     }
                 });
             }
