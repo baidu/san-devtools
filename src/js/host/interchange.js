@@ -8,6 +8,10 @@
 import Messenger from 'chrome-ext-messenger';
 
 import highlighter from './highlighter';
+import utils from '../common/utils';
+
+let messenger = new Messenger();
+let c = messenger.initConnection('interchange', () => {});
 
 function init() {
     window.addEventListener('message', e => {
@@ -19,6 +23,11 @@ function init() {
         if (!message) {
             return;
         }
+        // 这几种事件暂时不向 devtool 发送，仅用于更新 history。
+        if (message === 'comp-compiled' || message === 'comp-inited'
+            || message === 'comp-created' || message === 'comp-disposed') {
+            return;
+        }
         if (message.startsWith('comp-')) {
             postSanMessageToDevtool(eventData);
         }
@@ -27,8 +36,7 @@ function init() {
 }
 
 function postSanMessageToDevtool(data) {
-    let messenger = new Messenger();
-    let c = messenger.initConnection('interchange', () => {});
+    data.count = utils.getSanIdElementCount();
     c.sendMessage('devtool:component_tree', data, () => {});
 }
 

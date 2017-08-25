@@ -27,9 +27,6 @@ export default san.defineComponent({
                         {{hiddenClass}}"
                 style="{{itemContentStyle}}"
             >
-                <div class="sm-tree-view-item-left">
-                    <slot name="left"></slot>
-                </div>
                 <san-checkbox
                     s-if="checked === true || checked === false"
                     s-ref="checkbox"
@@ -48,9 +45,6 @@ export default san.defineComponent({
                     s-if="secondaryText"
                 >{{ treeData ? treeData.secondaryText : secondaryText | raw }}
                 </p>
-                <div class="sm-tree-view-item-right">
-                    <slot name="right"></slot>
-                </div>
             </div>
             <div
                 class="sm-tree-view-item-expand {{selectedClass}}
@@ -90,7 +84,7 @@ export default san.defineComponent({
             /* 是否选中 */
             selected: false,
             /* 是否取消波纹效果 */
-            disableRipple: false,
+            disableRipple: true,
             /* 点击时优先展开/折叠子项 */
             primaryTogglesNestedTreeView: true,
             /* 初始展开状态 */
@@ -392,11 +386,11 @@ export default san.defineComponent({
 
         this.updateSelfCheckboxStateFromChilds();
 
-        this.dispatch('UI:tree-view-item-attached', this);
+        //this.dispatch('UI:tree-view-item-attached', this);
     },
 
     detached() {
-        this.dispatch('UI:tree-view-item-detached', this);
+        //this.dispatch('UI:tree-view-item-detached', this);
 
         this.data.get('dataSource') !== 'JSON'
             && this.parentComponent
@@ -408,7 +402,9 @@ export default san.defineComponent({
     },
 
     disposed() {
-        this.dispatch('UI:query-parent-checkbox-state');
+        if (typeof checked === 'boolean') {
+            this.dispatch('UI:query-parent-checkbox-state');
+        }
     },
 
     updated() {

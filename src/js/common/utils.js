@@ -56,6 +56,11 @@ export default {
                 ix++;
             }
         }
+    },
+
+    getSanIdElementCount() {
+        return document.evaluate('//*[contains(@id,"_san_")]', document, null,
+            XPathResult.ORDERED_NODE_SNAPSHOT_TYPE).snapshotLength;
     }
 
 };

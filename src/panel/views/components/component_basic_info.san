@@ -6,8 +6,12 @@
                 <san-tr san-for="info in infoList">
                     <san-td>{{info.key}}</san-td>
                     <san-td s-if="!info.isArray">{{info.value}}
-                        <san-button
+                        <div class="button-wrapper"
                             s-if="info.key==='ID'"
+                            on-mouseover="highlight(info.value)"
+                            on-mouseout="unhighlight()"
+                        >
+                        <san-button
                             variants="primary raised"
                             style="margin-left:5px"
                             on-click="inspectId(info.value)"
@@ -15,13 +19,19 @@
                             <san-icon style="margin-right:6px">search</san-icon>
                             inspect
                         </san-button>
+                        </div>
                     </san-td>
                     <san-td s-else>
-                        <san-button
+                        <div class="button-wrapper"
                             s-for="id in info.value"
+                            on-mouseover="highlight(id)"
+                            on-mouseout="unhighlight()"
+                        >
+                        <san-button
                             variants="raised primary"
                             on-click="inspectId(id)"
                         >{{id}}</san-button>
+                        </div>
                     </san-td>
                 </san-tr>
             </san-tbody>
@@ -30,6 +40,8 @@
 </template>
 
 <script>
+import Messenger from 'chrome-ext-messenger';
+
 import {Table, THead, TFoot, TBody, TR, TD, TH} from 'san-mui/lib/Table';
 import 'san-mui/lib/Table/Table.styl';
 import {Button, IconButton} from 'san-mui/lib/Button';
@@ -68,6 +80,14 @@ export default {
                 {key: 'No data', value: 'Please choose a component.'}
             ]
         }
+    },
+
+    compiled() {
+        this.messenger = new Messenger();
+        this.mouseOverConnection = this.messenger.initConnection(
+            'component_base_info_mouseover', () => {});
+        this.mouseOutConnection = this.messenger.initConnection(
+            'component_base_info_mouseout', () => {});
     },
 
     attached() {
@@ -111,6 +131,16 @@ export default {
 
     inspectId(id) {
         this.pageEval('inspect(document.getElementById("' + id + '"))|0');
+    },
+
+    highlight(id) {
+        id && this.mouseOverConnection.sendMessage(
+            'content_script:highlight_dom', {id: id}, () => {});
+    },
+
+    unhighlight() {
+        this.mouseOutConnection.sendMessage(
+            'content_script:unhighlight_dom', {}, () => {});
     }
 }
 </script>
@@ -122,8 +152,10 @@ export default {
             height: auto !important
             white-space: normal !important
             line-height: 2
-            .sm-button
-                zoom: .6 !important
-                margin-right: 3px
+            .button-wrapper
+                display: inline-block
+                .sm-button
+                    zoom: .6 !important
+                    margin-right: 3px
 
 </style>
