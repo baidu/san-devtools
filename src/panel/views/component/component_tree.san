@@ -31,13 +31,13 @@ import Divider from 'san-mui/lib/Divider'
 
 import utils from '../../../js/common/utils';
 import components from '../../../js/host/components';
-import {TreeView, TreeViewItem} from '../../ui/mui/TreeView';
+import {TreeView, TreeViewItem} from '../../components/TreeView';
 
 import 'san-mui/lib/index.css';
 import 'san-mui/lib/Divider/Divider.styl';
 
-import '../../ui/mui/TreeView/index.styl';
-import '../../ui/mui/TreeView/custom.styl';
+import '../../components/TreeView/index.styl';
+import '../../components/TreeView/custom.styl';
 
 export default {
 

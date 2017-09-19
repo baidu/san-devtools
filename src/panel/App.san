@@ -80,13 +80,6 @@ export default {
     },
 
     attached() {
-        /*Object.keys(routes).forEach(rule => router.add({
-            rule,
-            Component: routes[rule],
-            target: '#containter'
-        }));
-        router.start();*/
-
         this.watch('currentTab', value => {
             console.log('currentTab', value);
             Object.keys(this.data.get('containerShown')).forEach(k => {

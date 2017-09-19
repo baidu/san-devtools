@@ -85,11 +85,11 @@ export default {
                     icon: 'widgets',
                     value: 'component'
                 },
-                {
+                /*{
                     label: 'Store',
                     icon: 'settings_backup_restore',
                     value: 'store'
-                },
+                },*/
                 {
                     label: 'History',
                     icon: 'history',
