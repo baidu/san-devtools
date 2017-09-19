@@ -9,10 +9,13 @@ import san from 'san';
 import Messenger from 'chrome-ext-messenger';
 
 function update(version) {
-    if (!version || typeof version !== 'string') {
+    if (typeof version !== 'string') {
         return false;
     }
     let versionEl = document.getElementById('version');
+    if (!versionEl) {
+        return;
+    }
     if (version === 'N/A') {
         versionEl.innerHTML = 'San detected, unknown version.';
     } else {

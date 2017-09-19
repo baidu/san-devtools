@@ -32,7 +32,7 @@ function buildHistory(component, root, event) {
     if (!root || !root['history']) {
         return;
     }
-    root['history'].push({
+    root['history'].unshift({
         id: component.id,
         path: component.path,
         timestamp: Date.now(),
@@ -72,7 +72,8 @@ function addSanEventListeners() {
 
             component.el['__san_component__'] = component;
             component.el['__san_path__'] = path;
-            component.el['__san_data__'] = component.data.raw;
+            component.el['__san_data__'] = component.data.raw
+                || component.data.data;
             component.el['__san_tree_index__'] = indexList;
 
             // 为提高效率在 get 的时候才生成数据。

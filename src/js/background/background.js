@@ -9,10 +9,10 @@ import Messenger from 'chrome-ext-messenger';
 import ChromePromise from 'chrome-promise';
 
 function updateBrowserActionBadge(ver) {
-    if (!ver) {
+    if (typeof ver === 'undefined') {
         return;
     }
-    
+
     const chromep = new ChromePromise();
 
     let count = 0;
@@ -21,7 +21,7 @@ function updateBrowserActionBadge(ver) {
         active: true,
         currentWindow: true
     }).then((tabs) => {
-        setInterval(() => {
+        window.setInterval(() => {
             chrome.browserAction.setBadgeText({
                 tabId: tabs[0].id,
                 text: count++ % 2 === 0 && !noBlinking ? ver : ''
@@ -42,9 +42,6 @@ function updateBrowserActionBadge(ver) {
 let messenger = new Messenger();
 
 let versionMessageHandler = function(message, from, sender, sendResponse) {
-    if (!message || typeof message !== 'string') {
-        return;
-    }
     updateBrowserActionBadge(message);
 };
 

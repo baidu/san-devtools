@@ -36,9 +36,9 @@ import ExpansionPanel from 'san-mui/lib/ExpansionPanel';
 import 'san-mui/lib/Grid/Grid.styl';
 import 'san-mui/lib/ExpansionPanel/ExpansionPanel.styl'
 
-import ComponentTree from './components/component_tree.san';
-import ComponentBasicInfo from './components/component_basic_info.san';
-import ComponentDataViewer from './components/component_data_viewer.san';
+import ComponentTree from './component/component_tree.san';
+import ComponentBasicInfo from './component/component_basic_info.san';
+import ComponentDataViewer from './component/component_data_viewer.san';
 
 export default {
 

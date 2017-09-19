@@ -48,6 +48,9 @@ function getVersionNumberFromPage(callback) {
         if (e.data && e.data.message === 'version') {
             window.sanVersion =
                 utils.normalizeVersionNumber(e.data.sanVersion);
+            if (window.sanVersion === '') {
+                window.sanVersion = 'N/A';
+            }
             callback.bind(this)(window.sanVersion);
         }
     });
