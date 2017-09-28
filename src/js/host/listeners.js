@@ -34,11 +34,16 @@ function buildHistory(component, root, event) {
     }
     root['history'].unshift({
         id: component.id,
-        path: component.path,
+        idPath: component.idPath,
+        componentName: getComponentName(component),
         timestamp: Date.now(),
-        data: component.data.raw,
+        compData: component.el['__san_data__'],
         message: event
     });
+}
+
+function getComponentName(component) {
+    return component && (component.subTag || component.constructor.name);
 }
 
 // 注册所有 San 发送给 devtool 的 event listeners。
@@ -69,11 +74,11 @@ function addSanEventListeners() {
             components.updatePrimitiveTree(data, e, sanDevtool['data']);
             let indexList = components.getIndexListFromPathAndTreeData(path,
                 sanDevtool['data'].treeData);
+            let compData = component.data.raw || component.data.data;
 
             component.el['__san_component__'] = component;
             component.el['__san_path__'] = path;
-            component.el['__san_data__'] = component.data.raw
-                || component.data.data;
+            component.el['__san_data__'] = compData;
             component.el['__san_tree_index__'] = indexList;
 
             // 为提高效率在 get 的时候才生成数据。
@@ -95,7 +100,10 @@ function addSanEventListeners() {
                     id: component.id,
                     idPath: path,
                     indexList: indexList,
-                    data: data
+                    data: data,
+                    timestamp: Date.now(),
+                    componentName: getComponentName(component),
+                    compData: JSON.parse(JSON.stringify(compData))
                 }, '*');
             }
         });

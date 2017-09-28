@@ -7,10 +7,21 @@
 </template>
 
 <script>
-import JSONView from 'json-view';
-import 'json-view/devtools.css';
+import JSONView from 'json-tree-view';
+import 'json-tree-view/devtools.css';
 
 export default {
+
+    initData() {
+        return {
+            data: {
+                'No data': 'Please choose a component.'
+            },
+            defaultdata: {
+                'No data': 'Please choose a component.'
+            }
+        };
+    },
 
     attached() {
         this.pageEval = chrome.devtools.inspectedWindow.eval;
@@ -20,14 +31,37 @@ export default {
         this.jsonViewer.expand(true);
         document.getElementById('data_json_viewer').appendChild(
             this.jsonViewer.dom);
+        this.watch('data', value => {
+            if (!value) {
+                return;
+            }
+            this.jsonViewer.value = value;
+            this.jsonViewer.expand(true);
+        });
         this.watch('cid', value => {
             this.pageEval(
                 'document.getElementById("' + value + '").__san_data__',
                 (res, ex) => {
-                    this.jsonViewer.value = res;
-                    this.jsonViewer.expand(true);
+                    if (!res || typeof res !== 'object') {
+                        this.data.set('data', this.data.get('defaultData'));
+                        return;
+                    }
+                    this.data.set('data', res);
                 }
             );
+        });
+
+        this.jsonViewer.on('change', function(self, key, oldValue, newValue){
+
+        });
+        this.jsonViewer.on('rename', function(self, key, oldName, newName) {
+            console.log('rename', key, oldName, '=>', newName);
+        });
+        this.jsonViewer.on('delete', function(self, key) {
+            console.log('delete', key);
+        });
+        this.jsonViewer.on('append', function(self, key, nameOrValue, newValue) {
+            console.log('append', key, nameOrValue, '=>', newValue);
         });
     }
 

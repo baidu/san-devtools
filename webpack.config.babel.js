@@ -99,7 +99,8 @@ export default {
                     ? JSON.stringify('production')
                         : undefined
             },
-            'SAN_DEVTOOL': JSON.stringify('__san_devtool__')
+            'SAN_DEVTOOL': JSON.stringify('__san_devtool__'),
+            'IN_BROWSER': true
         }),
         new webpack.optimize.UglifyJsPlugin({
             compress: {

@@ -4,6 +4,7 @@
         <div class="sd-comp-wrapper">
             <sandevtool-component-tree
                 cid="{=cid=}"
+                recording="{{recording}}"
             >
             </sandevtool-component-tree>
         </div>
@@ -12,6 +13,7 @@
                 <san-expansion-panel title="Basic Information" open="{{!0}}">
                     <sandevtool-component-basic-info
                         cid="{{cid}}"
+                        s-ref="cbi"
                     >
                     </sandevtool-component-basic-info>
                 </san-expansion-panel>
@@ -20,8 +22,45 @@
                 <san-expansion-panel title="Data" open="{{!0}}">
                     <sandevtool-component-data-viewer
                         cid="{{cid}}"
+                        s-ref="cdv"
                     >
                     </sandevtool-component-data-viewer>
+                </san-expansion-panel>
+            </div>
+            <div class="ex-panel-wrapper">
+                <san-expansion-panel title="Computed" open="{{!!0}}">
+                    <sandevtool-component-computed
+                        cid="{{cid}}"
+                        s-ref="cc"
+                    >
+                    </sandevtool-component-computed>
+                </san-expansion-panel>
+            </div>
+            <div class="ex-panel-wrapper">
+                <san-expansion-panel title="Filters" open="{{!!0}}">
+                    <sandevtool-component-filters
+                        cid="{{cid}}"
+                        s-ref="cf"
+                    >
+                    </sandevtool-component-filters>
+                </san-expansion-panel>
+            </div>
+            <div class="ex-panel-wrapper">
+                <san-expansion-panel title="Messages" open="{{!!0}}">
+                    <sandevtool-component-messages
+                        cid="{{cid}}"
+                        s-ref="cm"
+                    >
+                    </sandevtool-component-messages>
+                </san-expansion-panel>
+            </div>
+            <div class="ex-panel-wrapper">
+                <san-expansion-panel title="Listeners" open="{{!!0}}">
+                    <sandevtool-component-listeners
+                        cid="{{cid}}"
+                        s-ref="cl"
+                    >
+                    </sandevtool-component-listeners>
                 </san-expansion-panel>
             </div>
         </div>
@@ -39,6 +78,10 @@ import 'san-mui/lib/ExpansionPanel/ExpansionPanel.styl'
 import ComponentTree from './component/component_tree.san';
 import ComponentBasicInfo from './component/component_basic_info.san';
 import ComponentDataViewer from './component/component_data_viewer.san';
+import ComponentComputed from './component/component_computed.san';
+import ComponentFilters from './component/component_filters.san';
+import ComponentMessages from './component/component_messages.san';
+import ComponentListeners from './component/component_listeners.san';
 
 export default {
 
@@ -47,14 +90,23 @@ export default {
         'sandevtool-component-tree': ComponentTree,
         'sandevtool-component-basic-info': ComponentBasicInfo,
         'sandevtool-component-data-viewer': ComponentDataViewer,
+        'sandevtool-component-computed': ComponentComputed,
+        'sandevtool-component-filters': ComponentFilters,
+        'sandevtool-component-messages': ComponentMessages,
+        'sandevtool-component-listeners': ComponentListeners,
         'san-expansion-panel': ExpansionPanel
     },
 
     messages: {
         'UI:current_component_id'(arg) {
-            console.log(arg.value);
             this.data.set('cid', arg.value || '');
         }
+    },
+
+    initData() {
+        return {
+            cid: ''
+        };
     },
 
     attached() {

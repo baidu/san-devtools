@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import Messenger from 'chrome-ext-messenger';
+import Messenger from 'chrome-ext-messenger2';
 import Icon from 'san-mui/lib/Icon';
 import Divider from 'san-mui/lib/Divider'
 
@@ -48,14 +48,12 @@ export default {
         'san-divider': Divider
     },
 
-    defaultData() {
+    initData() {
         return {
             // 默认不对执行代码进行合并处理
-            maxLengthOfExecutionCodeQueue: 1
+            maxLengthOfExecutionCodeQueue: 1,
+            cid: ''
         }
-    },
-
-    initData() {
     },
 
     messages: {
@@ -70,24 +68,24 @@ export default {
         },
         'EVENT:click'(arg) {
             let id = this.getComponentIdFromTreeViewItem(arg.value.comp);
+            this.data.set('cid', id);
             id && this.dispatch('UI:current_component_id', id);
         }
     },
 
     compiled() {
-        window.tree = this;
         this.pageEval = chrome.devtools.inspectedWindow.eval;
         this.messenger = new Messenger();
         this.mouseOverConnection = this.messenger.initConnection(
             'component_item_mouseover', () => {});
         this.mouseOutConnection = this.messenger.initConnection(
             'component_item_mouseout', () => {});
-        this.excutionIndex = 0;
-        this.excutionCodeQueue = [];
-        this.excutionCodeQueueChecker = null;
     },
 
     inited() {
+        this.excutionIndex = 0;
+        this.excutionCodeQueue = [];
+        this.excutionCodeQueueChecker = null;
         // 获取页面当前拥有 _san_XXX 的元素的个数，用来决定是否开启代码合并执行模式，
         // 以及合并的条数。
         this.pageEval('(' + utils.getSanIdElementCount.toString() + ')()',
@@ -108,9 +106,17 @@ export default {
             if (!res) {
                 return;
             }
+            this.messenger = new Messenger();
             let connection = this.messenger.initConnection(
                 'component_tree',
                 (message, from, sender, sendResponse) => {
+                    // 只有历史记录列表处于正在记录的状态时才向其发送事件。
+                    let recording = this.data.get('recording');
+                    console.log('recording', recording);
+                    if (recording) {
+                        connection.sendMessage('devtool:history_info', message,
+                            () => {});
+                    }
                     // 对于 maxLengthOfExecutionQueue 大于 1 的页面进行代码队列检查。
                     if (this.data.get('maxLengthOfExecutionCodeQueue') > 1) {
                         this.dirtyCheckExecutionCodeQueue();
@@ -215,6 +221,9 @@ export default {
     retrieveComponentDataFromPage(callback) {
         let code = '[' + this.excutionCodeQueue.join(',') + ']';
         this.pageEval(code, (resList, ex) => {
+            if (!resList || !(resList instanceof Array)) {
+                return;
+            }
             for (let res of resList) {
                 if (!res || typeof res !== 'object') {
                     return;
@@ -277,6 +286,19 @@ export default {
             }
             case 'comp-detached': {
                 this.detachFromTree(data, pathIndexList, root);
+                if (data && data.id === this.data.get('cid')) {
+                    if (this.parentComponent) {
+                        let panels = ['cbi', 'cdv', 'cc', 'cf', 'cm', 'cl'];
+                        let keys = ['infoList', 'data', 'computed', 'filters', 'messages', 'listeners'];
+                        for (let [i, p] of panels.entries()) {
+                            let ref = this.parentComponent.ref(p);
+                            if (ref) {
+                                ref.data.set(keys[i],
+                                    ref.initData()['default' + keys[i]]);
+                            }
+                        }
+                    }
+                }
                 break;
             }
         }
