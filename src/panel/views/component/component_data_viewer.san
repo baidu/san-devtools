@@ -37,6 +37,7 @@ export default {
             }
             this.jsonViewer.value = value;
             this.jsonViewer.expand(true);
+            this.jsonViewer.withRootName = false;
         });
         this.watch('cid', value => {
             this.pageEval(
@@ -52,7 +53,8 @@ export default {
         });
 
         this.jsonViewer.on('change', function(self, key, oldValue, newValue){
-
+            console.log('change', key, oldValue, '=>', newValue);
+            this.data.set(key, newValue);
         });
         this.jsonViewer.on('rename', function(self, key, oldName, newName) {
             console.log('rename', key, oldName, '=>', newName);
