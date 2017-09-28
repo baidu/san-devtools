@@ -2,7 +2,7 @@
     "manifest_version": 2,
     "name": "San Devtool",
     "description": "Browser developer tool extension for debugging San.",
-    "version": "0.0.1.1",
+    "version": "1.0.0.1",
     "minimum_chrome_version": "17",
     "icons": {
         "16": "icons/logo16.png",
