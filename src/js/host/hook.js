@@ -25,6 +25,7 @@ export function installSanHook(global) {
         },
         // 记录 San devtool 事件触发列表。
         history: [],
+        historyIndexBeforeDevtoolPanelCreated: 0,
         sub: (event, func) => {
             sanHook.on(event, func);
             return () => sanHook.off(event, func);
@@ -87,6 +88,8 @@ export function installSanHook(global) {
         },
         set(value) {
             sanHook._devtoolPanelCreated = !!value;
+            sanHook.historyIndexBeforeDevtoolPanelCreated
+                = sanHook.history.length;
             console.log('devtool panel created');
         }
     };

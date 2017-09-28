@@ -6,7 +6,8 @@
                 id="component_containter"
                 class="container {{containerShown.component ? 'show' : ''}}"
             >
-                <sandevtool-component></sandevtool-component>
+                <sandevtool-component recording="{{historyRecording}}">
+                </sandevtool-component>
             </div>
             <div
                 id="store_containter"
@@ -17,13 +18,14 @@
                 id="history_containter"
                 class="container {{containerShown.history ? 'show' : ''}}"
             >
+                <sandevtool-history></sandevtool-history>
             </div>
         </san-row>
     </div>
 </template>
 
 <script>
-import Messenger from 'chrome-ext-messenger';
+import Messenger from 'chrome-ext-messenger2';
 import {router} from 'san-router';
 
 import Grid from 'san-mui/lib/Grid';
@@ -31,13 +33,15 @@ import Grid from 'san-mui/lib/Grid';
 import routes from './routes';
 import Navigation from './views/navigation.san';
 import Component from './views/component.san';
+import History from './views/history.san';
 
 export default {
 
     components: {
         'san-row': Grid.Row,
         'sandevtool-navigation': Navigation,
-        'sandevtool-component': Component
+        'sandevtool-component': Component,
+        'sandevtool-history': History
     },
 
     initData() {
@@ -48,7 +52,8 @@ export default {
                 'component': true,
                 'store': false,
                 'history': false
-            }
+            },
+            historyRecording: false
         }
     },
 
@@ -67,7 +72,10 @@ export default {
                         ? this[SAN_DEVTOOL].san.version
                         : '[unknown version]');
         },
-        
+        'UI:history-recording'(arg) {
+            console.log('UI:history-recording', arg.value);
+            this.data.set('historyRecording', arg.value);
+        }
     },
 
     toggleMenu() {
@@ -116,4 +124,9 @@ html, body
         display: none
         &.show
             display: block
+
+#history_containter
+    overflow-y: auto
+    padding: 5px
+    box-sizing: border-box
 </style>

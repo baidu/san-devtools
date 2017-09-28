@@ -5,7 +5,7 @@
  * @file Interchange station for page context and content script context.
  */
 
-import Messenger from 'chrome-ext-messenger';
+import Messenger from 'chrome-ext-messenger2';
 
 import highlighter from './highlighter';
 import utils from '../common/utils';
@@ -38,6 +38,7 @@ function init() {
 function postSanMessageToDevtool(data) {
     data.count = utils.getSanIdElementCount();
     c.sendMessage('devtool:component_tree', data, () => {});
+    //c.sendMessage('devtool:history_info', data, () => {});
 }
 
 function initHighlightEvent() {

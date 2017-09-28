@@ -6,7 +6,7 @@
  */
 
 import san from 'san';
-import Messenger from 'chrome-ext-messenger';
+import Messenger from 'chrome-ext-messenger2';
 
 function update(version) {
     if (typeof version !== 'string') {

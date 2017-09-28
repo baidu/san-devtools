@@ -16,6 +16,7 @@
                     <san-button
                         variants="secondery raised"
                         slot="right"
+                        s-if="false"
                     >
                         <san-icon style="margin-right:6px">refresh</san-icon>
                         Reload
@@ -40,7 +41,7 @@
 
 <script>
 import san from 'san';
-import Messenger from 'chrome-ext-messenger';
+import Messenger from 'chrome-ext-messenger2';
 import utils from '../../js/common/utils';
 
 import Grid from 'san-mui/lib/Grid';

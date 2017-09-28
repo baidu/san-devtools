@@ -5,7 +5,7 @@
  * @file Background script
  */
 
-import Messenger from 'chrome-ext-messenger';
+import Messenger from 'chrome-ext-messenger2';
 import ChromePromise from 'chrome-promise';
 
 function updateBrowserActionBadge(ver) {
@@ -22,6 +22,7 @@ function updateBrowserActionBadge(ver) {
         currentWindow: true
     }).then((tabs) => {
         window.setInterval(() => {
+            console.log(tabs);
             chrome.browserAction.setBadgeText({
                 tabId: tabs[0].id,
                 text: count++ % 2 === 0 && !noBlinking ? ver : ''
