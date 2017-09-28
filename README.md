@@ -26,7 +26,7 @@ Coming soon...
 
 ## See Also
 
-- [san] (https://github.com/ecomfe/san) - A MVVM Component Framework for Web
+- [san](https://github.com/ecomfe/san) - A MVVM Component Framework for Web
 - [san-router](https://github.com/ecomfe/san-router) - Official Router for San
 - [san-store](https://github.com/ecomfe/san-store) - Official Application States Management for San
 - [san-update](https://github.com/ecomfe/san-update) - Immutable Data Update Library
