@@ -5,7 +5,7 @@
  * @file Background script
  */
 
-import Messenger from 'chrome-ext-messenger2';
+import Messenger from 'chrome-ext-messenger';
 import ChromePromise from 'chrome-promise';
 
 function updateBrowserActionBadge(ver) {

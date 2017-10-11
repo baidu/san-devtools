@@ -5,7 +5,7 @@
  * @file Devtool panel main entry.
  */
 
-import Messenger from 'chrome-ext-messenger2'; 
+import Messenger from 'chrome-ext-messenger'; 
 
 import './index.styl';
 import App from './App.san';
