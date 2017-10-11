@@ -14,6 +14,25 @@ $ npm i
 $ npm run build
 $ cd dist
 ```
+Navigate to chrome://extensions in Chrome/Chromium to load the unpacked extension from dist directory.
+
+npm:
+
+```
+$ npm install san-devtool -g
+$ san-devtool --url=localhost:8005
+```
+san-devtool command will launch default Chrome browser to inspect the specified url.
+
+### san-devtool options
+ - --chrome-path alias -c: Path of Chrome/Chromium executable.
+ - --directory alias -d: Specify the directory for unpacked san-devtool.
+ - --url alias -u: Specify the url to load.
+ - --auto alias -a: Open devtools automatically.
+ - --kill alias -k: Kill entire browser before loading san-devtool.
+ - --port alias -p: Remote debugging port number to use.
+ - --force-quit alias -f: Close the Chrome/Chromium process on `Ctrl-C`
+
 
 Chrome App Store:
 
