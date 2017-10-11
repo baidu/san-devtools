@@ -5,7 +5,7 @@
  * @file Interchange station for page context and content script context.
  */
 
-import Messenger from 'chrome-ext-messenger2';
+import Messenger from 'chrome-ext-messenger';
 
 import highlighter from './highlighter';
 import utils from '../common/utils';

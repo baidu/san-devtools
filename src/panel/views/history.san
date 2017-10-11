@@ -101,7 +101,7 @@
 
 <script>
 import san, {DataTypes} from 'san';
-import Messenger from 'chrome-ext-messenger2';
+import Messenger from 'chrome-ext-messenger';
 
 import {Table, THead, TFoot, TBody, TR, TD, TH} from 'san-mui/lib/Table';
 import 'san-mui/lib/Table/Table.styl';

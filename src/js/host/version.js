@@ -5,7 +5,7 @@
  * @file 版本号处理。
  */
 
-import Messenger from 'chrome-ext-messenger2';
+import Messenger from 'chrome-ext-messenger';
 
 import utils from '../common/utils';
 import highlighter from './highlighter';
