@@ -36,7 +36,7 @@ san-devtool command will launch default Chrome browser to inspect the specified 
 
 Chrome App Store:
 
-Coming soon...
+[San Devtool](https://chrome.google.com/webstore/detail/san-devtool/pjnngoafflflkagpebgfifjejlnfhahc?utm_source=chrome-ntp-icon)
 
 
 ## ChangeLog
