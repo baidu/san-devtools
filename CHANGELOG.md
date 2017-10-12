@@ -1,7 +1,7 @@
 ChangeLog
 ========
 
-1.0.0-rc.2
+1.0.0-rc.3
 -------
 [Add] A global san-devtool cli
 
