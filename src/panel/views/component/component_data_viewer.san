@@ -25,9 +25,7 @@ export default {
 
     attached() {
         this.pageEval = chrome.devtools.inspectedWindow.eval;
-        this.jsonViewer = new JSONView('data', {
-            'No data': 'Please choose a component.'
-        });
+        this.jsonViewer = new JSONView('data', this.data.get('defaultData'));
         this.jsonViewer.expand(true);
         document.getElementById('data_json_viewer').appendChild(
             this.jsonViewer.dom);
@@ -38,6 +36,7 @@ export default {
             this.jsonViewer.value = value;
             this.jsonViewer.expand(true);
             this.jsonViewer.withRootName = false;
+            this.jsonViewer.refresh();
         });
         this.watch('cid', value => {
             this.pageEval(
@@ -54,7 +53,6 @@ export default {
 
         this.jsonViewer.on('change', function(self, key, oldValue, newValue){
             console.log('change', key, oldValue, '=>', newValue);
-            this.data.set(key, newValue);
         });
         this.jsonViewer.on('rename', function(self, key, oldName, newName) {
             console.log('rename', key, oldName, '=>', newName);

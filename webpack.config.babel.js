@@ -6,29 +6,44 @@
  */
 
 import webpack from 'webpack';
+import merge from 'webpack-merge';
 import rider from 'rider';
 import autoprefixer from 'autoprefixer';
 import CleanWebpackPlugin from 'clean-webpack-plugin';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 import path from 'path';
 
-let productionMode = false;
+let productionMode = process.env.NODE_ENV === 'production';
 
-export default {
-    devtool: productionMode ? false : 'source-map',
+let productionConfig = {
+    devtool: false,
+    plugins: [
+        new webpack.optimize.UglifyJsPlugin({
+            compress: {
+                warnings: false
+            },
+            exclude: /invasion/i
+        })
+    ]
+};
 
+let developConfig = {
+    devtool: 'source-map'
+};
+
+let baseConfig = {
     entry: {
-        'js/background/background.min.js'
+        'js/background/background.js'
             : './src/js/background/background.js',
-        'js/background/popup.min.js'
+        'js/background/popup.js'
             : './src/js/background/popup.js',
-        'js/devtool/devtool_background.min.js'
+        'js/devtool/devtool_background.js'
             : './src/js/devtool/devtool_background.js',
-        'js/host/invasion.min.js'
+        'js/host/invasion.js'
             : './src/js/host/invasion.js',
-        'panel/index.min.js'
+        'panel/index.js'
             : './src/panel/index.js',
-        'js/host/host_entry.min.js'
+        'js/host/host_entry.js'
             : './src/js/host/host_entry.js'
     },
     output: {
@@ -94,25 +109,21 @@ export default {
     },
     plugins: [
         new webpack.DefinePlugin({
-            'process.env': {
-                'NODE_ENV': productionMode
-                    ? JSON.stringify('production')
-                        : undefined
-            },
             'SAN_DEVTOOL': JSON.stringify('__san_devtool__'),
             'IN_BROWSER': true
-        }),
-        new webpack.optimize.UglifyJsPlugin({
-            compress: {
-                warnings: false
-            },
-            exclude: /invasion/i
         }),
         new CleanWebpackPlugin([
             'dist'
         ]),
         new CopyWebpackPlugin([{
-            from: './src'
+            from: './src/manifest.json', to: 'manifest.json'
+        }, {
+            from: './src/html', to: 'html'
+        }, {
+            from: './src/icons', to: 'icons'
         }])
     ]
 };
+
+export default merge(baseConfig,
+    productionMode ? productionConfig : developConfig);
