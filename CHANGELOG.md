@@ -4,7 +4,9 @@ ChangeLog
 1.0.0-rc.2
 -------
 [Add] A global san-devtool cli
+
 [Update] Deps: chrome-ext-messenger, san, san-mui
+
 [Remove] Useless files
 
 1.0.0-rc.1
