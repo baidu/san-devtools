@@ -17,7 +17,7 @@ injector.fromContentScript(installSanHook.toString(), 'window');
 // 将需要挂在到 window.__san_devtool__ 上的脚本入口文件引入到页面上。并布置 san 的
 // listeners。
 injector.fromContentScriptURL(
-    chrome.runtime.getURL('js/host/host_entry.min.js')
+    chrome.runtime.getURL('js/host/host_entry.js')
 ).then(() => {
     /*injector.fromContentScript(function () {
         window[SAN_DEVTOOL].listeners.addSanEventListeners();
