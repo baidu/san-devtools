@@ -1,0 +1,180 @@
+<template>
+    <div class="sd-routes">
+        <san-expansion-panel
+            s-for="route, index in routes"
+            title="{{route.routeData.path}}"
+            open="{{!0}}"
+        >
+            <san-table>
+                <san-tbody>
+                    <san-tr>
+                        <san-th>Component</san-th>
+                        <san-td class="component">
+                            <div
+                                class="button-wrapper"
+                                on-mouseover="highlight(route.id)"
+                                on-mouseout="unhighlight()"
+                            >
+                                <san-button
+                                    variants="raised info"
+                                    on-click="inspectId(route.id)"
+                                >{{route.id}}</san-button>
+                            </div>
+                            <div class="timestamp-wrapper">
+                                {{route.datetime}}
+                            </div>
+                        </san-td>
+                    </san-tr>
+                    <san-tr>
+                        <san-th>Current Path</san-th>
+                        <san-td>
+                            {{route.routeData.path}}
+                        </san-td>
+                    </san-tr>
+                    <san-tr s-if="route.routeData.hash !== ''">
+                        <san-th>Hash</san-th>
+                        <san-td>{{route.routeData.hash}}</san-td>
+                    </san-tr>
+                    <san-tr s-if="route.routeData.queryString !== ''">
+                        <san-th>Query String</san-th>
+                        <san-td>{{route.routeData.queryString}}</san-td>
+                    </san-tr>
+                    <san-tr s-if="route.routeData.referrer !== ''">
+                        <san-th>Referer</san-th>
+                        <san-td>{{route.routeData.referrer}}</san-td>
+                    </san-tr>
+                </san-tbody>
+            </san-table>
+        </san-expansion-panel>
+    </div>
+</template>
+
+<script>
+import san, {DataTypes} from 'san';
+import Messenger from 'chrome-ext-messenger';
+
+import utils from '../../js/common/utils';
+
+import ExpansionPanel from 'san-mui/lib/ExpansionPanel';
+import 'san-mui/lib/ExpansionPanel/ExpansionPanel.styl';
+import {Table, THead, TFoot, TBody, TR, TD, TH} from 'san-mui/lib/Table';
+import 'san-mui/lib/Table/Table.styl';
+import {Button, IconButton} from 'san-mui/lib/Button';
+import 'san-mui/lib/Button/Button.styl';
+
+const pageEval = chrome.devtools.inspectedWindow.eval;
+
+function getRoutesBeforeDevtoolPanelCreated() {
+    let code = 'window.' + SAN_DEVTOOL + '.routes';
+    return new Promise((resolve, reject) => {
+        pageEval(code, (res, ex) => {
+            if (ex && ex.isException) {
+                return Promise.reject(ex.value);
+            }
+            if (!res || typeof res !== 'object') {
+                return Promise.reject(
+                    'Result of ' + code + ' is not an unexpected object.');
+            }
+            resolve(res);
+        });
+    });
+}
+
+function processRouteData(data) {
+    if (!data || typeof data !== 'object') {
+        return null;
+    }
+    if (data.timestamp) {
+        data.datetime = utils.toLocaleDatetime(data.timestamp);
+    }
+    return data;
+}
+
+export default {
+
+    components: {
+        'san-expansion-panel': ExpansionPanel,
+        'san-button': Button,
+        'san-table': Table,
+        'san-tr': TR,
+        'san-th': TH,
+        'san-td': TD,
+        'san-tbody': TBody,
+        'san-thead': THead,
+        'san-tfoot': TFoot
+    },
+
+    initData() {
+        return {
+        }
+    },
+
+    dataTypes: {
+        routes: DataTypes.arrayOf(DataTypes.object)
+    },
+
+    compiled() {
+        this.messenger = new Messenger();
+        this.mouseOverConnection = this.messenger.initConnection(
+            'routes_mouseover', () => {});
+        this.mouseOutConnection = this.messenger.initConnection(
+            'routes_mouseout', () => {});
+        this.routesInfoConnection = this.messenger.initConnection(
+            'routes',
+            (message, from, sender, sendResponse) => {
+                this.data.unshift('routes', processRouteData(message));
+            }
+        );
+    },
+
+    attached() {
+        window.routes = this;
+        this.watch('routes', value => {
+        });
+        getRoutesBeforeDevtoolPanelCreated().then(res => {
+            for (let i of res) {
+                processRouteData(i);
+            }
+            this.data.set('routes', res);
+        });
+
+    },
+
+    inspectId(id) {
+        pageEval('inspect(document.getElementById("' + id + '"))|0');
+    },
+
+    highlight(id) {
+        id && this.mouseOverConnection.sendMessage(
+            'content_script:highlight_dom', {id: id}, () => {});
+    },
+
+    unhighlight() {
+        this.mouseOutConnection.sendMessage(
+            'content_script:unhighlight_dom', {}, () => {});
+    },
+
+    computed: {
+    }
+
+}
+
+</script>
+
+<style lang="stylus">
+.blue
+    color: #2196f3
+
+.sd-routes
+    margin: 10px
+    .sm-expansion-panel
+        &:first-child
+            .sm-expansion-panel-title
+                color: #2196f3
+        .sm-expansion-panel-content
+            td.component
+                div
+                    display: inline-block
+                .button-wrapper
+                    margin-right: 10px
+</style>

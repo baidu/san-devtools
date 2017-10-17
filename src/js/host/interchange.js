@@ -28,6 +28,12 @@ function init() {
             || message === 'comp-created' || message === 'comp-disposed') {
             return;
         }
+        // san-router 消息单独处理。
+        if (message === 'comp-route') {
+            postRouteMessageToDevtool(eventData);
+            return;
+        }
+        // Component 的 7 种事件。
         if (message.startsWith('comp-')) {
             postSanMessageToDevtool(eventData);
         }
@@ -38,7 +44,10 @@ function init() {
 function postSanMessageToDevtool(data) {
     data.count = utils.getSanIdElementCount();
     c.sendMessage('devtool:component_tree', data, () => {});
-    //c.sendMessage('devtool:history_info', data, () => {});
+}
+
+function postRouteMessageToDevtool(data) {
+    c.sendMessage('devtool:routes', data, () => {});
 }
 
 function initHighlightEvent() {

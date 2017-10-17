@@ -103,6 +103,8 @@
 import san, {DataTypes} from 'san';
 import Messenger from 'chrome-ext-messenger';
 
+import utils from '../../js/common/utils';
+
 import {Table, THead, TFoot, TBody, TR, TD, TH} from 'san-mui/lib/Table';
 import 'san-mui/lib/Table/Table.styl';
 import {Button, IconButton} from 'san-mui/lib/Button';
@@ -117,19 +119,7 @@ function generateHistoryInfoData(data) {
         return {};
     }
     return {
-        datetime: new Date(data.timestamp).toLocaleString(
-            navigator.language,
-            {
-                hour12: false,
-                month: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                day: '2-digit',
-                year: '2-digit',
-                weekday: 'short'
-            }
-        ),
+        datetime: utils.toLocaleDatetime(data.timestamp),
         event: data.message.substring(5),
         data: data.compData,
         componentName: data.componentName,
