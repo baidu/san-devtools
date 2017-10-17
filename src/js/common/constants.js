@@ -14,7 +14,8 @@ export default {
         'comp-attached',
         'comp-detached',
         'comp-disposed',
-        'comp-updated'
+        'comp-updated',
+        'comp-route'
     ],
 
     subTreeKey: 'treeData'

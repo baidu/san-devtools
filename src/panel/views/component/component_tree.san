@@ -110,9 +110,9 @@ export default {
             let connection = this.messenger.initConnection(
                 'component_tree',
                 (message, from, sender, sendResponse) => {
+                    this.lastSanMessageTimestamp = Date.now();
                     // 只有历史记录列表处于正在记录的状态时才向其发送事件。
                     let recording = this.data.get('recording');
-                    console.log('recording', recording);
                     if (recording) {
                         connection.sendMessage('devtool:history_info', message,
                             () => {});
@@ -137,9 +137,15 @@ export default {
         this.pageEval('window.' + SAN_DEVTOOL + '.data.treeData', (res, ex) => {
             this.data.set('treeData', res);
         });
+        window.tree = this;
     },
 
     attached() {
+        setInterval(() => {
+            if (Date.now() - this.lastSanMessageTimestamp > 1000) {
+                this.dirtyCheckExecutionCodeQueue();
+            }
+        }, 1000);
     },
 
     // 通过 indexList 获取组件及其父组件的 key 与 data 信息。

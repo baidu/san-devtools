@@ -10,40 +10,64 @@ import utils from '../common/utils';
 import components from './components';
 
 // 获得 devtool 显示组件树所需要的组件的信息。
-function getComponentTreeItemData(component) {
-    let id = component.id;
-    let componentName = component.subTag || component.constructor.name;
-    return {
-        id: id,
-        text: '<' + componentName + '>',
-        secondaryText: id,
-        idPath: component.idPath
-    };
-}
+let getComponentTreeItemData = component => ({
+    id: component.id,
+    text: '<' + getComponentName(component) + '> '
+        + getComponentRouteData(component),
+    secondaryText: component.id,
+    idPath: component.idPath
+});
 
 // 生成组件的路径。
-function generatePath(component) {
-    component.idPath = components.getComponentPath(component);
-    return component.idPath;
-}
+let generatePath = component => components.getComponentPath(component);
+
+// 生成历史记录信息。
+let getHistoryInfo = (component, message) => ({
+    id: component.id,
+    idPath: component.idPath,
+    componentName: getComponentName(component),
+    timestamp: Date.now(),
+    compData: component.el['__san_data__'],
+    message
+});
+
+// 生成路由信息。
+let getRouteInfo = component => ({
+    id: component.id,
+    timestamp: Date.now(),
+    routeData: component.data.get('route')
+});
 
 // 将所有事件信息存入 history 数组，以便后续使用。
-function buildHistory(component, root, event) {
+function buildHistory(component, root, message) {
     if (!root || !root['history']) {
-        return;
+        return null;
     }
-    root['history'].unshift({
-        id: component.id,
-        idPath: component.idPath,
-        componentName: getComponentName(component),
-        timestamp: Date.now(),
-        compData: component.el['__san_data__'],
-        message: event
-    });
+    let info = getHistoryInfo(component, message);
+    root['history'].unshift(info);
+    return info;
+}
+
+function buildRoutes(component, root) {
+    if (!root || !root['routes'] || !component || !component.data) {
+        return null;
+    }
+    let info = getRouteInfo(component);
+    root['routes'].unshift(info);
+    return info;
 }
 
 function getComponentName(component) {
-    return component && (component.subTag || component.constructor.name);
+    let name = component && (component.subTag || component.constructor.name);
+    if (!name || name.length === 1) {
+        name = component ? component.tagName : 'Component';
+    }
+    return name;
+}
+
+function getComponentRouteData(component) {
+    let data = getRouteInfo(component);
+    return data.routeData ? 'Route:' + data.routeData.path : '';
 }
 
 // 注册所有 San 发送给 devtool 的 event listeners。
@@ -59,17 +83,32 @@ function addSanEventListeners() {
     }
     let sanDevtool = global[SAN_DEVTOOL];
 
-    // 7 种事件。
+    // 8 种事件。
     for (let e of constants.sanEventNames) {
         sanDevtool.on(e, (...args) => {
             // 默认第一个参数均为 Component 实例。
             const component = args[0];
-            if (!component || !component.el || !component.el.id) {
+
+            if (!component || !component.id) {
+                return;
+            }
+
+            if (e === 'comp-route') {
+                let data = buildRoutes(args[0], sanDevtool);
+                if (sanDevtool.devtoolPanelCreated) {
+                    window.postMessage({...data, message: e}, '*');
+                }
+                return;
+            }
+
+            if (!component.el) {
                 return;
             }
 
             let path = generatePath(component);
             let data = getComponentTreeItemData(component);
+            component.idPath = data.idPath = path;
+
             buildHistory(component, sanDevtool, e);
             components.updatePrimitiveTree(data, e, sanDevtool['data']);
             let indexList = components.getIndexListFromPathAndTreeData(path,

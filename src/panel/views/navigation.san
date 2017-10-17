@@ -40,7 +40,7 @@
 </template>
 
 <script>
-import san from 'san';
+import san, {DataTypes} from 'san';
 import Messenger from 'chrome-ext-messenger';
 import utils from '../../js/common/utils';
 
@@ -101,6 +101,11 @@ export default {
         }
     },
 
+    dataTypes: {
+        sanVersion: DataTypes.string,
+        tabs: DataTypes.arrayOf(DataTypes.objectOf(DataTypes.string))
+    },
+
     computed: {
         navTitle() {
 
@@ -115,9 +120,24 @@ export default {
     },
 
     attached() {
+        let getVersionAndRoutes = () => ({
+            version: window[SAN_DEVTOOL].san.version,
+            routes: window[SAN_DEVTOOL].routes
+        });
         chrome.devtools.inspectedWindow.eval(
-            'window.' + SAN_DEVTOOL + '.san.version', (res, ex) => {
-                let ver = utils.normalizeVersionNumber(res);
+            '(' + getVersionAndRoutes.toString() + ')()', (res, ex) => {
+                if (!res || typeof res !== 'object') {
+                    return;
+                }
+                let routes = res.routes;
+                if (routes && routes.length > 0) {
+                    this.data.push('tabs', {
+                        label: 'Routes',
+                        icon: 'navigation',
+                        value: 'routes'
+                    });
+                }
+                let ver = utils.normalizeVersionNumber(res.version);
                 ver === 'N/A' && (ver = 'unknown version');
                 this.data.set('sanVersion', ver);
             }

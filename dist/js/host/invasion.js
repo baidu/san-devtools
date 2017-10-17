@@ -121,7 +121,7 @@
 
 	exports.default = {
 
-	    sanEventNames: ['comp-compiled', 'comp-inited', 'comp-created', 'comp-attached', 'comp-detached', 'comp-disposed', 'comp-updated'],
+	    sanEventNames: ['comp-compiled', 'comp-inited', 'comp-created', 'comp-attached', 'comp-detached', 'comp-disposed', 'comp-updated', 'comp-route'],
 
 	    subTreeKey: 'treeData'
 
@@ -160,6 +160,18 @@
 	            return '';
 	        }
 	        return version;
+	    },
+	    toLocaleDatetime: function toLocaleDatetime(timestamp) {
+	        return new Date(+timestamp).toLocaleString(navigator.language, {
+	            hour12: false,
+	            month: '2-digit',
+	            hour: '2-digit',
+	            minute: '2-digit',
+	            second: '2-digit',
+	            day: '2-digit',
+	            year: '2-digit',
+	            weekday: 'short'
+	        });
 	    },
 	    isBrowser: function isBrowser() {
 	        return typeof window !== 'undefined';
@@ -1323,16 +1335,14 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	// 获得 devtool 显示组件树所需要的组件的信息。
-	function getComponentTreeItemData(component) {
-	    var id = component.id;
-	    var componentName = component.subTag || component.constructor.name;
+	var getComponentTreeItemData = function getComponentTreeItemData(component) {
 	    return {
-	        id: id,
-	        text: '<' + componentName + '>',
-	        secondaryText: id,
+	        id: component.id,
+	        text: '<' + getComponentName(component) + '> ' + getComponentRouteData(component),
+	        secondaryText: component.id,
 	        idPath: component.idPath
 	    };
-	}
+	};
 
 	// 生成组件的路径。
 	/**
@@ -1342,28 +1352,61 @@
 	 * @file San 事件注册。
 	 */
 
-	function generatePath(component) {
-	    component.idPath = _components2.default.getComponentPath(component);
-	    return component.idPath;
-	}
+	var generatePath = function generatePath(component) {
+	    return _components2.default.getComponentPath(component);
+	};
 
-	// 将所有事件信息存入 history 数组，以便后续使用。
-	function buildHistory(component, root, event) {
-	    if (!root || !root['history']) {
-	        return;
-	    }
-	    root['history'].unshift({
+	// 生成历史记录信息。
+	var getHistoryInfo = function getHistoryInfo(component, message) {
+	    return {
 	        id: component.id,
 	        idPath: component.idPath,
 	        componentName: getComponentName(component),
 	        timestamp: Date.now(),
 	        compData: component.el['__san_data__'],
-	        message: event
-	    });
+	        message: message
+	    };
+	};
+
+	// 生成路由信息。
+	var getRouteInfo = function getRouteInfo(component) {
+	    return {
+	        id: component.id,
+	        timestamp: Date.now(),
+	        routeData: component.data.get('route')
+	    };
+	};
+
+	// 将所有事件信息存入 history 数组，以便后续使用。
+	function buildHistory(component, root, message) {
+	    if (!root || !root['history']) {
+	        return null;
+	    }
+	    var info = getHistoryInfo(component, message);
+	    root['history'].unshift(info);
+	    return info;
+	}
+
+	function buildRoutes(component, root) {
+	    if (!root || !root['routes'] || !component || !component.data) {
+	        return null;
+	    }
+	    var info = getRouteInfo(component);
+	    root['routes'].unshift(info);
+	    return info;
 	}
 
 	function getComponentName(component) {
-	    return component && (component.subTag || component.constructor.name);
+	    var name = component && (component.subTag || component.constructor.name);
+	    if (!name || name.length === 1) {
+	        name = component ? component.tagName : 'Component';
+	    }
+	    return name;
+	}
+
+	function getComponentRouteData(component) {
+	    var data = getRouteInfo(component);
+	    return data.routeData ? 'Route:' + data.routeData.path : '';
 	}
 
 	// 注册所有 San 发送给 devtool 的 event listeners。
@@ -1379,7 +1422,7 @@
 	    }
 	    var sanDevtool = global[("__san_devtool__")];
 
-	    // 7 种事件。
+	    // 8 种事件。
 	    var _iteratorNormalCompletion = true;
 	    var _didIteratorError = false;
 	    var _iteratorError = undefined;
@@ -1391,12 +1434,27 @@
 	            sanDevtool.on(e, function () {
 	                // 默认第一个参数均为 Component 实例。
 	                var component = arguments.length <= 0 ? undefined : arguments[0];
-	                if (!component || !component.el || !component.el.id) {
+
+	                if (!component || !component.id) {
+	                    return;
+	                }
+
+	                if (e === 'comp-route') {
+	                    var _data = buildRoutes(arguments.length <= 0 ? undefined : arguments[0], sanDevtool);
+	                    if (sanDevtool.devtoolPanelCreated) {
+	                        window.postMessage((0, _extends3.default)({}, _data, { message: e }), '*');
+	                    }
+	                    return;
+	                }
+
+	                if (!component.el) {
 	                    return;
 	                }
 
 	                var path = generatePath(component);
 	                var data = getComponentTreeItemData(component);
+	                component.idPath = data.idPath = path;
+
 	                buildHistory(component, sanDevtool, e);
 	                _components2.default.updatePrimitiveTree(data, e, sanDevtool['data']);
 	                var indexList = _components2.default.getIndexListFromPathAndTreeData(path, sanDevtool['data'].treeData);
@@ -3316,6 +3374,7 @@
 	        // 记录 San devtool 事件触发列表。
 	        history: [],
 	        historyIndexBeforeDevtoolPanelCreated: 0,
+	        routes: [],
 	        sub: function sub(event, func) {
 	            sanHook.on(event, func);
 	            return function () {
@@ -3436,6 +3495,12 @@
 	        if (message === 'comp-compiled' || message === 'comp-inited' || message === 'comp-created' || message === 'comp-disposed') {
 	            return;
 	        }
+	        // san-router 消息单独处理。
+	        if (message === 'comp-route') {
+	            postRouteMessageToDevtool(eventData);
+	            return;
+	        }
+	        // Component 的 7 种事件。
 	        if (message.startsWith('comp-')) {
 	            postSanMessageToDevtool(eventData);
 	        }
@@ -3446,7 +3511,10 @@
 	function postSanMessageToDevtool(data) {
 	    data.count = _utils2.default.getSanIdElementCount();
 	    c.sendMessage('devtool:component_tree', data, function () {});
-	    //c.sendMessage('devtool:history_info', data, () => {});
+	}
+
+	function postRouteMessageToDevtool(data) {
+	    c.sendMessage('devtool:routes', data, function () {});
 	}
 
 	function initHighlightEvent() {
