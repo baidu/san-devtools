@@ -1,3 +1,9 @@
+<p>
+    <a href="https://ecomfe.github.io/san/">
+        <img align="right" src="https://ecomfe.github.io/san/img/san-devtool-logo.svg" alt="Logo" height="250">
+    </a>
+</p>
+
 # Sav Devtool
 
 Browser developer tools extension for debugging San.
