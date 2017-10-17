@@ -57,6 +57,7 @@ let baseConfig = {
         autoprefixer({})
     ],
     module: {
+        noParse: /node_modules\/acorn\/dist\/acorn.js/,
         loaders: [
             {
                 test: /\.js?$/,
