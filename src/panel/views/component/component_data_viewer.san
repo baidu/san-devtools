@@ -16,16 +16,13 @@ export default {
         return {
             data: {
                 'No data': 'Please choose a component.'
-            },
-            defaultdata: {
-                'No data': 'Please choose a component.'
             }
         };
     },
 
     attached() {
         this.pageEval = chrome.devtools.inspectedWindow.eval;
-        this.jsonViewer = new JSONView('data', this.data.get('defaultData'));
+        this.jsonViewer = new JSONView('data', this.data.get('data'));
         this.jsonViewer.expand(true);
         document.getElementById('data_json_viewer').appendChild(
             this.jsonViewer.dom);
@@ -43,7 +40,6 @@ export default {
                 'document.getElementById("' + value + '").__san_data__',
                 (res, ex) => {
                     if (!res || typeof res !== 'object') {
-                        this.data.set('data', this.data.get('defaultData'));
                         return;
                     }
                     this.data.set('data', res);
