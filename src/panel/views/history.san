@@ -199,7 +199,6 @@ export default {
     },
 
     attached() {
-        window.his = this;
         this.watch('recording', value => {
             this.dispatch('UI:history-recording', value);
             if (value) {

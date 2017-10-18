@@ -128,7 +128,6 @@ export default {
     },
 
     attached() {
-        window.routes = this;
         this.watch('routes', value => {
         });
         getRoutesBeforeDevtoolPanelCreated().then(res => {
