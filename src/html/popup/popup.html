@@ -14,6 +14,13 @@
                 height: 54px;
                 filter: grayscale(100%);
             }
+            #version {
+                overflow: hidden;
+                height: 60px;
+            }
+            .options {
+                user-select: none;
+            }
         </style>
         <script src="/js/background/popup.js"></script>
     </head>
@@ -26,5 +33,9 @@
             San not detected
             <br />
         </p>
+        <div class="options">
+            <input type="checkbox" id="no_version_shown" />
+            <label for="no_version_shown">Do not display the version number.</label>
+        </div>
     </body>
 </html>

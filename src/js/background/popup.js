@@ -3,6 +3,7 @@
  * Copyright 2017 Ecomfe. All rights reserved.
  *
  * @file Background popup page
+ * @author luyuan(luyuan.china@gmail.com)
  */
 
 import san from 'san';
@@ -21,10 +22,13 @@ function update(version) {
     } else {
         versionEl.innerHTML = 'San <b>' + version + '</b> detected.';
     }
+    document.querySelector('a img').style.filter = 'none';
     versionEl.innerHTML
         += '<br />Please open devtools and click San panel for the detail.'
-    connector.sendMessage('background:no_blinking', {
-        from: 'popup:detector'
+    connector.sendMessage('background:version_visibility', {
+        from: 'popup:detector',
+        versionVisibility: false,
+        version
     });
     return true;
 }
@@ -36,12 +40,29 @@ let connector = messenger.initConnection('detector',
     }
 );
 
+let options = {};
+
 // FIXME
 setTimeout(() => {
     connector.sendMessage('content_script:san_version', {
         from: 'popup:detector'
-    }, res => {
-        console.log(res);
+    }).then(res => {
         update(res);
     });
+
+    connector.sendMessage('background:options', {}).then(res => {
+        options = res;
+
+        document.querySelector('#no_version_shown').checked = !!+options[
+            'do_not_show_version'];
+    });
+
 }, 100);
+
+window.addEventListener('load', e => {
+    document.querySelector('#no_version_shown').addEventListener('click', e => {
+        connector.sendMessage('background:options', {
+            'do_not_show_version': e.target.checked ? 1 : 0,
+        });
+    });
+});

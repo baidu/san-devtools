@@ -3,52 +3,55 @@
  * Copyright 2017 Ecomfe. All rights reserved.
  *
  * @file Background script
+ * @author luyuan(luyuan.china@gmail.com)
  */
 
 import Messenger from 'chrome-ext-messenger';
-import ChromePromise from 'chrome-promise';
 
-function updateBrowserActionBadge(ver) {
+function updateBrowserAction(ver, visibility, from) {
     if (typeof ver === 'undefined') {
         return;
     }
 
-    const chromep = new ChromePromise();
+    let tabId = from.match(/\d+$/)[0];
+    if (tabId) {
+        updateBadgeTextAndIcon(+tabId, ver, visibility);
+    }
+}
 
-    let count = 0;
-
-    chromep.tabs.query({
-        active: true,
-        currentWindow: true
-    }).then((tabs) => {
-        window.setInterval(() => {
-            console.log(tabs);
-            chrome.browserAction.setBadgeText({
-                tabId: tabs[0].id,
-                text: count++ % 2 === 0 && !noBlinking ? ver : ''
-            });
-            chrome.browserAction.setIcon({
-                tabId: tabs[0].id,
-                path: {
-                    16: 'icons/logo16.png',
-                    48: 'icons/logo48.png',
-                    128: 'icons/logo128.png'
-                }
-            });
-        }, 1000);
+function updateBadgeTextAndIcon(tabId, ver, visibility) {
+    chrome.browserAction.setBadgeText({
+        tabId,
+        text: visibility && !+options['do_not_show_version'] ? ver : ''
+    });
+    chrome.browserAction.setIcon({
+        tabId,
+        path: {
+            16: 'icons/logo16.png',
+            48: 'icons/logo48.png',
+            128: 'icons/logo128.png'
+        }
     });
 }
 
+let options = window.localStorage;
 
 let messenger = new Messenger();
 
 let versionMessageHandler = function(message, from, sender, sendResponse) {
-    updateBrowserActionBadge(message);
+    updateBrowserAction(message, true, from);
 };
 
-let noBlinking = false;
-let noBlinkingMessageHandler = function(message, from, sender, sendResponse) {
-    noBlinking = true;
+let versionVisibilityMessageHandler = function(
+    message, from, sender, sendResponse) {
+    updateBrowserAction(message.version, message.versionVisibility, from);
+}
+
+let optionsMessageHandler = function(message, from, sender, sendResponse) {
+    for (let k in message) {
+        options[k] = message[k];
+    }
+    sendResponse(options);
 }
 
 let connectedHandler  = function(extensionPart, port, tabId) {
@@ -65,5 +68,8 @@ messenger.initBackgroundHub({
 let versionConnector = messenger.initConnection(
     'version', versionMessageHandler);
 
-let noBlinkingConnector = messenger.initConnection(
-    'no_blinking', noBlinkingMessageHandler);
+let versionVisibilityConnector = messenger.initConnection(
+    'version_visibility', versionVisibilityMessageHandler);
+
+let optionsConnector = messenger.initConnection(
+    'options', optionsMessageHandler);
