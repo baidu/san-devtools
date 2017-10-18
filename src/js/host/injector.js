@@ -41,18 +41,30 @@ function inject(codeString) {
     return script;
 }
 
-function injectURL(url) {
+function injectUrl(url) {
     return new Promise(function (resolve, reject) {
         const script = document.createElement('script');
         script.src = url;
         script.onload = resolve;
         script.onerror = reject;
         document.documentElement.appendChild(script);
+        script.parentElement.removeChild(script);
     });
 }
 
-function mount(codeString) {
-
+function injectUrlSync(url) {
+    let request = new XMLHttpRequest();
+    request.open('GET', url, false);
+    request.send(null);
+    let code;
+    if (request.status === 200) {
+        code = request.responseText;
+    }
+    const script = document.createElement('script');
+    script.textContent = code;
+    document.documentElement.appendChild(script);
+    script.parentElement.removeChild(script);
+    return script;
 }
 
 export default {
@@ -62,8 +74,12 @@ export default {
         inject(generateCodeString(codeArg, thisArg, mountingKey));
     },
 
-    fromContentScriptURL(url) {
-        return injectURL(url);
+    fromExtensionUrl(url) {
+        return injectUrl(url);
+    },
+
+    fromExtensionUrlSync(url) {
+        return injectUrlSync(url);
     },
 
     fromDevtool(code) {
