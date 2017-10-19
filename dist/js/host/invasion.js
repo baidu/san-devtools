@@ -1303,17 +1303,17 @@
 	    value: true
 	});
 
-	var _stringify = __webpack_require__(64);
-
-	var _stringify2 = _interopRequireDefault(_stringify);
-
-	var _extends2 = __webpack_require__(66);
+	var _extends2 = __webpack_require__(64);
 
 	var _extends3 = _interopRequireDefault(_extends2);
 
 	var _getIterator2 = __webpack_require__(8);
 
 	var _getIterator3 = _interopRequireDefault(_getIterator2);
+
+	var _stringify = __webpack_require__(71);
+
+	var _stringify2 = _interopRequireDefault(_stringify);
 
 	var _constants = __webpack_require__(6);
 
@@ -1368,7 +1368,7 @@
 	    return {
 	        id: component.id,
 	        timestamp: Date.now(),
-	        routeData: component.data.get('route')
+	        routeData: component.data.get('route') ? JSON.parse((0, _stringify2.default)(component.data.get('route'))) : undefined
 	    };
 	};
 
@@ -1514,28 +1514,11 @@
 /* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	module.exports = { "default": __webpack_require__(65), __esModule: true };
-
-/***/ }),
-/* 65 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	var core = __webpack_require__(23);
-	var $JSON = core.JSON || (core.JSON = { stringify: JSON.stringify });
-	module.exports = function stringify(it) { // eslint-disable-line no-unused-vars
-	  return $JSON.stringify.apply($JSON, arguments);
-	};
-
-
-/***/ }),
-/* 66 */
-/***/ (function(module, exports, __webpack_require__) {
-
 	"use strict";
 
 	exports.__esModule = true;
 
-	var _assign = __webpack_require__(67);
+	var _assign = __webpack_require__(65);
 
 	var _assign2 = _interopRequireDefault(_assign);
 
@@ -1556,38 +1539,38 @@
 	};
 
 /***/ }),
-/* 67 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	module.exports = { "default": __webpack_require__(68), __esModule: true };
+	module.exports = { "default": __webpack_require__(66), __esModule: true };
 
 /***/ }),
-/* 68 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	__webpack_require__(69);
+	__webpack_require__(67);
 	module.exports = __webpack_require__(23).Object.assign;
 
 
 /***/ }),
-/* 69 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// 19.1.3.1 Object.assign(target, source)
 	var $export = __webpack_require__(21);
 
-	$export($export.S + $export.F, 'Object', { assign: __webpack_require__(70) });
+	$export($export.S + $export.F, 'Object', { assign: __webpack_require__(68) });
 
 
 /***/ }),
-/* 70 */
+/* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	// 19.1.2.1 Object.assign(target, source, ...)
 	var getKeys = __webpack_require__(41);
-	var gOPS = __webpack_require__(71);
-	var pIE = __webpack_require__(72);
+	var gOPS = __webpack_require__(69);
+	var pIE = __webpack_require__(70);
 	var toObject = __webpack_require__(55);
 	var IObject = __webpack_require__(16);
 	var $assign = Object.assign;
@@ -1620,17 +1603,34 @@
 
 
 /***/ }),
-/* 71 */
+/* 69 */
 /***/ (function(module, exports) {
 
 	exports.f = Object.getOwnPropertySymbols;
 
 
 /***/ }),
-/* 72 */
+/* 70 */
 /***/ (function(module, exports) {
 
 	exports.f = {}.propertyIsEnumerable;
+
+
+/***/ }),
+/* 71 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	module.exports = { "default": __webpack_require__(72), __esModule: true };
+
+/***/ }),
+/* 72 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	var core = __webpack_require__(23);
+	var $JSON = core.JSON || (core.JSON = { stringify: JSON.stringify });
+	module.exports = function stringify(it) { // eslint-disable-line no-unused-vars
+	  return $JSON.stringify.apply($JSON, arguments);
+	};
 
 
 /***/ }),
@@ -1643,7 +1643,7 @@
 	    value: true
 	});
 
-	var _stringify = __webpack_require__(64);
+	var _stringify = __webpack_require__(71);
 
 	var _stringify2 = _interopRequireDefault(_stringify);
 
@@ -3081,8 +3081,8 @@
 	  $GOPD.f = $getOwnPropertyDescriptor;
 	  $DP.f = $defineProperty;
 	  __webpack_require__(111).f = gOPNExt.f = $getOwnPropertyNames;
-	  __webpack_require__(72).f = $propertyIsEnumerable;
-	  __webpack_require__(71).f = $getOwnPropertySymbols;
+	  __webpack_require__(70).f = $propertyIsEnumerable;
+	  __webpack_require__(69).f = $getOwnPropertySymbols;
 
 	  if (DESCRIPTORS && !__webpack_require__(20)) {
 	    redefine(ObjectProto, 'propertyIsEnumerable', $propertyIsEnumerable, true);
@@ -3248,8 +3248,8 @@
 
 	// all enumerable object keys, includes symbols
 	var getKeys = __webpack_require__(41);
-	var gOPS = __webpack_require__(71);
-	var pIE = __webpack_require__(72);
+	var gOPS = __webpack_require__(69);
+	var pIE = __webpack_require__(70);
 	module.exports = function (it) {
 	  var result = getKeys(it);
 	  var getSymbols = gOPS.f;
@@ -3316,7 +3316,7 @@
 /* 112 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var pIE = __webpack_require__(72);
+	var pIE = __webpack_require__(70);
 	var createDesc = __webpack_require__(35);
 	var toIObject = __webpack_require__(15);
 	var toPrimitive = __webpack_require__(34);
