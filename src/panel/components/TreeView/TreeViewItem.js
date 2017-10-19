@@ -39,11 +39,11 @@ export default san.defineComponent({
                 />
                 <p class="sm-tree-view-item-primary-text"
                     s-if="primaryText"
-                >{{ treeData ? treeData.text : primaryText }}</p>
+                >{{primaryText}}</p>
                 <p class="sm-tree-view-item-secondary-text" 
                     style="{{secondaryTextStyle}}" 
                     s-if="secondaryText"
-                >{{ treeData ? treeData.secondaryText : secondaryText | raw }}
+                >{{secondaryText | raw}}
                 </p>
             </div>
             <div
@@ -65,10 +65,9 @@ export default san.defineComponent({
                     s-for="item, index in treeData.treeData"
                     index="{{index}}"
                     treeData="{=item=}"
+                    filterText="{{filterText}}"
                     initiallyOpen="{{initiallyOpen}}"
                     dataSource="JSON"
-                    on-click1="handleClick($event)"
-                    on-mouseenter1="handleMouseover($event)"
                 >
                 </san-tree-view-item>
             </div>
@@ -94,7 +93,9 @@ export default san.defineComponent({
             checked: null,
             /* 数据源
               （ATTRIBUTE：属性定义（静态），JSON：传入 treeData 数据定义（动态）） */
-            dataSource: 'ATTRIBUTE'
+            dataSource: 'ATTRIBUTE',
+            /* 是否高亮关键字 */
+            highlighted: false
         };
     },
 
@@ -110,12 +111,14 @@ export default san.defineComponent({
         keepingSelected: DataTypes.bool,
         checked: DataTypes.bool,
         nestedLevel: DataTypes.number,
-        children: DataTypes.number,
         secondaryTextLines: DataTypes.number,
         lastExpandingState: DataTypes.bool,
         checkboxValue: DataTypes.string,
         checkboxInputValue: DataTypes.array,
-        checkboxIndeterminate: DataTypes.bool
+        checkboxIndeterminate: DataTypes.bool,
+        filterText: DataTypes.string,
+        filtered: DataTypes.bool,
+        highlighted: DataTypes.bool
     },
 
     components: {
@@ -146,20 +149,6 @@ export default san.defineComponent({
             this.toggleTreeView(document.createEvent('MouseEvent'), '',
                 true, false);
         },
-        'UI:tree-view-item-attached'(arg) {
-            this.data.set('children', this.data.get('children') + 1);
-            this.dispatch('UI:tree-view-item-attached', arg.value);
-        },
-        'UI:tree-view-item-detached'(arg) {
-            if (this.data.get('dataSource') !== 'JSON') {
-                this.data.set('toggleNested',
-                    !!this.getNestedAndCheckedSlotChilds().length);
-            }
-            this.data && this.data.set(
-                'children', this.data.get('children') - 1);
-            this.dispatch('UI:tree-view-item-detached', arg.value);
-
-        },
         'UI:query-data-source-attribute'(arg) {
             let target = arg.target;
             if (target.data.get('dataSource') === undefined) {
@@ -188,12 +177,13 @@ export default san.defineComponent({
     initData() {
         return {
             nestedLevel: 1,
-            children: 0,
             secondaryTextLines: 1,
             lastExpandingState: null,
             checkboxValue: 'ON',
             checkboxInputValue: [],
-            checkboxIndeterminate: false
+            checkboxIndeterminate: false,
+            filterText: '',
+            filtered: true
         };
     },
 
@@ -255,7 +245,7 @@ export default san.defineComponent({
             return this.data.get('checked') === true ? 'checked' : '';
         },
         hiddenClass() {
-            return this.data.get('hidden') ? 'hidden' : '';
+            return !this.data.get('filtered') ? 'hidden' : '';
         },
         hasSecondaryTextClass() {
             return this.data.get('secondaryText') ? 'hasSecondaryText' : '';
@@ -283,7 +273,6 @@ export default san.defineComponent({
         this.dispatch('UI:query-compact-attribute');
         this.dispatch('UI:query-whole-line-selected-attribute');
         this.dispatch('UI:query-keeping-selected-attribute');
-
         this.dispatch('UI:query-data-source-attribute');
 
         if (this.data.get('dataSource') === 'JSON') {
@@ -292,6 +281,41 @@ export default san.defineComponent({
         else {
             this.generateTreeData();
         }
+
+        this.watch('treeData.text', value => {
+            this.data.get('treeData') && this.data.set('primaryText', value);
+        });
+        this.watch('treeData.secondaryText', value => {
+            this.data.get('treeData') && this.data.set('secondaryText', value);
+        });
+
+        this.watch('filterText', value => {
+            if (!value) {
+                this.data.set('filtered', true);
+                return;
+            }
+            let index = this.data.get('primaryText').indexOf(value);
+            this.data.set('filtered', index >= 0);
+        });
+        this.watch('filtered', value => {
+            let parent = this.parentComponent;
+            if (!value) {
+                do {
+                    let parentFiltered = parent.data.get('filtered');
+                    if (parentFiltered) {
+                        this.data.set('filtered', true);
+                    }
+                } while (parent = parent.parentComponent);
+            }
+        });
+        this.watch('highlighted', value => {
+            if (value) {
+                let text = this.data.get('filterText');
+                text !== '' && this.highlight(text, filterInputBoxEl);
+            } else {
+                this.highlight(null, filterInputBoxEl);
+            }
+        });
 
         this.watch('treeData.checked', value => {
             this.data.set('checked', value, {silence: true});
@@ -386,12 +410,13 @@ export default san.defineComponent({
 
         this.updateSelfCheckboxStateFromChilds();
 
-        //this.dispatch('UI:tree-view-item-attached', this);
+        this.treeView = this.getTreeView();
+        this.filterInputBoxEl = this.treeView
+            && this.treeView.ref('filterInputBox')
+                && this.treeView.ref('filterInputBox').el.querySelector('input');
     },
 
     detached() {
-        //this.dispatch('UI:tree-view-item-detached', this);
-
         this.data.get('dataSource') !== 'JSON'
             && this.parentComponent
                 && this.parentComponent.subTag === this.subTag
@@ -408,6 +433,16 @@ export default san.defineComponent({
     },
 
     updated() {
+    },
+
+    getTreeView() {
+        let parent = this.parentComponent;
+        do {
+            if (parent && parent.data.get('rootTreeView')) {
+                return parent;
+            }
+        } while (parent = parent.parentComponent);
+        return null;
     },
 
     toggleTreeView(evt, driver, forceOpen = false, forceSelected = true) {
@@ -448,30 +483,13 @@ export default san.defineComponent({
             {event: evt, comp: this.ref('checkbox'), checked: checked});
     },
 
-    handleClick(evt) {
-        //console.log('click', this, evt);
-        //this.parentComponent
-        //    && this.parentComponent.fire('click', evt);
-
-    },
-
-    handleMouseover(evt) {
-        //console.log('mouseenter', this.parentComponent, evt);
-        //this.parentComponent
-        //    && this.parentComponent.fire('mouseenter', evt);
-    },
-
     handleContainerMouseover(evt) {
         evt.stopPropagation();
-        //console.log(this.data.get('secondaryText'))
-        //this.fire('mouseenter', {event: evt, data: JSON.stringify(this.data.raw)});
         this.dispatch('EVENT:mouseover', {event: evt, comp: this});
     },
 
     handleContainerMouseout(evt) {
         evt.stopPropagation();
-        //console.log(this.data.get('secondaryText'))
-        //this.fire('mouseenter', {event: evt, data: JSON.stringify(this.data.raw)});
         this.dispatch('EVENT:mouseout', {event: evt, comp: this});
     },
 
