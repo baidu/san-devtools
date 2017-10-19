@@ -36,6 +36,8 @@ let getRouteInfo = component => ({
     id: component.id,
     timestamp: Date.now(),
     routeData: component.data.get('route')
+        ? JSON.parse(JSON.stringify(component.data.get('route')))
+            : undefined
 });
 
 // 将所有事件信息存入 history 数组，以便后续使用。
