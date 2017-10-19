@@ -6,7 +6,9 @@
             wholeLineSelected="{{!0}}"
             keepingSelected="{{!0}}"
             filterBar="{{!0}}"
-            filterBarHintText="Type to find component, Enter to highlight"
+            filterIcon="search"
+            filterPlaceholder="Find component"
+            filterText="{=filterText=}"
             initiallyOpen="{{!0}}"
             primaryTogglesNestedTreeView="{{!0}}"
             dataSource="JSON"
@@ -16,6 +18,7 @@
                     san-for="item, index in treeData"
                     initiallyOpen="{{!0}}"
                     treeData="{=item=}"
+                    filterText="{{filterText}}"
                     dataSource="JSON"
                 >
                 </san-tree-view-item>
