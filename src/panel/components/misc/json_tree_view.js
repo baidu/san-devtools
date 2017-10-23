@@ -20,7 +20,11 @@ export default class SanJsonTreeView extends Component {
         data: DataTypes.object,
         expand: DataTypes.bool,
         rootName: DataTypes.string,
-        withRootName: DataTypes.bool
+        withRootName: DataTypes.bool,
+        alwaysShowRoot: DataTypes.bool,
+        readonlyWhenFiltering: DataTypes.bool,
+        filterText: DataTypes.string,
+        readonly: DataTypes.bool
     };
 
     initData() {
@@ -28,7 +32,11 @@ export default class SanJsonTreeView extends Component {
             data: {},
             expand: true,
             rootName: '',
-            withRootName: false
+            withRootName: false,
+            alwaysShowRoot: false,
+            readonlyWhenFiltering: true,
+            filterText: '',
+            readonly: false
         }
     }
 
@@ -43,14 +51,33 @@ export default class SanJsonTreeView extends Component {
         });
     }
 
+    watch(key) {
+        this.watch(key, value => {
+            this.view[key] = value;
+        });
+    }
+
     attached() {
+        watch('alwaysShowRoot');
+        watch('readonlyWhenFiltering');
+        watch('filterText');
+        watch('readonly');
+
         let rootName = this.data.get('rootName');
         let withRootName = this.data.get('withRootName');
+        let alwaysShowRoot = this.data.get('alwaysShowRoot');
+        let readonlyWhenFiltering = this.data.get('readonlyWhenFiltering');
+        let filterText = this.data.get('filterText');
+        let readonly = this.data.get('readonly');
         let expand = this.data.get('expand');
         let data = this.data.get('data');
         this.view = new JSONTreeView(rootName, data);
         expand ? this.view.expand() : this.view.collapse();
         this.view.withRootName = withRootName;
+        this.view.alwaysShowRoot = alwaysShowRoot;
+        this.view.readonlyWhenFiltering = readonlyWhenFiltering;
+        this.view.filterText = filterText;
+        this.view.readonly = readonly;
         this.el.appendChild(this.view.dom);
 
         this.fire('change');

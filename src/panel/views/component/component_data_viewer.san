@@ -7,6 +7,7 @@
 </template>
 
 <script>
+import san, {DataTypes} from 'san';
 import JSONView from 'json-tree-view';
 import 'json-tree-view/devtools.css';
 
@@ -16,11 +17,22 @@ export default {
         return {
             data: {
                 'No data': 'Please choose a component.'
-            }
+            },
+            filterText: ''
         };
     },
 
+    dataTypes: {
+        cid: DataTypes.string,
+        data: DataTypes.object,
+        filterText: DataTypes.string
+    },
+
     attached() {
+        this.watch('filterText', value => {
+            this.jsonViewer.filterText = value;
+        });
+
         this.pageEval = chrome.devtools.inspectedWindow.eval;
         this.jsonViewer = new JSONView('data', this.data.get('data'));
         this.jsonViewer.expand(true);
@@ -33,6 +45,7 @@ export default {
             this.jsonViewer.value = value;
             this.jsonViewer.expand(true);
             this.jsonViewer.withRootName = false;
+
             this.jsonViewer.refresh();
         });
         this.watch('cid', value => {

@@ -61,18 +61,21 @@ export default {
 
     messages: {
         'EVENT:mouseover'(arg) {
-            let id = this.getComponentIdFromTreeViewItem(arg.value.comp);
-            id && this.mouseOverConnection.sendMessage(
-                'content_script:highlight_dom', {id: id}, () => {});
+            let d = this.getComponentIdAndNameFromTreeViewItem(arg.value.comp);
+            d && d.id && this.mouseOverConnection.sendMessage(
+                'content_script:highlight_dom', {id: d.id}, () => {});
         },
         'EVENT:mouseout'(arg) {
             this.mouseOutConnection.sendMessage(
                 'content_script:unhighlight_dom', {}, () => {});
         },
         'EVENT:click'(arg) {
-            let id = this.getComponentIdFromTreeViewItem(arg.value.comp);
-            this.data.set('cid', id);
-            id && this.dispatch('UI:current_component_id', id);
+            let d = this.getComponentIdAndNameFromTreeViewItem(arg.value.comp);
+            if (!d) {
+                return;
+            }
+            this.data.set('cid', d.id);
+            this.dispatch('UI:current_component_id', d);
         }
     },
 
@@ -313,15 +316,16 @@ export default {
         }
     },
 
-    getComponentIdFromTreeViewItem(comp) {
+    getComponentIdAndNameFromTreeViewItem(comp) {
         if (!comp || !comp.data) {
-            return '';
+            return null;
         }
-        let data = comp.data.get('secondaryText');
-        if (!data) {
-            return;
+        let id = comp.data.get('secondaryText');
+        let compName = (comp.data.get('primaryText').match(/<.+>/) || [])[0];
+        if (!id || !compName) {
+            return null;
         }
-        return data;
+        return {id, compName};
     }
 }
 </script>
