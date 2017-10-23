@@ -1,7 +1,7 @@
 <template>
     <div class="listeners-wrapper" style="{{displayStyle}}">
         <input type="hidden" value="{{cid}}" />
-        <div class="listeners" s-for="l in listeners">
+        <div class="listeners {{hidden[i] ? 'hidden' : ''}}" s-for="l, i in listeners">
             <div class="eventName">{{l.name}}</div>
             <div class="lists" s-for="ll in l.list">
                 <div class="info">
@@ -43,10 +43,6 @@ let getListeners = cid => ({
                     }
                 })();
             }
-            /*listenersArr.push({
-                name: l,
-                list: originListeners[l]
-            });*/
         }
         return listeners;
     })()
@@ -84,14 +80,17 @@ export default {
         return {
             cid: '',
             shown: true,
-            defaultlisteners: []
+            hidden: [],
+            filterText: ''
         }
     },
 
     dataTypes: {
         cid: DataTypes.string,
         shown: DataTypes.bool,
-        listeners: DataTypes.arrayOf(DataTypes.object)
+        listeners: DataTypes.arrayOf(DataTypes.object),
+        hidden: DataTypes.arrayOf(DataTypes.bool),
+        filterText: DataTypes.string
     },
 
     compiled() {
@@ -110,10 +109,30 @@ export default {
                     san.nextTick(() => {
                         this.el.querySelectorAll('pre code.javascript').forEach(e => {
                             hljs.highlightBlock(e);
+                            this.data.push('hidden', false);
                         });
                     });
                 }
             );
+        });
+
+        this.watch('filterText', value => {
+            this.filter(value.trim());
+        });
+    },
+
+    filter(text) {
+        for (let j = 0; j < this.data.get('hidden').length; j++) {
+            this.data.set('hidden[' + j + ']', false);
+        }
+        if (!text) {
+            return;
+        }
+        let listeners = this.el.querySelectorAll('.listeners');
+        listeners.forEach((e, i) => {
+            if (!e.innerText.match(new RegExp(text, 'i'))) {
+                this.data.set('hidden[' + i + ']', true);
+            }
         });
     },
 
@@ -147,7 +166,8 @@ export default {
                         background-color: #ff4081
                     &.id
                         background-color: #2196f3
-
+.hidden
+    display: none
 </style>
 
 
