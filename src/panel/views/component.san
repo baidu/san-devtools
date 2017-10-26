@@ -21,12 +21,16 @@
             <div class="sd-detail-wrapper" style="display:{{cid?'block':'none'}}">
                 <div class="title-wrapper">
                     <div class="component-name">{{componentName}}</div>
-                    <div class="inspector">
-                        <san-button variants="raised info">
-                            <san-icon>location_searching</san-icon>&nbsp;
-                            Inspect DOM
-                        </san-button>
-                    </div>
+                    <san-inspectable-button
+                        class="inspector"
+                        cid="{{cid}}"
+                        variants="raised info"
+                        hasIcon="{{!0}}"
+                        iconName="location_searching"
+                        spacing="6px"
+                        text="Inspect DOM"
+                    >
+                    </san-inspectable-button>
                     <div class="filter">
                         <san-text-field
                             icon="search"
@@ -118,6 +122,8 @@ import 'san-mui/lib/ExpansionPanel/ExpansionPanel.styl';
 import 'san-mui/lib/Button/Button.styl';
 import 'san-mui/lib/Icon/Icon.styl';
 
+import InspectableButton from '../components/misc/inspectable_button';
+
 import ComponentTree from './component/component_tree.san';
 import ComponentBasicInfo from './component/component_basic_info.san';
 import ComponentDataViewer from './component/component_data_viewer.san';
@@ -140,7 +146,8 @@ export default {
         'san-expansion-panel': ExpansionPanel,
         'san-text-field': TextField,
         'san-button': Button,
-        'san-icon': Icon
+        'san-icon': Icon,
+        'san-inspectable-button': InspectableButton
     },
 
     messages: {
