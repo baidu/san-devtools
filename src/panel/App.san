@@ -6,7 +6,7 @@
                 id="component_containter"
                 class="container {{containerShown.component ? 'show' : ''}}"
             >
-                <sandevtool-component recording="{{historyRecording}}">
+                <sandevtool-component recording="{{historyRecording}}" s-ref="comp">
                 </sandevtool-component>
             </div>
             <div

@@ -15,9 +15,7 @@ export default {
 
     initData() {
         return {
-            data: {
-                'No data': 'Please choose a component.'
-            },
+            data: {},
             filterText: ''
         };
     },
@@ -36,6 +34,7 @@ export default {
         this.pageEval = chrome.devtools.inspectedWindow.eval;
         this.jsonViewer = new JSONView('data', this.data.get('data'));
         this.jsonViewer.expand(true);
+        this.jsonViewer.readonlyWhenFiltering = true;
         document.getElementById('data_json_viewer').appendChild(
             this.jsonViewer.dom);
         this.watch('data', value => {
@@ -53,9 +52,13 @@ export default {
                 'document.getElementById("' + value + '").__san_data__',
                 (res, ex) => {
                     if (!res || typeof res !== 'object') {
+                        this.owner.data.set('panelVisibility.dv', false);
                         return;
                     }
                     this.data.set('data', res);
+                    this.owner.data.set('panelVisibility.dv',
+                        this.data.get('data')
+                            && Object.keys(this.data.get('data')).length > 0);
                 }
             );
         });

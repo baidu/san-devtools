@@ -102,10 +102,13 @@ export default {
             this.pageEval('(' + getListeners.toString() + ')("' + value + '")',
                 (res, ex) => {
                     if (!res || typeof res !== 'object') {
+                        this.owner.data.set('panelVisibility.l', false);
                         return;
                     }
                     this.data.set('shown', true);
                     this.data.set('listeners', generateListenersInfo(res));
+                    this.owner.data.set('panelVisibility.l',
+                        this.data.get('listeners').length > 0);
                     san.nextTick(() => {
                         this.el.querySelectorAll('pre code.javascript').forEach(e => {
                             hljs.highlightBlock(e);

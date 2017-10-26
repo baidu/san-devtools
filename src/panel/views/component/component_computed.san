@@ -85,10 +85,13 @@ export default {
             this.pageEval('(' + getComputed.toString() + ')("' + value + '")',
                 (res, ex) => {
                     if (!res || typeof res !== 'object') {
+                        this.owner.data.set('panelVisibility.c', false);
                         return;
                     }
                     this.data.set('shown', true);
                     this.data.set('computed', generateComputedInfo(res));
+                    this.owner.data.set('panelVisibility.c',
+                        this.data.get('computed').length > 0);
                     san.nextTick(() => {
                         this.el.querySelectorAll('pre code.javascript').forEach(e => {
                             hljs.highlightBlock(e);

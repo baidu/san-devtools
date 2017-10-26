@@ -21,6 +21,13 @@
                         <san-icon style="margin-right:6px">refresh</san-icon>
                         Reload
                     </san-button>
+                    <san-icon-button
+                        variants="info raised"
+                        slot="right"
+                        on-click="helpClick"
+                    >
+                        help
+                    </san-icon-button>
                 </san-appbar>
             </san-col>
             <san-col span="12" order="2">
@@ -144,7 +151,8 @@ export default {
         );
     },
 
-    created() {
+    helpClick() {
+        this.parentComponent.ref('comp').data.set('cid', '');
     }
 
 }
