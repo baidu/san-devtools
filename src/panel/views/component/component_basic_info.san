@@ -2,36 +2,29 @@
     <div>
         <input type="hidden" value="{{cid}}" />
         <san-table>
-            <san-tbody>
-                <san-tr san-for="info in infoList">
+            <san-tbody s-for="info in infoList">
+                <san-tr s-if="info.isArray?info.value.length>0:!!info.value">
                     <san-td>{{info.key}}</san-td>
                     <san-td s-if="!info.isArray">{{info.value}}
-                        <div class="button-wrapper"
+                        <san-inspectable-button
                             s-if="info.key==='ID'"
-                            on-mouseover="highlight(info.value)"
-                            on-mouseout="unhighlight()"
+                            class="single"
+                            cid="{{info.value}}"
+                            variants="raised info"
+                            hasIcon="{{!0}}"
+                            spacing="6px"
+                            iconName="search"
                         >
-                        <san-button
-                            variants="info"
-                            style="margin-left:5px"
-                            on-click="inspectId(info.value)"
-                        >
-                            <san-icon style="margin-right:6px">search</san-icon>
-                            inspect
-                        </san-button>
-                        </div>
+                        </san-inspectable-button>
                     </san-td>
                     <san-td s-else>
-                        <div class="button-wrapper"
+                        <san-inspectable-button
                             s-for="id in info.value"
-                            on-mouseover="highlight(id)"
-                            on-mouseout="unhighlight()"
+                            cid="{{id}}"
+                            hasIcon="{{!!0}}"
+                            text="{{id}}"
                         >
-                        <san-button
-                            variants="info"
-                            on-click="inspectId(id)"
-                        >{{id}}</san-button>
-                        </div>
+                        </san-inspectable-button>
                     </san-td>
                 </san-tr>
             </san-tbody>
@@ -49,6 +42,8 @@ import 'san-mui/lib/Button/Button.styl';
 import Icon from 'san-mui/lib/Icon';
 import 'san-mui/lib/Icon/Icon.styl';
 
+import InspectableButton from '../../components/misc/inspectable_button';
+
 export default {
 
     components: {
@@ -61,7 +56,8 @@ export default {
         'san-tfoot': TFoot,
         'san-button': Button,
         'san-icon-button': IconButton,
-        'san-icon': Icon
+        'san-icon': Icon,
+        'san-inspectable-button': InspectableButton
     },
 
     initData() {
@@ -78,23 +74,15 @@ export default {
             ],
             infoList: [
                 {key: 'No data', value: 'Please choose a component.'}
-            ],
-            defaultinfoList: [
-                {key: 'No data', value: 'Please choose a component.'}
             ]
         }
     },
 
     compiled() {
         this.pageEval = chrome.devtools.inspectedWindow.eval;
-        this.messenger = new Messenger();
-        this.mouseOverConnection = this.messenger.initConnection(
-            'component_base_info_mouseover', () => {});
-        this.mouseOutConnection = this.messenger.initConnection(
-            'component_base_info_mouseout', () => {});
     },
 
-    attached() {
+    attached() {window.bi=this;
         this.watch('cid', value => {
             this.generateInfoList(value);
         });
@@ -125,26 +113,14 @@ export default {
     },
 
     getDescFromCamelCase(string) {
-        return string.replace(/([A-Z])/g," $1").toLowerCase()
+        return string.replace(/([A-Z])/g," $1")
+            .toLowerCase()
             .replace(/\b(id|\w)|\s(id|\w)/g, function (m) {
                 return m.toUpperCase();  
             }
         );
     },
 
-    inspectId(id) {
-        this.pageEval('inspect(document.getElementById("' + id + '"))|0');
-    },
-
-    highlight(id) {
-        id && this.mouseOverConnection.sendMessage(
-            'content_script:highlight_dom', {id: id}, () => {});
-    },
-
-    unhighlight() {
-        this.mouseOutConnection.sendMessage(
-            'content_script:unhighlight_dom', {}, () => {});
-    }
 }
 </script>
 
@@ -155,10 +131,11 @@ export default {
             height: auto !important
             white-space: normal !important
             line-height: 2
-            .button-wrapper
+            .inspectable-button-wrapper
                 display: inline-block
+                &.single
+                    margin-left: 5px
                 .sm-button
                     zoom: .6 !important
                     margin-right: 3px
-
 </style>
