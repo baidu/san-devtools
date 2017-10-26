@@ -1,6 +1,9 @@
 /**
+ * San Devtools
+ * Copyright 2017 Ecomfe. All rights reserved.
+ *
  * @file A Json Tree View component
- * @author Lu Yuan
+ * @author luyuan(luyuan.china@gmail.com)
  */
 
 import {Component, DataTypes} from 'san';
@@ -44,10 +47,9 @@ export default class SanJsonTreeView extends Component {
         this.view && this.view.refresh();
     }
 
-    fire(event) {
-        let that = this;
-        this.view.on(event, function (...args) {
-            that.fire(event, ...args);
+    on(event) {
+        this.view.on(event, (...args) => {
+            this.fire(event, ...args);
         });
     }
 
@@ -58,10 +60,10 @@ export default class SanJsonTreeView extends Component {
     }
 
     attached() {
-        watch('alwaysShowRoot');
-        watch('readonlyWhenFiltering');
-        watch('filterText');
-        watch('readonly');
+        this.watch('alwaysShowRoot');
+        this.watch('readonlyWhenFiltering');
+        this.watch('filterText');
+        this.watch('readonly');
 
         let rootName = this.data.get('rootName');
         let withRootName = this.data.get('withRootName');
@@ -80,10 +82,10 @@ export default class SanJsonTreeView extends Component {
         this.view.readonly = readonly;
         this.el.appendChild(this.view.dom);
 
-        this.fire('change');
-        this.fire('rename');
-        this.fire('delete');
-        this.fire('append');
+        this.on('change');
+        this.on('rename');
+        this.on('delete');
+        this.on('append');
     }
 
 }

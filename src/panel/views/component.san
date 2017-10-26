@@ -8,85 +8,96 @@
             >
             </sandevtool-component-tree>
         </div>
-        <div class="sd-detail-wrapper">
-            <div class="title-wrapper" s-if="cid">
-                <div class="component-name">{{componentName}}</div>
-                <div class="inspector">
-                    <san-button variants="raised info">
-                        <san-icon>location_searching</san-icon>
-                        Inspect DOM
-                    </san-button>
+        <div class="sd-info-wrapper">
+            <div class="sd-none-wrapper" style="display:{{cid?'none':'block'}}">
+                <div class="devtool-info">
+                    <div class="logo" style="display:{{logoVisibility?'block':'none'}}">
+                        <img src="../../icons/san_devtool_logo_clipped.svg" />
+                    </div>
+                    <div class="version">San DevTool {{version}}</div>
                 </div>
-                <div class="filter">
-                    <san-text-field
-                        icon="search"
-                        hintText="{{filterPlaceholder}}"
-                        inputValue="{=filterText=}"
-                        fullWidth
-                        s-ref="detailFilterInputBox"
-                        on-input-keypress="doFilter($event)"
-                    />
-                </div>
+                <div class="guide">Please select a component to inspect the detailed information.</div>
             </div>
-            <div class="panel-container">
-                <div class="ex-panel-wrapper">
-                    <san-expansion-panel title="Basic Information" open="{{!0}}">
-                        <sandevtool-component-basic-info
-                            cid="{{cid}}"
-                            s-ref="cbi"
-                        >
-                        </sandevtool-component-basic-info>
-                    </san-expansion-panel>
+            <div class="sd-detail-wrapper" style="display:{{cid?'block':'none'}}">
+                <div class="title-wrapper">
+                    <div class="component-name">{{componentName}}</div>
+                    <div class="inspector">
+                        <san-button variants="raised info">
+                            <san-icon>location_searching</san-icon>&nbsp;
+                            Inspect DOM
+                        </san-button>
+                    </div>
+                    <div class="filter">
+                        <san-text-field
+                            icon="search"
+                            hintText="{{filterPlaceholder}}"
+                            inputValue="{=filterText=}"
+                            fullWidth
+                            s-ref="detailFilterInputBox"
+                            on-input-keypress="doFilter($event)"
+                        />
+                    </div>
                 </div>
-                <div class="ex-panel-wrapper">
-                    <san-expansion-panel title="Data" open="{{!0}}">
-                        <sandevtool-component-data-viewer
-                            cid="{{cid}}"
-                            s-ref="cdv"
-                            filterText="{{filterText}}"
-                        >
-                        </sandevtool-component-data-viewer>
-                    </san-expansion-panel>
-                </div>
-                <div class="ex-panel-wrapper">
-                    <san-expansion-panel title="Computed" open="{{!0}}">
-                        <sandevtool-component-computed
-                            cid="{{cid}}"
-                            s-ref="cc"
-                            filterText="{{filterText}}"
-                        >
-                        </sandevtool-component-computed>
-                    </san-expansion-panel>
-                </div>
-                <div class="ex-panel-wrapper">
-                    <san-expansion-panel title="Filters" open="{{!0}}">
-                        <sandevtool-component-filters
-                            cid="{{cid}}"
-                            s-ref="cf"
-                            filterText="{{filterText}}"
-                        >
-                        </sandevtool-component-filters>
-                    </san-expansion-panel>
-                </div>
-                <div class="ex-panel-wrapper">
-                    <san-expansion-panel title="Messages" open="{{!0}}">
-                        <sandevtool-component-messages
-                            cid="{{cid}}"
-                            s-ref="cm"
-                            filterText="{{filterText}}"
-                        >
-                        </sandevtool-component-messages>
-                    </san-expansion-panel>
-                </div>
-                <div class="ex-panel-wrapper">
-                    <san-expansion-panel title="Listeners" open="{{!0}}">
-                        <sandevtool-component-listeners
-                            cid="{{cid}}"
-                            s-ref="cl"
-                            filterText="{{filterText}}"
-                        >
-                        </sandevtool-component-listeners>
-                    </san-expansion-panel>
+                <div class="panel-container">
+                    <div class="ex-panel-wrapper" style="display:{{panelVisibility.bi?'block':'none'}}">
+                        <san-expansion-panel title="Basic Information" open="{{!0}}">
+                            <sandevtool-component-basic-info
+                                cid="{{cid}}"
+                                s-ref="cbi"
+                            >
+                            </sandevtool-component-basic-info>
+                        </san-expansion-panel>
+                    </div>
+                    <div class="ex-panel-wrapper" style="display:{{panelVisibility.dv?'block':'none'}}">
+                        <san-expansion-panel title="Data" open="{{!0}}">
+                            <sandevtool-component-data-viewer
+                                cid="{{cid}}"
+                                s-ref="cdv"
+                                filterText="{{filterText}}"
+                            >
+                            </sandevtool-component-data-viewer>
+                        </san-expansion-panel>
+                    </div>
+                    <div class="ex-panel-wrapper" style="display:{{panelVisibility.c?'block':'none'}}">
+                        <san-expansion-panel title="Computed" open="{{!0}}">
+                            <sandevtool-component-computed
+                                cid="{{cid}}"
+                                s-ref="cc"
+                                filterText="{{filterText}}"
+                            >
+                            </sandevtool-component-computed>
+                        </san-expansion-panel>
+                    </div>
+                    <div class="ex-panel-wrapper" style="display:{{panelVisibility.f?'block':'none'}}">
+                        <san-expansion-panel title="Filters" open="{{!0}}">
+                            <sandevtool-component-filters
+                                cid="{{cid}}"
+                                s-ref="cf"
+                                filterText="{{filterText}}"
+                            >
+                            </sandevtool-component-filters>
+                        </san-expansion-panel>
+                    </div>
+                    <div class="ex-panel-wrapper" style="display:{{panelVisibility.m?'block':'none'}}">
+                        <san-expansion-panel title="Messages" open="{{!0}}">
+                            <sandevtool-component-messages
+                                cid="{{cid}}"
+                                s-ref="cm"
+                                filterText="{{filterText}}"
+                            >
+                            </sandevtool-component-messages>
+                        </san-expansion-panel>
+                    </div>
+                    <div class="ex-panel-wrapper" style="display:{{panelVisibility.l?'block':'none'}}">
+                        <san-expansion-panel title="Listeners" open="{{!0}}">
+                            <sandevtool-component-listeners
+                                cid="{{cid}}"
+                                s-ref="cl"
+                                filterText="{{filterText}}"
+                            >
+                            </sandevtool-component-listeners>
+                        </san-expansion-panel>
+                    </div>
                 </div>
             </div>
         </div>
@@ -142,6 +153,16 @@ export default {
     initData() {
         return {
             cid: '',
+            version: '',
+            logoVisibility: false,
+            panelVisibility: {
+                bi: true,
+                dv: true,
+                c: true,
+                f: true,
+                m: true,
+                l: true
+            },
             filterPlaceholder: 'Search keyword',
             filterText: ''
         };
@@ -149,17 +170,23 @@ export default {
 
     dataTypes: {
         cid: DataTypes.string,
+        version: DataTypes.string,
+        logoVisibility: DataTypes.bool,
+        panelVisibility: DataTypes.objectOf(DataTypes.bool),
         componentName: DataTypes.string,
         filterPlaceholder: DataTypes.string,
         filterText: DataTypes.string
     },
 
-    attached() {
-        Split(['.sd-comp-wrapper', '.sd-detail-wrapper'], {
+    attached() {window.co = this;
+        Split(['.sd-comp-wrapper', '.sd-info-wrapper'], {
             sizes: [50, 50],
             minSize: 300
         });
-
+        this.data.set('version', chrome.runtime.getManifest().version);
+        setTimeout(() => {
+            this.data.set('logoVisibility', true);
+        }, 100);
     }
 
 }
@@ -175,8 +202,24 @@ export default {
     .gutter-horizontal
         background-color: #e1e1e1
         cursor: ew-resize
+    .sd-none-wrapper
+        box-sizing: border-box
+        padding: 5vw
+        text-align: center
+        .devtool-info
+            .logo
+                img
+                    width: 40%
+            .version
+                font-size: 3vw
+        .guide
+            font-weight: bold
+            text-shadow: #ccc .15vw .15vw
+            font-size: 2vw
+            margin-top: 5vw
     .sd-detail-wrapper
         position: relative
+        height: 100%
         .panel-container
             overflow: auto
             position: absolute

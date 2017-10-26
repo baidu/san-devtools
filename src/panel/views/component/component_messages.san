@@ -68,12 +68,15 @@ export default {
     attached() {
         this.watch('cid', value => {
             this.pageEval('(' + getMessages.toString() + ')("' + value + '")',
-                (res, ex) => {
+                (res, ex) => {console.log(res,ex);
                     if (!res || typeof res !== 'object') {
+                        this.owner.data.set('panelVisibility.m', false);
                         return;
                     }
                     this.data.set('shown', true);
                     this.data.set('messages', generateMessagesInfo(res));
+                    this.owner.data.set('panelVisibility.m',
+                        this.data.get('messages').length > 0);
                     san.nextTick(() => {
                         this.el.querySelectorAll('pre code.javascript').forEach(e => {
                             hljs.highlightBlock(e);
