@@ -2101,6 +2101,16 @@
 	    return script;
 	}
 
+	function executeJavaScriptFromDevtool(codeString) {
+	    return new _promise2.default(function (resolve, reject) {
+	        !chrome.devtools && reject('Not in devtools.');
+	        chrome.devtools.inspectedWindow.eval(codeString, function (res, ex) {
+	            ex && ex.isException && reject(ex.value);
+	            resolve(res);
+	        });
+	    });
+	}
+
 	exports.default = {
 
 	    // Must be run in content script context. 
@@ -2113,7 +2123,9 @@
 	    fromExtensionUrlSync: function fromExtensionUrlSync(url) {
 	        return injectUrlSync(url);
 	    },
-	    fromDevtool: function fromDevtool(code) {},
+	    fromDevtool: function fromDevtool(code) {
+	        return executeJavaScriptFromDevtool(code);
+	    },
 	    fromBackground: function fromBackground(code) {}
 	};
 

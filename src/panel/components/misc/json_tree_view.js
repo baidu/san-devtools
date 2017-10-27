@@ -12,7 +12,7 @@ import JSONTreeView from 'json-tree-view';
 import 'json-tree-view/devtools.css';
 
 
-export default class SanJsonTreeView extends Component {
+export default class JsonTreeView extends Component {
 
     static template = `
         <div class="s-json-tree-view">
@@ -47,23 +47,28 @@ export default class SanJsonTreeView extends Component {
         this.view && this.view.refresh();
     }
 
-    on(event) {
+    bind(event) {
         this.view.on(event, (...args) => {
-            this.fire(event, ...args);
+            this.fire.call(this, event, args);
         });
     }
 
-    watch(key) {
+    watchProp(key) {
         this.watch(key, value => {
             this.view[key] = value;
         });
     }
 
     attached() {
-        this.watch('alwaysShowRoot');
-        this.watch('readonlyWhenFiltering');
-        this.watch('filterText');
-        this.watch('readonly');
+        this.watchProp('alwaysShowRoot');
+        this.watchProp('readonlyWhenFiltering');
+        this.watchProp('filterText');
+        this.watchProp('readonly');
+
+        this.watch('data', value => {
+            this.view.value = value;
+            this.view.refresh();
+        });
 
         let rootName = this.data.get('rootName');
         let withRootName = this.data.get('withRootName');
@@ -82,10 +87,10 @@ export default class SanJsonTreeView extends Component {
         this.view.readonly = readonly;
         this.el.appendChild(this.view.dom);
 
-        this.on('change');
-        this.on('rename');
-        this.on('delete');
-        this.on('append');
+        this.bind('change');
+        this.bind('rename');
+        this.bind('delete');
+        this.bind('append');
     }
 
 }
