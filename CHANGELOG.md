@@ -1,6 +1,20 @@
 ChangeLog
 ========
 
+1.0.0-rc.6
+-------
+ - [Add]
+   - Data viewer can update the data of the component.
+   - Welcome page and title bar for component panel.
+   - A filter for component panel, can filter keyword in component data (key or value), messages, computed, etc.
+ - [BUGFIX]
+   - Fix window.postMessage data error when navigating.
+ - [UPDATE]
+   - Enhance component tree's filter.
+ - [REMOVE]
+   - Highlight of component tree filter.
+   - Unnessessary lines in base information.
+
 1.0.0-rc.5
 -------
 [Add] Show Routes channel and the relative component in component tree when using san-router.
