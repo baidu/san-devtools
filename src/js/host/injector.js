@@ -67,6 +67,16 @@ function injectUrlSync(url) {
     return script;
 }
 
+function executeJavaScriptFromDevtool(codeString) {
+    return new Promise(function (resolve, reject) {
+        !chrome.devtools && reject('Not in devtools.');
+        chrome.devtools.inspectedWindow.eval(codeString, (res, ex) => {
+            ex && ex.isException && reject(ex.value);
+            resolve(res);
+        });
+    });
+}
+
 export default {
 
     // Must be run in content script context. 
@@ -83,7 +93,7 @@ export default {
     },
 
     fromDevtool(code) {
-
+        return executeJavaScriptFromDevtool(code);
     },
 
     fromBackground(code) {

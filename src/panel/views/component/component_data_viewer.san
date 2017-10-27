@@ -1,8 +1,17 @@
 <template>
     <div>
         <input type="hidden" value="{{cid}}" />
-        <div id="data_json_viewer">
-        </div>
+        <san-json-tree-view
+            alwaysShowRoot="{{!0}}"
+            data="{=data=}"
+            filterText="{{filterText}}"
+            rootName="data"
+            on-change="change($event)"
+            on-append="append($event)"
+            on-rename="rename($event)"
+            on-delete="delete($event)"
+        >
+        </san-json-tree-view>
     </div>
 </template>
 
@@ -10,8 +19,16 @@
 import san, {DataTypes} from 'san';
 import JSONView from 'json-tree-view';
 import 'json-tree-view/devtools.css';
+import Messenger from 'chrome-ext-messenger';
+
+import JsonTreeView from '../../components/misc/json_tree_view';
+import injector from '../../../js/host/injector';
 
 export default {
+
+    components: {
+        'san-json-tree-view': JsonTreeView
+    },
 
     initData() {
         return {
@@ -27,27 +44,10 @@ export default {
     },
 
     attached() {
-        this.watch('filterText', value => {
-            this.jsonViewer.filterText = value;
-        });
-
         this.pageEval = chrome.devtools.inspectedWindow.eval;
-        this.jsonViewer = new JSONView('data', this.data.get('data'));
-        this.jsonViewer.expand(true);
-        this.jsonViewer.readonlyWhenFiltering = true;
-        document.getElementById('data_json_viewer').appendChild(
-            this.jsonViewer.dom);
-        this.watch('data', value => {
-            if (!value) {
-                return;
-            }
-            this.jsonViewer.value = value;
-            this.jsonViewer.expand(true);
-            this.jsonViewer.withRootName = false;
 
-            this.jsonViewer.refresh();
-        });
         this.watch('cid', value => {
+            //this.hookSetter([value]);
             this.pageEval(
                 'document.getElementById("' + value + '").__san_data__',
                 (res, ex) => {
@@ -62,19 +62,65 @@ export default {
                 }
             );
         });
+    },
 
-        this.jsonViewer.on('change', function(self, key, oldValue, newValue){
-            console.log('change', key, oldValue, '=>', newValue);
-        });
-        this.jsonViewer.on('rename', function(self, key, oldName, newName) {
-            console.log('rename', key, oldName, '=>', newName);
-        });
-        this.jsonViewer.on('delete', function(self, key) {
-            console.log('delete', key);
-        });
-        this.jsonViewer.on('append', function(self, key, nameOrValue, newValue) {
-            console.log('append', key, nameOrValue, '=>', newValue);
-        });
+    setData(args) {
+        return injector.fromDevtool('(' + (args => {
+            var cid = args[0];
+            var key = args[1];
+            var event = args[4];
+            let data = document.getElementById(cid).__san_component__.data;
+            switch (event) {
+                case 'change':
+                    if (data.get(key) === args[2] && data.get(key) !== args[3]) {
+                        data.set(key, args[3]);
+                    }
+                    break;
+                case 'append':
+                    if (data.get(key)) {
+                        break;
+                    }
+                    args[2] === 'value'
+                        ? data.push(key.replace(/^(.*)\[\d+\]$/,'$1'), args[3])
+                            : data.set(key, args[3]);
+                    break;
+                case 'rename':
+                    var oldKey = key.replace(/(^|(?!\.))\w+$/, args[2]);
+                    var value = data.get(oldKey);
+                    data.set(oldKey, undefined);
+                    data.set(key, value);
+                    break;
+                case 'delete':
+                    var m = key.match(/^(.*)\[(\d+)\]$/);
+                    if (args[3] === 'array') {
+                        data.splice(m[1], [m[2], 1]);
+                    } else {
+                        data.set(key, undefined);
+                    }
+                    break;
+            }
+        }).toString() + ')(' + JSON.stringify(args) + ')');
+    },
+
+    change(args) {
+        let [view, key, oldVal, newVal] = args;
+        this.setData([this.data.get('cid'), key, oldVal, newVal, 'change']);
+    },
+
+    append(args) {
+        let [view, key, nameOrVal, newVal] = args;
+        this.setData([this.data.get('cid'), key, nameOrVal, newVal, 'append']);
+    },
+
+    rename(args) {
+        let [view, key, oldName, newName] = args;
+        this.setData([this.data.get('cid'), key, oldName, newName, 'rename']);
+    },
+
+    delete(args) {
+        let [view, key, deletedValue, parentType] = args;
+        this.setData([this.data.get('cid'), key, deletedValue, parentType,
+            'delete']);
     }
 
 }

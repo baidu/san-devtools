@@ -68,7 +68,7 @@ export default {
     attached() {
         this.watch('cid', value => {
             this.pageEval('(' + getMessages.toString() + ')("' + value + '")',
-                (res, ex) => {console.log(res,ex);
+                (res, ex) => {
                     if (!res || typeof res !== 'object') {
                         this.owner.data.set('panelVisibility.m', false);
                         return;
