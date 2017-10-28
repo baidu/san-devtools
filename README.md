@@ -4,7 +4,7 @@
     </a>
 </p>
 
-# <San-DevTool/>
+# &lt;San-DevTool /&gt;
 
 Browser developer tools extension for debugging San.
 
