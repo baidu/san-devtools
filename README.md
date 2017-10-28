@@ -1,6 +1,6 @@
 <p>
     <a href="https://ecomfe.github.io/san/">
-        <img align="right" src="https://ecomfe.github.io/san/img/san-devtool-logo.svg" alt="Logo" height="250">
+        <img align="right" src="https://ecomfe.github.io/san-devtool/san_devtool_logo_clipped.svg" alt="Logo" height="250">
     </a>
 </p>
 
