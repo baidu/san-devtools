@@ -5,6 +5,8 @@
  * @file San 事件注册。
  */
 
+import _ from 'lodash';
+
 import constants from '../common/constants';
 import utils from '../common/utils';
 import components from './components';
@@ -72,18 +74,63 @@ function getComponentRouteData(component) {
     return data.routeData ? 'Route:' + data.routeData.path : '';
 }
 
+function getDevtoolNS() {
+    if (!utils.isBrowser()) {
+        return;
+    }
+    let global = window;
+    if (!global || !_.isObject(global[SAN_DEVTOOL])) {
+        return null;
+    }
+    return global[SAN_DEVTOOL];
+}
+
+function addStoreEventListeners() {
+    let sanDevtool = getDevtoolNS();
+    if (!sanDevtool || !_.isObject(sanDevtool.store)) {
+        return;
+    }
+
+    if (!_.isArray(sanDevtool.store.actions)
+        || !_.isArray(sanDevtool.store.mutations)
+        || !_.isObject(sanDevtool.store.stores)) {
+        return;
+    }
+
+    for (let e of constants.storeEventNames) {
+        sanDevtool.on(e, (...args) => {
+            switch (e) {
+            case 'store-connected':
+                let store = args[0].store;
+                let componentClass = args[0].componentClass;
+                store.connectedComponentClass =
+                    store.connectedComponentClass || [];
+                if (store.connectedComponentClass.indexOf(componentClass) < 0) {
+                    store.connectedComponentClass.push(componentClass);
+                }
+                if (!sanDevtool.store.stores['default']) {
+                    sanDevtool.store.stores['default'] = store;
+                }
+                break;
+            case 'store-action-added':
+                sanDevtool.store.actions.push(args[0]);
+                break;
+            case 'store-dispatched':
+                sanDevtool.store.mutations.push(args[0]);
+                break;
+            }
+        });
+    }
+}
+
 // 注册所有 San 发送给 devtool 的 event listeners。
 // 必须在页面上下文中执行。
 // 必须在 window.__san_devtool__ 挂钩注册好后执行。
 function addSanEventListeners() {
-    if (!utils.isBrowser()) {
+    let sanDevtool = getDevtoolNS();
+    if (!sanDevtool || !_.isObject(sanDevtool.store)) {
         return;
     }
-    let global = this;
-    if (!global || !global[SAN_DEVTOOL]) {
-        return;
-    }
-    let sanDevtool = global[SAN_DEVTOOL];
 
     // 8 种事件。
     for (let e of constants.sanEventNames) {
@@ -152,5 +199,6 @@ function addSanEventListeners() {
 }
 
 export default {
-    addSanEventListeners
+    addSanEventListeners,
+    addStoreEventListeners
 };

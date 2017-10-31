@@ -37,6 +37,7 @@ import Grid from 'san-mui/lib/Grid';
 
 import Navigation from './views/navigation.san';
 import Component from './views/component.san';
+import Store from './views/store.san';
 import History from './views/history.san';
 import Routes from './views/routes.san';
 
@@ -46,6 +47,7 @@ export default {
         'san-row': Grid.Row,
         'sandevtool-navigation': Navigation,
         'sandevtool-component': Component,
+        'sandevtool-store': Store,
         'sandevtool-history': History,
         'sandevtool-routes': Routes
     },
@@ -80,7 +82,6 @@ export default {
                         : '[unknown version]');
         },
         'UI:history-recording'(arg) {
-            console.log('UI:history-recording', arg.value);
             this.data.set('historyRecording', arg.value);
         }
     },

@@ -93,6 +93,9 @@ export default {
     },
 
     fromDevtool(code) {
+        if (typeof code === 'function') {
+            code = '(' + code.toString() + ')()';
+        }
         return executeJavaScriptFromDevtool(code);
     },
 

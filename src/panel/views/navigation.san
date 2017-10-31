@@ -48,8 +48,10 @@
 
 <script>
 import san, {DataTypes} from 'san';
+import _ from 'lodash';
 import Messenger from 'chrome-ext-messenger';
 import utils from '../../js/common/utils';
+import injector from '../../js/host/injector';
 
 import Grid from 'san-mui/lib/Grid';
 import Icon from 'san-mui/lib/Icon';
@@ -93,11 +95,6 @@ export default {
                     icon: 'widgets',
                     value: 'component'
                 },
-                /*{
-                    label: 'Store',
-                    icon: 'settings_backup_restore',
-                    value: 'store'
-                },*/
                 {
                     label: 'History',
                     icon: 'history',
@@ -127,28 +124,37 @@ export default {
     },
 
     attached() {
-        let getVersionAndRoutes = () => ({
-            version: window[SAN_DEVTOOL].san.version,
-            routes: window[SAN_DEVTOOL].routes
+        let getVersion = () => (window[SAN_DEVTOOL].san.version);
+        let getRoutesAndStore = () => ({
+            routes: window[SAN_DEVTOOL].routes.length,
+            store: !!window[SAN_DEVTOOL].store.stores['default']
         });
-        chrome.devtools.inspectedWindow.eval(
-            '(' + getVersionAndRoutes.toString() + ')()', (res, ex) => {
-                if (!res || typeof res !== 'object') {
-                    return;
-                }
-                let routes = res.routes;
-                if (routes && routes.length > 0) {
-                    this.data.push('tabs', {
-                        label: 'Routes',
-                        icon: 'navigation',
-                        value: 'routes'
-                    });
-                }
-                let ver = utils.normalizeVersionNumber(res.version);
-                ver === 'N/A' && (ver = 'unknown version');
-                this.data.set('sanVersion', ver);
+        injector.fromDevtool(getVersion).then(res => {
+            let ver = utils.normalizeVersionNumber(res);
+            ver === 'N/A' && (ver = 'unknown version');
+            this.data.set('sanVersion', ver);
+        });
+        injector.fromDevtool(getRoutesAndStore).then(res => {
+            if (!res || !_.isObject(res)) {
+                return;
             }
-        );
+            let routes = res.routes;
+            let store = res.store;
+            if (routes > 0) {
+                this.data.push('tabs', {
+                    label: 'Routes',
+                    icon: 'navigation',
+                    value: 'routes'
+                });
+            }
+            if (store) {
+                this.data.push('tabs', {
+                    label: 'Store',
+                    icon: 'settings_backup_restore',
+                    value: 'store'
+                });
+            }
+        });
     },
 
     helpClick() {

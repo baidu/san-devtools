@@ -18,6 +18,12 @@ export default {
         'comp-route'
     ],
 
+    storeEventNames: [
+        'store-connected',
+        'store-dispatched',
+        'store-action-added'
+    ],
+
     subTreeKey: 'treeData'
 
 };
