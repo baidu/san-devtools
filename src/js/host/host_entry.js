@@ -17,3 +17,5 @@ version.detectSan();
 
 // 布置 San devtool 监听器
 listeners.addSanEventListeners();
+// 布置 Store 监听器
+listeners.addStoreEventListeners();

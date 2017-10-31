@@ -27,6 +27,11 @@ export function installSanHook(global) {
         history: [],
         historyIndexBeforeDevtoolPanelCreated: 0,
         routes: [],
+        store: {
+            stores: {},
+            mutations: [],
+            actions: []
+        },
         sub: (event, func) => {
             sanHook.on(event, func);
             return () => sanHook.off(event, func);
