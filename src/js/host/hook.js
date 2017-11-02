@@ -94,6 +94,10 @@ export function installSanHook(global) {
         },
         set(value) {
             sanHook._devtoolPanelCreated = !!value;
+            value && window.postMessage({
+                data: sanHook.data.treeData,
+                message: 'treedata'
+            }, '*');
             sanHook.historyIndexBeforeDevtoolPanelCreated
                 = sanHook.history.length;
             console.log('devtool panel created');

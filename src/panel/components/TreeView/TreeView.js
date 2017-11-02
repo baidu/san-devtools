@@ -24,21 +24,14 @@ export default san.defineComponent({
                     on-input-keypress="doHighlight($event)"
                 />
             </div>
-            <slot></slot>
+            <div class="sm-tree-view-loading-toast" s-if="loading">
+                {{loadingToast}}
+            </div>
+            <div class="sm-tree-view-item-wrapper">
+                <slot></slot>
+            </div>
         </div>
     `,
-
-    defaultData() {
-        return {
-            compact: false,
-            wholeLineSelected: false,
-            keepingSelected: false,
-            filterBar: false,
-            filterBarHintText: '',
-            dataSource: 'ATTRIBUTE',
-            highlighted: false
-        };
-    },
 
     dataTypes: {
         compact: DataTypes.bool,
@@ -47,7 +40,10 @@ export default san.defineComponent({
         filterBar: DataTypes.bool,
         filterBarHintText: DataTypes.string,
         dataSource: DataTypes.oneOf(['ATTRIBUTE', 'JSON']),
-        highlighted: DataTypes.bool
+        highlighted: DataTypes.bool,
+        treeData: DataTypes.arrayOf(DataTypes.object),
+        loading: DataTypes.bool,
+        loadingToast: DataTypes.string
     },
 
     components: {
@@ -60,6 +56,14 @@ export default san.defineComponent({
 
     initData() {
         return {
+            compact: false,
+            wholeLineSelected: false,
+            keepingSelected: false,
+            filterBar: false,
+            filterBarHintText: '',
+            dataSource: 'ATTRIBUTE',
+            highlighted: false,
+            loading: true,
             rootTreeView: true,
             filterText: '',
             lastFilterText: ''

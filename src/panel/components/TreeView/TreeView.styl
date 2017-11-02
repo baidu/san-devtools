@@ -1,6 +1,7 @@
 .sm-tree-view
     padding: 8px 0
     background: #fff
+    position: relative
 
     &.compact
         padding: 0
@@ -22,10 +23,10 @@
                 position: relative
 
         &.compact
-            paxdding: 5px
+            padding: 5px
 
             .sm-text-field
-                zoom: 0.75
+                zoom: 0.85
                 min-height: auto
                 margin: 0
 
@@ -38,3 +39,14 @@
         text-overflow: ellipsis
         white-space: nowrap
 
+.sm-tree-view-loading-toast
+    position: absolute
+    left: 50%
+    top: 50%
+    transform: translate(-50%,-50%)
+    font-size: 150%
+    width: 80%
+    text-align: center
+    overflow: hidden
+.sm-tree-view-item-wrapper
+    position: relative

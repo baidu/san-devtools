@@ -12,22 +12,23 @@
             initiallyOpen="{{!0}}"
             primaryTogglesNestedTreeView="{{!0}}"
             dataSource="JSON"
+            loadingToast="{{loadingToast}}"
+            loading="{{loading}}"
         >
-            <div class="sm-tree-view-item-wrapper">
-                <san-tree-view-item
-                    san-for="item, index in treeData"
-                    initiallyOpen="{{!0}}"
-                    treeData="{=item=}"
-                    filterText="{{filterText}}"
-                    dataSource="JSON"
-                >
-                </san-tree-view-item>
-            </div>
+            <san-tree-view-item
+                san-for="item, index in treeData"
+                initiallyOpen="{{!0}}"
+                treeData="{=item=}"
+                filterText="{{filterText}}"
+                dataSource="JSON"
+            >
+            </san-tree-view-item>
         </san-tree-view>
     </div>
 </template>
 
 <script>
+import san, {DataTypes} from 'san';
 import Messenger from 'chrome-ext-messenger';
 import Icon from 'san-mui/lib/Icon';
 import Divider from 'san-mui/lib/Divider'
@@ -54,9 +55,18 @@ export default {
     initData() {
         return {
             // 默认不对执行代码进行合并处理
-            maxLengthOfExecutionCodeQueue: 1,
-            cid: ''
-        }
+            maxLengthOfExecutionCodeQueue: 10,
+            cid: '',
+            loadingToast: 'Oops, too many components, so be patient.',
+            loading: true
+        };
+    },
+
+    dataTypes: {
+        maxLengthOfExecutionCodeQueue: DataTypes.number,
+        cid: DataTypes.string,
+        loadingToast: DataTypes.string,
+        loading: DataTypes.bool
     },
 
     messages: {
@@ -112,7 +122,6 @@ export default {
             if (!res) {
                 return;
             }
-            this.messenger = new Messenger();
             let connection = this.messenger.initConnection(
                 'component_tree',
                 (message, from, sender, sendResponse) => {
@@ -140,10 +149,25 @@ export default {
     created() {
         // 面板初始化时一次性从 __san_devtool__.data 中读取整个组件树结构。
         // FIXME: 组件树很大时的效率问题需要解决。
-        this.pageEval('window.' + SAN_DEVTOOL + '.data.treeData', (res, ex) => {
+        /*this.pageEval('window.' + SAN_DEVTOOL + '.data.treeData', (res, ex) => {
             this.data.set('treeData', res);
-        });
-        window.tree = this;
+        });*/
+        let connection = this.messenger.initConnection('comp_tree_data',
+            (message, from, sender, sendResponse) => {
+                console.log('ddd', message);
+                //this.data.set('loading', false);
+                if (message && _.isObject(message)) {
+                    this.data.set('treeData', message);
+                    this.data.set('loading', false);
+                }
+            }
+        );
+        /*console.log(connection);
+        connection.sendMessage('devtool:get_background_treedata', {},
+            (message, from, sender, sendResponse) => {
+                
+            }
+        );*/
     },
 
     attached() {
@@ -336,9 +360,21 @@ export default {
     height: 100%
     .sm-tree-view
         height: 100%
+        .sm-tree-view-filter-bar
+            background-image: linear-gradient(#fff, #fff 35px, rgba(255,255,255,0))
+            height: 50px
+            z-index: 1000
+            position: relative
+            pointer-events: none
+            margin-right: 15px
+            .sm-text-field
+                pointer-events: auto
         .sm-tree-view-item-wrapper
             height: calc(100% - 34px)
             overflow: auto
+            margin-top: -35px
+            &>.sm-tree-view-item:first-child
+                margin-top: 25px
             .sm-tree-view-item
                 .sm-touch-ripple.selected:hover
                     &~.sm-tree-view-item-content.selected
@@ -360,6 +396,8 @@ export default {
                     &.selected
                         .sm-tree-view-item-primary-text
                             background-image: linear-gradient(90deg,#fff calc(100% - 40px),transparent);
+                    .sm-tree-view-item-secondary-text
+                        margin-right: 5px
 
     .sm-text-field
         .sm-text-field-hint
