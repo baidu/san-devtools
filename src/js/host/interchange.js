@@ -23,6 +23,10 @@ function init() {
         if (!message) {
             return;
         }
+        if (message === 'treedata') {
+            postTreeDataToDevtool(eventData);
+            return;
+        }
         // 这几种事件暂时不向 devtool 发送，仅用于更新 history。
         if (message === 'comp-compiled' || message === 'comp-inited'
             || message === 'comp-created' || message === 'comp-disposed') {
@@ -39,6 +43,10 @@ function init() {
         }
     });
     initHighlightEvent();
+}
+
+function postTreeDataToDevtool(data) {
+    c.sendMessage('devtool:set_background_treedata', data.data, () => {});
 }
 
 function postSanMessageToDevtool(data) {

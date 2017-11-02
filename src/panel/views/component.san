@@ -112,12 +112,10 @@
 import san, {DataTypes} from 'san';
 import Split from 'split.js';
 
-import Grid from 'san-mui/lib/Grid';
 import ExpansionPanel from 'san-mui/lib/ExpansionPanel';
 import TextField from 'san-mui/lib/TextField';
 import {Button, IconButton} from 'san-mui/lib/Button';
 import Icon from 'san-mui/lib/Icon';
-import 'san-mui/lib/Grid/Grid.styl';
 import 'san-mui/lib/ExpansionPanel/ExpansionPanel.styl';
 import 'san-mui/lib/Button/Button.styl';
 import 'san-mui/lib/Icon/Icon.styl';
@@ -135,7 +133,6 @@ import ComponentListeners from './component/component_listeners.san';
 export default {
 
     components: {
-        'san-col': Grid.Col,
         'sandevtool-component-tree': ComponentTree,
         'sandevtool-component-basic-info': ComponentBasicInfo,
         'sandevtool-component-data-viewer': ComponentDataViewer,
@@ -185,7 +182,7 @@ export default {
         filterText: DataTypes.string
     },
 
-    attached() {window.co = this;
+    attached() {
         Split(['.sd-comp-wrapper', '.sd-info-wrapper'], {
             sizes: [50, 50],
             minSize: 300
