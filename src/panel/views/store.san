@@ -1,0 +1,86 @@
+<template>
+    <div class="sd-store-wrapper">
+        <div class="sd-state-wrapper">
+            <sandevtool-state-list
+
+            >
+            </sandevtool-state-list>
+        </div>
+        <div class="sd-store-detail-wrapper">
+        </div>
+    </div>
+</template>
+
+<script>
+import san, {DataTypes} from 'san';
+import Split from 'split.js';
+
+import ExpansionPanel from 'san-mui/lib/ExpansionPanel';
+import TextField from 'san-mui/lib/TextField';
+import {Button, IconButton} from 'san-mui/lib/Button';
+import Icon from 'san-mui/lib/Icon';
+import 'san-mui/lib/Grid/Grid.styl';
+import 'san-mui/lib/ExpansionPanel/ExpansionPanel.styl';
+import 'san-mui/lib/Button/Button.styl';
+import 'san-mui/lib/Icon/Icon.styl';
+
+import StateList from './store/state_list.san';
+
+export default {
+
+    components: {
+        'sandevtool-state-list': StateList,
+        'san-text-field': TextField,
+        'san-button': Button,
+        'san-icon': Icon
+    },
+
+    messages: {
+
+    },
+
+    initData() {
+        return {
+            filterPlaceholder: 'Search keyword',
+            filterText: ''
+        };
+    },
+
+    dataTypes: {
+        filterPlaceholder: DataTypes.string,
+        filterText: DataTypes.string
+    },
+
+    attached() {
+        Split(['.sd-state-wrapper', '.sd-store-detail-wrapper'], {
+            sizes: [50, 50],
+            minSize: 300
+        });
+    }
+
+}
+</script>
+
+<style lang="stylus">
+.sd-store-wrapper
+    height: 100%
+    width: 100%
+    &>*
+        height: 100%
+        float: left
+    .gutter-horizontal
+        background-color: #e1e1e1
+        cursor: ew-resize
+    .sd-store-detail-wrapper
+        position: relative
+        height: 100%
+
+.ex-panel-wrapper
+    padding: 0 10px
+    margin: 10px 0
+    box-sizing: border-box
+    width: 100%
+    .sm-expansion-panel
+        &.state-open
+            margin: 0;
+</style>

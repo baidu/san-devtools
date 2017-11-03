@@ -19,7 +19,12 @@ export default {
     ],
 
     storeEventNames: [
+        'store-default-inited',
         'store-connected',
+        'store-comp-inited',
+        'store-comp-diposed',
+        'store-listened',
+        'store-unlistened',
         'store-dispatched',
         'store-action-added'
     ],

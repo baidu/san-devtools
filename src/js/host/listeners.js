@@ -85,6 +85,18 @@ function getDevtoolNS() {
     return global[SAN_DEVTOOL];
 }
 
+function getStoreName(devtool, store) {
+    if (!devtool || !devtool.store || !devtool.store.stores || !store) {
+        return;
+    }
+    for (let k in devtool.store.stores) {
+        if (store === devtool.store.stores[k]) {
+            return k;
+        }
+    }
+    return null;
+}
+
 function addStoreEventListeners() {
     let sanDevtool = getDevtoolNS();
     if (!sanDevtool || !_.isObject(sanDevtool.store)) {
@@ -100,24 +112,79 @@ function addStoreEventListeners() {
     for (let e of constants.storeEventNames) {
         sanDevtool.on(e, (...args) => {
             switch (e) {
-            case 'store-connected':
-                let store = args[0].store;
-                let componentClass = args[0].componentClass;
-                store.connectedComponentClass =
-                    store.connectedComponentClass || [];
-                if (store.connectedComponentClass.indexOf(componentClass) < 0) {
-                    store.connectedComponentClass.push(componentClass);
+                case 'store-connected': {
+                    let {store, name, isDefault} = args[0];
+                    store.isDefault = isDefault;
+                    if (!store) {
+                        return;
+                    }
+                    if (name) {
+                        let has = !!sanDevtool.store.stores[name];
+                        if (!has) {
+                            sanDevtool.store.stores[name] = store;
+                        }
+                    } else {
+                        let n = getStoreName(sanDevtool, store);
+                        if (n) {
+                            return;
+                        }
+                        let len = Object.keys(sanDevtool.store.stores).length;
+                        sanDevtool.store.stores['Store' + len] = store;
+                    }
+                    break;
                 }
-                if (!sanDevtool.store.stores['default']) {
-                    sanDevtool.store.stores['default'] = store;
+                case 'store-comp-inited': {
+                    let {store, component} = args[0];
+                    if (!store || !component) {
+                        return;
+                    }
+                    store.components = store.components || {};
+                    store.components[component.id] = component;
+                    component.store = store;
+                    break;
                 }
-                break;
-            case 'store-action-added':
-                sanDevtool.store.actions.push(args[0]);
-                break;
-            case 'store-dispatched':
-                sanDevtool.store.mutations.push(args[0]);
-                break;
+                case 'store-comp-disposed': {
+                    let {store, component} = args[0];
+                    delete store.components[component.id];
+                    delete component.store;
+                    break;
+                }
+                case 'store-action-added':
+                    sanDevtool.store.actions.push(args[0]);
+                    break;
+                case 'store-dispatched':
+                    sanDevtool.store.mutations.push(args[0]);
+                    break;
+                // 替代方案，当使用非官方 connector 并且没有在 connector 中向 devtool
+                // 发送相应的时间的时候有效。
+                case 'store-default-inited': {
+                    let store = args[0].store;
+                    store.isDefault = true;
+                    break;
+                }
+                case 'store-listened': {
+                    if (Object.keys(sanDevtool.store.stores).length > 0) {
+                        return;
+                    }
+                    let {store, listener} = args[0];
+                    if (!store || !listener) {
+                        return;
+                    }
+                    let name = getStoreName(sanDevtool, store);
+                    if (name) {
+                        return;
+                    }
+                    let len = Object.keys(sanDevtool.store.stores).length;
+                    sanDevtool.store.stores[
+                        store.isDefault ? 'Default' : 'Store' + len] = store;
+                    break;
+                }
+                case 'store-unlistened': {
+                    if (Object.keys(sanDevtool.store.stores).length > 0) {
+                        return;
+                    }
+                    break;
+                }
             }
         });
     }
