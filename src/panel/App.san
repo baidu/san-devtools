@@ -13,6 +13,7 @@
                 id="store_containter"
                 class="container {{containerShown.store ? 'show' : ''}}"
             >
+                <sandevtool-store></sandevtool-store>
             </div>
             <div
                 id="history_containter"

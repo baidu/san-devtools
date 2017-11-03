@@ -30,6 +30,7 @@
 <script>
 import san, {DataTypes} from 'san';
 import Messenger from 'chrome-ext-messenger';
+
 import Icon from 'san-mui/lib/Icon';
 import Divider from 'san-mui/lib/Divider'
 
@@ -154,8 +155,6 @@ export default {
         });*/
         let connection = this.messenger.initConnection('comp_tree_data',
             (message, from, sender, sendResponse) => {
-                console.log('ddd', message);
-                //this.data.set('loading', false);
                 if (message && _.isObject(message)) {
                     this.data.set('treeData', message);
                     this.data.set('loading', false);
