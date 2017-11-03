@@ -2,7 +2,7 @@
     <div id="navigation">
         <input type="hidden" value="{=currentTab=}" />
         <san-row type="flex">
-            <san-col span="12" order="1">
+            <san-col span="10" order="1">
                 <san-appbar title="San {{sanVersion}}" class="version">
                     <san-icon-button
                         s-if="sanVersion !== 'unknown version'"
@@ -30,14 +30,14 @@
                     </san-icon-button>
                 </san-appbar>
             </san-col>
-            <san-col span="12" order="2">
+            <san-col span="14" order="2">
                 <section class="main-tabs">
                     <san-tabs value="{=currentTab=}" on-change="change($event)">
                         <san-tab
                             san-for="tab, index in tabs"
                             value="{{tab.value}}">
                             <san-icon slot="icon">{{tab.icon}}</san-icon>
-                            <span slot="label">{{tab.label}}</span>
+                            <span slot="label" s-if="!smallTabItem">{{tab.label}}</span>
                         </san-tab>
                     </san-tabs>
                 </section>
@@ -89,6 +89,7 @@ export default {
     initData() {
         return {
             sanVersion: '',
+            smallTabItem: false,
             tabs: [
                 {
                     label: 'Component',
@@ -107,6 +108,7 @@ export default {
 
     dataTypes: {
         sanVersion: DataTypes.string,
+        smallTabItem: DataTypes.bool,
         tabs: DataTypes.arrayOf(DataTypes.objectOf(DataTypes.string))
     },
 
@@ -123,11 +125,19 @@ export default {
     toggleMenu() {
     },
 
-    attached() {
+    setTabItemSize(e) {
+        console.log(window.innerWidth, e, this.data.get('tabs'));
+        this.data.set('smallTabItem',
+            window.innerWidth < 250 * this.data.get('tabs').length);
+        return this.setTabItemSize.bind(this);
+    },
+
+    created() {
         let getVersion = () => (window[SAN_DEVTOOL].san.version);
         let getRoutesAndStore = () => ({
             routes: window[SAN_DEVTOOL].routes.length,
-            store: !!window[SAN_DEVTOOL].store.stores['default']
+            stores: ({}).constructor.keys(
+                window[SAN_DEVTOOL].store.stores).length
         });
         injector.fromDevtool(getVersion).then(res => {
             let ver = utils.normalizeVersionNumber(res);
@@ -138,8 +148,7 @@ export default {
             if (!res || !_.isObject(res)) {
                 return;
             }
-            let routes = res.routes;
-            let store = res.store;
+            let {routes, stores} = res;
             if (routes > 0) {
                 this.data.push('tabs', {
                     label: 'Routes',
@@ -147,14 +156,17 @@ export default {
                     value: 'routes'
                 });
             }
-            if (store) {
+            if (stores > 0) {
                 this.data.push('tabs', {
                     label: 'Store',
                     icon: 'settings_backup_restore',
                     value: 'store'
                 });
             }
+            this.setTabItemSize();
         });
+
+        window.addEventListener('resize', this.setTabItemSize.bind(this)());
     },
 
     helpClick() {
