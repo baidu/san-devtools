@@ -4,15 +4,16 @@
         <san-row type="flex">
             <san-col span="10" order="1">
                 <san-appbar title="San {{sanVersion}}" class="version">
-                    <san-icon-button
+                    <san-button
                         s-if="sanVersion !== 'unknown version'"
                         variants="info raised"
+                        class="logo"
                         slot="left"
                         href="https://github.com/ecomfe/san/releases/tag/{{sanVersion}}"
                         target="_blank"
                     >
-                        code
-                    </san-icon-button>
+                        <san-avatar src="../../icons/san_logo_white.svg" backgroundColor="rgba(0,0,0,0)"></san-avatar>
+                    </san-button>
                     <san-button
                         variants="secondery raised"
                         slot="right"
@@ -32,10 +33,12 @@
             </san-col>
             <san-col span="14" order="2">
                 <section class="main-tabs">
-                    <san-tabs value="{=currentTab=}" on-change="change($event)">
+                    <san-tabs value="{=currentTab=}" on-change="change($event)" s-ref="tabs">
                         <san-tab
                             san-for="tab, index in tabs"
-                            value="{{tab.value}}">
+                            value="{{tab.value}}"
+                            s-ref="tab_{{index}}"
+                        >
                             <san-icon slot="icon">{{tab.icon}}</san-icon>
                             <span slot="label" s-if="!smallTabItem">{{tab.label}}</span>
                         </san-tab>
@@ -55,6 +58,7 @@ import injector from '../../js/host/injector';
 
 import Grid from 'san-mui/lib/Grid';
 import Icon from 'san-mui/lib/Icon';
+import Avatar from 'san-mui/lib/Avatar';
 import AppBar from 'san-mui/lib/AppBar';
 import {Button, IconButton} from 'san-mui/lib/Button';
 import {IconMenu, MenuItem, Divider} from 'san-mui/lib/Menu';
@@ -62,6 +66,7 @@ import Tabs, {Tab} from 'san-mui/lib/Tabs';
 
 import 'san-mui/lib/Grid/Grid.styl';
 import 'san-mui/lib/AppBar/AppBar.styl';
+import 'san-mui/lib/Avatar/Avatar.styl';
 import 'san-mui/lib/Button/Button.styl';
 import 'san-mui/lib/Icon/Icon.styl';
 import 'san-mui/lib/Menu/IconMenu.styl';
@@ -80,8 +85,9 @@ export default {
         'san-menu-item': MenuItem,
         'san-icon-menu': IconMenu,
         'san-menu-divider': Divider,
-        'san-icon-button': IconButton,
+        'san-avatar': Avatar,
         'san-button': Button,
+        'san-icon-button': IconButton,
         'san-icon': Icon,
         'san-tabs': Tabs,
         'san-tab': Tab
@@ -150,19 +156,23 @@ export default {
             }
             let {routes, stores} = res;
             if (routes > 0) {
-                this.data.push('tabs', {
+                this.data.splice('tabs', [1, 0, {
                     label: 'Routes',
                     icon: 'navigation',
                     value: 'routes'
-                });
+                }]);
             }
             if (stores > 0) {
-                this.data.push('tabs', {
+                this.data.splice('tabs', [1, 0, {
                     label: 'Store',
                     icon: 'settings_backup_restore',
                     value: 'store'
-                });
+                }]);
             }
+            san.nextTick(() => {
+                this.ref('tabs').data.set('items',
+                    this.data.get('tabs').map(i => i.value));
+            });
             this.setTabItemSize();
         });
 
@@ -181,6 +191,8 @@ export default {
 .version .sm-appbar-title
     font-size: 18px
     line-height: 3rem
+.logo
+    padding: 0 !important
 
 .sm-iconmenu .sm-iconmenu-tooltip
     width: auto
