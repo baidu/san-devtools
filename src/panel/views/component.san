@@ -120,8 +120,9 @@ import 'san-mui/lib/ExpansionPanel/ExpansionPanel.styl';
 import 'san-mui/lib/Button/Button.styl';
 import 'san-mui/lib/Icon/Icon.styl';
 
-import InspectableButton from '../components/misc/inspectable_button';
+import constants from '../../js/common/constants';
 
+import InspectableButton from '../components/misc/inspectable_button';
 import ComponentTree from './component/component_tree.san';
 import ComponentBasicInfo from './component/component_basic_info.san';
 import ComponentDataViewer from './component/component_data_viewer.san';
@@ -185,6 +186,7 @@ export default {
     attached() {
         Split(['.sd-comp-wrapper', '.sd-info-wrapper'], {
             sizes: [50, 50],
+            gutterSize: constants.gutterSize,
             minSize: 300
         });
         this.data.set('version', chrome.runtime.getManifest().version);
