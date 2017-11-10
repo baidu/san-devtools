@@ -1,5 +1,5 @@
 <template>
-    <div id="navigation">
+    <div class="navigation">
         <input type="hidden" value="{=currentTab=}" />
         <san-row type="flex">
             <san-col span="10" order="1">
@@ -75,6 +75,7 @@ export default {
 
     components: {
         'san-col': Grid.Col,
+        'san-row': Grid.Row,
         'san-appbar': AppBar,
         'san-menu-item': MenuItem,
         'san-icon-menu': IconMenu,
@@ -126,7 +127,6 @@ export default {
     },
 
     setTabItemSize(e) {
-        console.log(window.innerWidth, e, this.data.get('tabs'));
         this.data.set('smallTabItem',
             window.innerWidth < 250 * this.data.get('tabs').length);
         return this.setTabItemSize.bind(this);
@@ -180,15 +180,26 @@ export default {
 <style lang="stylus">
 .version .sm-appbar-title
     font-size: 18px
+    line-height: 3rem
 
 .sm-iconmenu .sm-iconmenu-tooltip
     width: auto
 
+.navigation
+    .sm-row-flex
+        height: 40px
+        &>.sm-col
+            height: 100%
+            .sm-appbar.version, .main-tabs
+                height: 100%
+
 .main-tabs
     .sm-tabs
+        height: 100%
         .sm-tab
             flex-flow: row nowrap
-            height: 56px
+            height: 40px
+            min-height: auto
             .sm-icon
                 ~ span
                     margin-top: 0
