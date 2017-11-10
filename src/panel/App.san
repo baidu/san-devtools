@@ -60,8 +60,8 @@ export default {
             containerShown: {
                 'component': true,
                 'store': false,
-                'history': false,
-                'routes': false
+                'routes': false,
+                'history': false
             },
             historyRecording: false
         }
