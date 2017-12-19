@@ -92,9 +92,9 @@ export default {
         return injectUrlSync(url);
     },
 
-    fromDevtool(code) {
+    fromDevtool(code, ...args) {
         if (typeof code === 'function') {
-            code = '(' + code.toString() + ')()';
+            code = '(' + code.toString() + ').apply(null, [' + args.toString() + '])';
         }
         return executeJavaScriptFromDevtool(code);
     },

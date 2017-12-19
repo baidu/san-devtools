@@ -404,25 +404,14 @@ export default san.defineComponent({
     },
 
     attached() {
-        if (this.data.get('dataSource') === 'JSON') {
-            let treeData = this.data.get('treeData');
-            let count = this.data.get('count');
-            if (count) {
-                this.data.set('count', count + 1);
-            } else {
-                this.data.set('count',
-                    treeData && treeData.treeData
-                        ? treeData.treeData.length
-                            : 1);
-            }
-        }
-
         if (this.data.get('loadingToast')) {
             let index = this.data.get('index');
             setTimeout(() => {
                 this.data.set('renderable', true);
                 this.dispatch('UI:item-rendering');
             }, index);
+        } else {
+            this.data.set('renderable', true);
         }
 
         let slotChilds = this.slotChilds;
