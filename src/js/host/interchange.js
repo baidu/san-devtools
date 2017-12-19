@@ -13,6 +13,11 @@ import utils from '../common/utils';
 let messenger = new Messenger();
 let c = messenger.initConnection('interchange', () => {});
 
+const INTERVAL = 1000;
+let sanMessageQueue = [];
+let lastSanMessageQueueSent = 0;
+let onceSanMessageChecker = null;
+
 function init() {
     window.addEventListener('message', e => {
         let eventData = e.data;
@@ -23,8 +28,8 @@ function init() {
         if (!message) {
             return;
         }
-        if (message === 'treedata') {
-            postTreeDataToDevtool(eventData);
+        if (message.startsWith('store-')) {
+            postStoreMessageToDevtool(eventData);
             return;
         }
         // 这几种事件暂时不向 devtool 发送，仅用于更新 history。
@@ -45,17 +50,38 @@ function init() {
     initHighlightEvent();
 }
 
-function postTreeDataToDevtool(data) {
-    c.sendMessage('devtool:set_background_treedata', data.data, () => {});
+function checkSanMessageQueue() {
+    onceSanMessageChecker = window.setTimeout(() => {
+        c.sendMessage('devtool:component_tree_mutations',
+            {queue: _.clone(sanMessageQueue)}, () => {});
+        sanMessageQueue.splice(0, sanMessageQueue.length);
+        window.clearTimeout(onceSanMessageChecker);
+    }, INTERVAL / 10);
 }
 
 function postSanMessageToDevtool(data) {
     data.count = utils.getSanIdElementCount();
-    c.sendMessage('devtool:component_tree', data, () => {});
+    if (!lastSanMessageQueueSent) {
+        lastSanMessageQueueSent = Date.now();
+    }
+    if (Date.now() - lastSanMessageQueueSent < INTERVAL) {
+        window.clearTimeout(onceSanMessageChecker);
+        sanMessageQueue.push(data);
+        checkSanMessageQueue();
+    } else {
+        lastSanMessageQueueSent = Date.now();
+        c.sendMessage('devtool:component_tree_mutations',
+            {queue: _.clone(sanMessageQueue)}, () => {});
+        sanMessageQueue.splice(0, sanMessageQueue.length);
+    }
 }
 
 function postRouteMessageToDevtool(data) {
     c.sendMessage('devtool:routes', data, () => {});
+}
+
+function postStoreMessageToDevtool(data) {
+    c.sendMessage('devtool:store_mutation', data, () => {});
 }
 
 function initHighlightEvent() {

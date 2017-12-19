@@ -4,8 +4,11 @@
  */
 
 import san, {DataTypes} from 'san';
+import _ from 'lodash';
 import {TouchRipple, CenterRipple} from 'san-mui/lib/Ripple';
 import Icon from 'san-mui/lib/Icon';
+import Chip from 'san-mui/lib/Chip';
+import Avatar from 'san-mui/lib/Avatar';
 import Checkbox from 'san-mui/lib/Checkbox';
 import {Highlight} from './highlight';
 
@@ -19,57 +22,74 @@ export default san.defineComponent({
             on-mouseout="handleContainerMouseout($event)"
             style="{{itemStyle}}"
         >
-            <san-touch-ripple s-if="!disableRipple && !disabled"
-                style="{{touchRippleStyle}}"
-                class="{{selectedClass}} {{hiddenClass}}"
-            ></san-touch-ripple>
-            <div class="sm-tree-view-item-content {{selectedClass}}
-                        {{hiddenClass}}"
-                style="{{itemContentStyle}}"
-            >
-                <san-checkbox
-                    s-if="checked === true || checked === false"
-                    s-ref="checkbox"
-                    nativeValue="{{checkboxValue}}"
-                    disabled="{{disabled}}"
-                    checked="{=checkboxInputValue=}"
-                    indeterminate="{=checkboxIndeterminate=}"
-                    on-change="checkboxChanged($event)"
-                    on-click="checkboxClicked($event)"
-                />
-                <p class="sm-tree-view-item-primary-text"
-                    s-if="primaryText"
-                >{{primaryText}}</p>
-                <p class="sm-tree-view-item-secondary-text" 
-                    style="{{secondaryTextStyle}}" 
-                    s-if="secondaryText"
-                >{{secondaryText | raw}}
-                </p>
-            </div>
-            <div
-                class="sm-tree-view-item-expand {{selectedClass}}
-                       {{hiddenClass}}"
-                s-if="toggleNested"
-                on-click="toggleTreeView($event, 'EXPAND', false, true)"
-                style="{{expandStyle}}"
-            >
-                <san-icon>arrow_drop_{{ open | treeViewOpenIcon }}</san-icon>
-                <san-center-ripple />
-            </div>
-            <div class="sm-tree-view-item-nested {{ open | treeViewOpen }}"
-                style="{{nestedTreeViewStyle}}"
-            >
-                <slot name="nested" s-if="dataSource!=='JSON'"></slot>
-                <san-tree-view-item
-                    s-else
-                    s-for="item, index in treeData.treeData"
-                    index="{{index}}"
-                    treeData="{=item=}"
-                    filterText="{{filterText}}"
-                    initiallyOpen="{{initiallyOpen}}"
-                    dataSource="JSON"
+            <div class="pad" s-if="renderable">
+                <san-touch-ripple s-if="!disableRipple && !disabled"
+                    style="{{touchRippleStyle}}"
+                    class="{{selectedClass}} {{hiddenClass}}"
+                ></san-touch-ripple>
+                <div class="sm-tree-view-item-content {{selectedClass}}
+                            {{hiddenClass}}"
+                    style="{{itemContentStyle}}"
                 >
-                </san-tree-view-item>
+                    <san-checkbox
+                        s-if="checked === true || checked === false"
+                        s-ref="checkbox"
+                        nativeValue="{{checkboxValue}}"
+                        disabled="{{disabled}}"
+                        checked="{=checkboxInputValue=}"
+                        indeterminate="{=checkboxIndeterminate=}"
+                        on-change="checkboxChanged($event)"
+                        on-click="checkboxClicked($event)"
+                    />
+                    <p
+                        class="sm-tree-view-item-primary-text"
+                        s-if="primaryText"
+                    >
+                        {{primaryText}}
+                    </p>
+                    <div class="sm-tree-view-item-extras" s-if="extras">
+                        <san-chip
+                            s-for="extra in extras"
+                            class="{{extra.class||extra.text}}"
+                        >
+                            <san-avatar icon="{{extra.icon}}" s-if="extra.icon">
+                            </san-avatar>
+                            {{extra.text}}
+                        </san-chip>
+                    </div>
+                    <p class="sm-tree-view-item-secondary-text" 
+                        style="{{secondaryTextStyle}}" 
+                        s-if="secondaryText"
+                    >{{secondaryText | raw}}
+                    </p>
+                </div>
+                <div
+                    class="sm-tree-view-item-expand {{selectedClass}}
+                           {{hiddenClass}}"
+                    s-if="toggleNested"
+                    on-click="toggleTreeView($event, 'EXPAND', false, true)"
+                    style="{{expandStyle}}"
+                >
+                    <san-icon>
+                        arrow_drop_{{ open | treeViewOpenIcon }}
+                    </san-icon>
+                    <san-center-ripple />
+                </div>
+                <div class="sm-tree-view-item-nested {{ open | treeViewOpen }}"
+                    style="{{nestedTreeViewStyle}}"
+                >
+                    <slot name="nested" s-if="dataSource!=='JSON'"></slot>
+                    <san-tree-view-item
+                        s-else
+                        s-for="item, index in treeData.treeData"
+                        index="{{index}}"
+                        treeData="{=item=}"
+                        filterText="{{filterText}}"
+                        initiallyOpen="{{initiallyOpen}}"
+                        dataSource="JSON"
+                    >
+                    </san-tree-view-item>
+                </div>
             </div>
         </div>
     `,
@@ -102,6 +122,8 @@ export default san.defineComponent({
     dataTypes: {
         disabled: DataTypes.bool,
         hidden: DataTypes.bool,
+        renderable: DataTypes.bool,
+        index: DataTypes.number,
         selected: DataTypes.bool,
         disableRipple: DataTypes.bool,
         primaryTogglesNestedTreeView: DataTypes.bool,
@@ -118,7 +140,10 @@ export default san.defineComponent({
         checkboxIndeterminate: DataTypes.bool,
         filterText: DataTypes.string,
         filtered: DataTypes.bool,
-        highlighted: DataTypes.bool
+        highlighted: DataTypes.bool,
+        primaryText: DataTypes.string,
+        secondaryText: DataTypes.string,
+        extras: DataTypes.arrayOf(DataTypes.objectOf(DataTypes.string))
     },
 
     components: {
@@ -126,6 +151,8 @@ export default san.defineComponent({
         'san-center-ripple': CenterRipple,
         'san-checkbox': Checkbox,
         'san-icon': Icon,
+        'san-chip': Chip,
+        'san-avatar': Avatar,
         'san-tree-view-item': 'self'
     },
 
@@ -153,6 +180,12 @@ export default san.defineComponent({
             let target = arg.target;
             if (target.data.get('dataSource') === undefined) {
                 target.data.set('dataSource', this.data.get('dataSource'));
+            }
+        },
+        'UI:query-loading-toast-attribute'(arg) {
+            let target = arg.target;
+            if (target.data.get('loadingToast') === undefined) {
+                target.data.set('loadingToast', this.data.get('loadingToast'));
             }
         },
         'UI:query-parent-checkbox-state'(arg) {
@@ -274,6 +307,7 @@ export default san.defineComponent({
         this.dispatch('UI:query-whole-line-selected-attribute');
         this.dispatch('UI:query-keeping-selected-attribute');
         this.dispatch('UI:query-data-source-attribute');
+        this.dispatch('UI:query-loading-toast-attribute');
 
         if (this.data.get('dataSource') === 'JSON') {
             this.initFromTreeData(this.data.get('treeData'));
@@ -288,25 +322,28 @@ export default san.defineComponent({
         this.watch('treeData.secondaryText', value => {
             this.data.get('treeData') && this.data.set('secondaryText', value);
         });
+        this.watch('treeData.extras', value => {
+            this.data.get('treeData') && this.data.set('extras', value);
+        });
 
         this.watch('filterText', value => {
             if (!value) {
                 this.data.set('filtered', true);
                 return;
             }
-            let index = this.data.get('primaryText').indexOf(value);
-            this.data.set('filtered', index >= 0);
+            let text = [
+                this.data.get('primaryText'),
+                this.data.get('secondaryText'),
+                this.data.get('extras').map(item => item ? item.text : '')
+            ];
+            let matched = new RegExp(value, 'ig').test(
+                text.reduce((a, b) => a.concat(b), []));
+            this.data.get('filtered') === matched
+                ? this.watchFiltered(matched)
+                    : this.data.set('filtered', matched);
         });
         this.watch('filtered', value => {
-            let parent = this.parentComponent;
-            if (!value) {
-                do {
-                    let parentFiltered = parent.data.get('filtered');
-                    if (parentFiltered) {
-                        this.data.set('filtered', true);
-                    }
-                } while (parent = parent.parentComponent);
-            }
+            this.watchFiltered(value);
         });
         this.watch('highlighted', value => {
             if (value) {
@@ -367,6 +404,27 @@ export default san.defineComponent({
     },
 
     attached() {
+        if (this.data.get('dataSource') === 'JSON') {
+            let treeData = this.data.get('treeData');
+            let count = this.data.get('count');
+            if (count) {
+                this.data.set('count', count + 1);
+            } else {
+                this.data.set('count',
+                    treeData && treeData.treeData
+                        ? treeData.treeData.length
+                            : 1);
+            }
+        }
+
+        if (this.data.get('loadingToast')) {
+            let index = this.data.get('index');
+            setTimeout(() => {
+                this.data.set('renderable', true);
+                this.dispatch('UI:item-rendering');
+            }, index);
+        }
+
         let slotChilds = this.slotChilds;
         let hasLeft = 0;
 
@@ -433,6 +491,18 @@ export default san.defineComponent({
     },
 
     updated() {
+    },
+
+    watchFiltered(filtered) {
+        let parent = this.parentComponent;
+        if (!filtered) {
+            do {
+                let parentFiltered = parent.data.get('filtered');
+                if (parentFiltered) {
+                    this.data.set('filtered', true);
+                }
+            } while (parent = parent.parentComponent);
+        }
     },
 
     getTreeView() {
@@ -713,6 +783,7 @@ export default san.defineComponent({
         this.data.set('toggleNested', !!data.treeData);
         this.data.set('primaryText', data.text);
         this.data.set('secondaryText', data.secondaryText);
+        this.data.set('extras', data.extras);
         this.data.set('open', data.treeData && data.treeData.length > 0);
         let checked = data.checked;
 
@@ -731,6 +802,7 @@ export default san.defineComponent({
         let data = {
             text: this.data.get('primaryText'),
             secondaryText: this.data.get('secondaryText'),
+            extras: this.data.get('extras'),
             checked: this.data.get('checked')
         };
         this.data.set('treeData', data, {

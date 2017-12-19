@@ -1,6 +1,7 @@
 <template>
     <div class="sm-tree-view-wrapper custom">
         <san-tree-view
+            s-ref="tv"
             treeData="{=treeData=}"
             compact="{{!0}}"
             wholeLineSelected="{{!0}}"
@@ -13,25 +14,23 @@
             primaryTogglesNestedTreeView="{{!0}}"
             dataSource="JSON"
             loadingToast="{{loadingToast}}"
-            loading="{{loading}}"
+            loading="{=loading=}"
+            loadingToastContentFromColor="#2196f3"
+            loadingToastContentToColor="#000"
+            progress="{=progress=}"
         >
-            <san-tree-view-item
-                san-for="item, index in treeData"
-                initiallyOpen="{{!0}}"
-                treeData="{=item=}"
-                filterText="{{filterText}}"
-                dataSource="JSON"
-            >
-            </san-tree-view-item>
         </san-tree-view>
     </div>
 </template>
 
 <script>
 import san, {DataTypes} from 'san';
+import _ from 'lodash';
 import Messenger from 'chrome-ext-messenger';
 
 import Icon from 'san-mui/lib/Icon';
+import Chip from 'san-mui/lib/Chip';
+import Avatar from 'san-mui/lib/Avatar';
 import Divider from 'san-mui/lib/Divider'
 
 import utils from '../../../js/common/utils';
@@ -40,6 +39,8 @@ import {TreeView, TreeViewItem} from '../../components/TreeView';
 
 import 'san-mui/lib/index.css';
 import 'san-mui/lib/Divider/Divider.styl';
+import 'san-mui/lib/Chip/Chip.styl';
+import 'san-mui/lib/Avatar/Avatar.styl';
 
 import '../../components/TreeView/index.styl';
 import '../../components/TreeView/custom.styl';
@@ -50,7 +51,9 @@ export default {
         'san-icon': Icon,
         'san-tree-view': TreeView,
         'san-tree-view-item': TreeViewItem,
-        'san-divider': Divider
+        'san-divider': Divider,
+        'san-chip': Chip,
+        'san-avatar': Avatar
     },
 
     initData() {
@@ -58,7 +61,7 @@ export default {
             // 默认不对执行代码进行合并处理
             maxLengthOfExecutionCodeQueue: 10,
             cid: '',
-            loadingToast: 'Oops, too many components, so be patient.',
+            loadingToast: 'Building and loading component tree...',
             loading: true
         };
     },
@@ -100,6 +103,7 @@ export default {
     },
 
     inited() {
+        window.ct = this;
         this.excutionIndex = 0;
         this.excutionCodeQueue = [];
         this.excutionCodeQueueChecker = null;
@@ -123,6 +127,7 @@ export default {
             if (!res) {
                 return;
             }
+            // 首次打开 San devtool panel，一次性从 content script 加载。
             let connection = this.messenger.initConnection(
                 'component_tree',
                 (message, from, sender, sendResponse) => {
@@ -142,6 +147,24 @@ export default {
                         message.data, message.indexList, message.count);
                 }
             );
+            // 更新 component tree 的变化
+            this.messenger.initConnection('component_tree_mutations',
+                (message, from, sender, sendResponse) => {
+                    this.lastSanMessageTimestamp = Date.now();
+                    if (!message || !_.isObject(message)
+                        || !_.isArray(message.queue)) {
+                        return;
+                    }
+                    if (this.data.get('progress') === 100) {
+                        this.data.set('progress', .1);
+                    }
+                    this.data.set('loading', true);
+                    for (let m of message.queue) {
+                        this.updateTreeData(m.message, m.idPath, m.data,
+                            m.indexList, m.count, true);
+                    }
+                }
+            );
         });
         // 通知页面 devtool 面板已经打开，可以开始发送 comp-XXX 消息。
         this.pageEval('window.' + SAN_DEVTOOL + '.devtoolPanelCreated = true');
@@ -150,23 +173,12 @@ export default {
     created() {
         // 面板初始化时一次性从 __san_devtool__.data 中读取整个组件树结构。
         // FIXME: 组件树很大时的效率问题需要解决。
-        /*this.pageEval('window.' + SAN_DEVTOOL + '.data.treeData', (res, ex) => {
+        this.pageEval('window.' + SAN_DEVTOOL + '.data.treeData', (res, ex) => {
+            if (!res || !_.isObject(res)) {
+                return;
+            }
             this.data.set('treeData', res);
-        });*/
-        let connection = this.messenger.initConnection('comp_tree_data',
-            (message, from, sender, sendResponse) => {
-                if (message && _.isObject(message)) {
-                    this.data.set('treeData', message);
-                    this.data.set('loading', false);
-                }
-            }
-        );
-        /*console.log(connection);
-        connection.sendMessage('devtool:get_background_treedata', {},
-            (message, from, sender, sendResponse) => {
-                
-            }
-        );*/
+        });
     },
 
     attached() {
@@ -246,8 +258,10 @@ export default {
     detachFromTree(data, indexList, root) {
         const d = this.getDataByPathIndexList(indexList, root);
         if (d.self && d.parent) {
+            san.nextTick(() => {
             this.data.splice(
                 d.parentKey + '.treeData', [indexList[indexList.length - 1]]);
+            });
         }
     },
 
@@ -296,13 +310,13 @@ export default {
                 }
 
                 for (let [i, p] of path.entries()) {
+                    if (i < path.length - 1) {
+                        continue;
+                    }
                     let currentIndexList = indexList.slice(0, i + 1);
                     let code = 'window.' + SAN_DEVTOOL + '.data'; 
                     for (let index of currentIndexList) {
                         code += '.treeData[' + index + ']';
-                    }
-                    if (i < path.length - 1) {
-                        continue;
                     }
                     // 执行合并后的代码。
                     if (this.excutionIndex % max === 0
@@ -378,7 +392,7 @@ export default {
                 .sm-touch-ripple.selected:hover
                     &~.sm-tree-view-item-content.selected
                         .sm-tree-view-item-primary-text
-                            background-image: linear-gradient(to right, #c96 calc(100% - 40px), transparent);
+                            background-image: linear-gradient(to right, #c96 calc(100% - 40px), transparent)
                 .sm-tree-view-item-content
                     .sm-tree-view-item-primary-text
                     &:hover
@@ -387,16 +401,24 @@ export default {
                         font-weight: bold
                         color: #c96
                         width: 100%;
-                        background-image: linear-gradient(to right, #c96 calc(100% - 40px), transparent);
-                        -webkit-background-clip: text;
-                        -webkit-text-fill-color: transparent;
-                        background-size: calc(100% - 80px) auto;
-                        background-repeat-x: no-repeat;
+                        background-image: linear-gradient(to right, #c96 calc(100% - 40px), transparent)
+                        -webkit-background-clip: text
+                        -webkit-text-fill-color: transparent
+                        background-size: calc(100% - 80px) auto
+                        background-repeat-x: no-repeat
                     &.selected
                         .sm-tree-view-item-primary-text
-                            background-image: linear-gradient(90deg,#fff calc(100% - 40px),transparent);
+                            background-image: linear-gradient(90deg,#fff calc(100% - 40px),transparent)
+                    .sm-tree-view-item-extras
+                        right: 200px
                     .sm-tree-view-item-secondary-text
                         margin-right: 5px
+                    .sm-chip
+                        background-color: #afd2ee !important
+                        margin-left: 5px
+                        .sm-avatar
+                            background-color: #1b74ba !important
+                            color: #fff !important
 
     .sm-text-field
         .sm-text-field-hint
