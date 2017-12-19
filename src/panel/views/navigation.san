@@ -12,7 +12,11 @@
                         href="https://github.com/ecomfe/san/releases/tag/{{sanVersion}}"
                         target="_blank"
                     >
-                        <san-avatar src="../../icons/san_logo_white.svg" backgroundColor="rgba(0,0,0,0)"></san-avatar>
+                        <san-avatar
+                            src="../../icons/san_logo_white.svg"
+                            backgroundColor="rgba(0,0,0,0)"
+                        >
+                        </san-avatar>
                     </san-button>
                     <san-button
                         variants="secondery raised"
@@ -33,14 +37,24 @@
             </san-col>
             <san-col span="14" order="2">
                 <section class="main-tabs">
-                    <san-tabs value="{=currentTab=}" on-change="change($event)" s-ref="tabs">
+                    <san-tabs
+                        value="{=currentTab=}"
+                        on-change="change($event)"
+                        s-ref="tabs"
+                    >
                         <san-tab
                             san-for="tab, index in tabs"
                             value="{{tab.value}}"
                             s-ref="tab_{{index}}"
                         >
                             <san-icon slot="icon">{{tab.icon}}</san-icon>
-                            <span slot="label" s-if="!smallTabItem">{{tab.label}}</span>
+                            <span
+                                slot="label"
+                                class="{{labelClass}}"
+                                title="{{smallTabItem ? tab.label : ''}}"
+                            >
+                                {{smallTabItem ? '' : tab.label}}
+                            </span>
                         </san-tab>
                     </san-tabs>
                 </section>
@@ -120,8 +134,8 @@ export default {
     },
 
     computed: {
-        navTitle() {
-
+        labelClass() {
+            return this.data.get('smallTabItem') ? 'tooltip' : '';
         }
     },
 
@@ -169,6 +183,7 @@ export default {
                     value: 'store'
                 }]);
             }
+            // FIXME: Bug in san-mui.
             san.nextTick(() => {
                 this.ref('tabs').data.set('items',
                     this.data.get('tabs').map(i => i.value));
@@ -212,6 +227,14 @@ export default {
             flex-flow: row nowrap
             height: 40px
             min-height: auto
+            position: relative
+            .tooltip
+                position: absolute
+                left: 0
+                top: 0
+                right: 0
+                bottom: 0
+                z-index: 100
             .sm-icon
                 ~ span
                     margin-top: 0
