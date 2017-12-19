@@ -6,7 +6,6 @@
  * @author luyuan(luyuan.china@gmail.com)
  */
 
-import san from 'san';
 import Messenger from 'chrome-ext-messenger';
 
 function update(version) {
@@ -33,6 +32,12 @@ function update(version) {
     return true;
 }
 
+function updateOptions() {
+    connector.sendMessage('background:options', {}).then(res => {
+        connector.sendMessage('devtool:options_updated', res);
+    });
+}
+
 let messenger = new Messenger();
 let connector = messenger.initConnection('detector',
     (message, from, sender, sendResponse) => {
@@ -55,6 +60,10 @@ setTimeout(() => {
 
         document.querySelector('#no_version_shown').checked = !!+options[
             'do_not_show_version'];
+        document.querySelector('#readonly_data').checked = !!+options[
+            'readonly_for_component_data'];
+        document.querySelector('#readonly_store').checked = !!+options[
+            'readonly_for_store'];
     });
 
 }, 100);
@@ -62,7 +71,20 @@ setTimeout(() => {
 window.addEventListener('load', e => {
     document.querySelector('#no_version_shown').addEventListener('click', e => {
         connector.sendMessage('background:options', {
-            'do_not_show_version': e.target.checked ? 1 : 0,
+            'do_not_show_version': +e.target.checked,
         });
+        updateOptions();
+    });
+    document.querySelector('#readonly_data').addEventListener('click', e => {
+        connector.sendMessage('background:options', {
+            'readonly_for_component_data': +e.target.checked,
+        });
+        updateOptions();
+    });
+    document.querySelector('#readonly_store').addEventListener('click', e => {
+        connector.sendMessage('background:options', {
+            'readonly_for_store': +e.target.checked,
+        });
+        updateOptions();
     });
 });

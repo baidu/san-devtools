@@ -6,6 +6,7 @@
             data="{=data=}"
             filterText="{{filterText}}"
             rootName="data"
+            readonly="{{dataReadonly}}"
             on-change="change($event)"
             on-append="append($event)"
             on-rename="rename($event)"
@@ -33,14 +34,16 @@ export default {
     initData() {
         return {
             data: {},
-            filterText: ''
+            filterText: '',
+            dataReadonly: false
         };
     },
 
     dataTypes: {
         cid: DataTypes.string,
         data: DataTypes.object,
-        filterText: DataTypes.string
+        filterText: DataTypes.string,
+        dataReadonly: DataTypes.bool
     },
 
     attached() {
@@ -65,41 +68,43 @@ export default {
     },
 
     setData(args) {
-        return injector.fromDevtool('(' + (args => {
-            var cid = args[0];
-            var key = args[1];
-            var event = args[4];
-            let data = document.getElementById(cid).__san_component__.data;
-            switch (event) {
-                case 'change':
-                    if (data.get(key) === args[2] && data.get(key) !== args[3]) {
-                        data.set(key, args[3]);
-                    }
-                    break;
-                case 'append':
-                    if (data.get(key)) {
+        return this.data.get('dataReadonly')
+            ? () => {}
+            : injector.fromDevtool('(' + (args => {
+                var cid = args[0];
+                var key = args[1];
+                var event = args[4];
+                let data = document.getElementById(cid).__san_component__.data;
+                switch (event) {
+                    case 'change':
+                        if (data.get(key) === args[2] && data.get(key) !== args[3]) {
+                            data.set(key, args[3]);
+                        }
                         break;
-                    }
-                    args[2] === 'value'
-                        ? data.push(key.replace(/^(.*)\[\d+\]$/,'$1'), args[3])
-                            : data.set(key, args[3]);
-                    break;
-                case 'rename':
-                    var oldKey = key.replace(/(^|(?!\.))\w+$/, args[2]);
-                    var value = data.get(oldKey);
-                    data.set(oldKey, undefined);
-                    data.set(key, value);
-                    break;
-                case 'delete':
-                    var m = key.match(/^(.*)\[(\d+)\]$/);
-                    if (args[3] === 'array') {
-                        data.splice(m[1], [m[2], 1]);
-                    } else {
-                        data.set(key, undefined);
-                    }
-                    break;
-            }
-        }).toString() + ')(' + JSON.stringify(args) + ')');
+                    case 'append':
+                        if (data.get(key)) {
+                            break;
+                        }
+                        args[2] === 'value'
+                            ? data.push(key.replace(/^(.*)\[\d+\]$/,'$1'), args[3])
+                                : data.set(key, args[3]);
+                        break;
+                    case 'rename':
+                        var oldKey = key.replace(/(^|(?!\.))\w+$/, args[2]);
+                        var value = data.get(oldKey);
+                        data.set(oldKey, undefined);
+                        data.set(key, value);
+                        break;
+                    case 'delete':
+                        var m = key.match(/^(.*)\[(\d+)\]$/);
+                        if (args[3] === 'array') {
+                            data.splice(m[1], [m[2], 1]);
+                        } else {
+                            data.set(key, undefined);
+                        }
+                        break;
+                }
+            }).toString() + ')(' + JSON.stringify(args) + ')');
     },
 
     change(args) {
