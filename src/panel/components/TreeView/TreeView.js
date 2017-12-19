@@ -6,6 +6,7 @@
 import san, {DataTypes} from 'san';
 import {Icon} from 'san-mui/lib/Icon';
 import TextField from 'san-mui/lib/TextField';
+import TreeViewItem from './TreeViewItem';
 
 export default san.defineComponent({
 
@@ -24,11 +25,29 @@ export default san.defineComponent({
                     on-input-keypress="doHighlight($event)"
                 />
             </div>
-            <div class="sm-tree-view-loading-toast" s-if="loading">
-                {{loadingToast}}
+            <div
+                class="sm-tree-view-loading-toast"
+                style="opacity:{{loading ? 1 : 0}}"
+            >
+                <div
+                    class="sm-tree-view-loading-toast-content"
+                    style="{{loadingToastContentStyle}}"
+                >
+                    {{loadingToast}}
+                </div>
             </div>
             <div class="sm-tree-view-item-wrapper">
-                <slot></slot>
+                <slot s-if="dataSource!=='JSON'"></slot>
+                <san-tree-view-item
+                    s-else
+                    s-for="item, index in treeData"
+                    index="{{index}}"
+                    treeData="{=item=}"
+                    filterText="{{filterText}}"
+                    initiallyOpen="{{initiallyOpen}}"
+                    dataSource="JSON"
+                >
+                </san-tree-view-item>
             </div>
         </div>
     `,
@@ -43,12 +62,15 @@ export default san.defineComponent({
         highlighted: DataTypes.bool,
         treeData: DataTypes.arrayOf(DataTypes.object),
         loading: DataTypes.bool,
-        loadingToast: DataTypes.string
+        loadingToast: DataTypes.string,
+        loadingAsync: DataTypes.bool,
+        progress: DataTypes.number
     },
 
     components: {
         'san-icon': Icon,
-        'san-text-field': TextField
+        'san-text-field': TextField,
+        'san-tree-view-item': TreeViewItem,
     },
 
     inited() {
@@ -64,6 +86,11 @@ export default san.defineComponent({
             dataSource: 'ATTRIBUTE',
             highlighted: false,
             loading: true,
+            loadingToast: '',
+            loadingAsync: true,
+            loadingToastContentFromColor: 'blue',
+            loadingToastContentToColor: 'red',
+            progress: 0,
             rootTreeView: true,
             filterText: '',
             lastFilterText: ''
@@ -71,10 +98,16 @@ export default san.defineComponent({
     },
 
     attached() {
+        this.watch('progress', value => {
+            this.data.set('loading', value < 100);
+        });
     },
 
     created() {
         this.dispatch('UI:tree-view-created', this);
+        if (!this.data.get('loadingToast')) {
+            this.data.set('loading', false);
+        }
     },
 
     messages: {
@@ -125,12 +158,37 @@ export default san.defineComponent({
             if (target.data.get('dataSource') === undefined) {
                 target.data.set('dataSource', this.data.get('dataSource'));
             }
+        },
+        'UI:query-loading-toast-attribute'(arg) {
+            arg.target && arg.target.data && arg.target.data.set(
+                'loadingToast', this.data.get('loadingToast'));
+        },
+        'UI:item-rendering'(arg) {
+            let allCount = this.getItemCount(false);
+            let renderableCount = this.getItemCount(true) + 1;
+            let progress = 0;
+            if (allCount > 0 && renderableCount > 1) {
+                progress = renderableCount / allCount * 100;
+            }
+            this.data.set('progress', progress);
         }
     },
 
     computed: {
         treeViewClass() {
             return this.data.get('compact') ? 'compact ' : '';
+        },
+        loadingToastContentStyle() {
+            let fromColor = this.data.get('loadingToastContentFromColor');
+            let toColor = this.data.get('loadingToastContentToColor');
+            let progress = this.data.get('progress');
+            let leftBound = Math.max(0, progress - 3);
+            let rightBound = Math.min(100, progress + 3);
+            return {
+                'background-image':
+                    `linear-gradient(to right, ${fromColor} ${leftBound}%,
+                        ${toColor} ${rightBound}%, ${toColor})`
+            };
         }
     },
 
@@ -140,6 +198,12 @@ export default san.defineComponent({
             return;
         }
         let filterText = this.data.get('filterText');
+    },
+
+    getItemCount(onlyRenderable) {
+        let all = this.el.querySelectorAll(
+            onlyRenderable ? '.pad' : '.sm-tree-view-item');
+        return all && all.length > 0 ? all.length : 1;
     }
 
 });
