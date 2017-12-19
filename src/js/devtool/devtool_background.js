@@ -30,30 +30,12 @@ function createDevtoolPanelIfNeeded() {
                 'html/devtool/panel_index.html',
                 function (panel) {
                     // panel loaded
-                    console.log(panel);
                 }
             );
             created = true;
         }
     );
 }
-
-let messenger = new Messenger;
-let setterConnect = messenger.initConnection(
-    'set_background_treedata',
-    (message, from, sender, sendResponse) => {
-        console.log('set_background_treedata', message);
-        window.treeData = message;
-        setterConnect.sendMessage('devtool:comp_tree_data', message, () => {});
-    }
-);
-let getterConnect = messenger.initConnection(
-    'get_background_treedata',
-    (message, from, sender, sendResponse) => {
-        console.log('get_background_treedata', window.treeData);
-        sendResponse(window.treeData);
-    }
-);
 
 //chrome.devtools.network.onNavigated.addListener(createDevtoolPanelIfNeeded);
 
