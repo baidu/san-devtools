@@ -20,7 +20,6 @@ export default class JsonTreeView extends Component {
     `;
 
     static dataTypes = {
-        data: DataTypes.object,
         expand: DataTypes.bool,
         rootName: DataTypes.string,
         withRootName: DataTypes.bool,
@@ -57,6 +56,10 @@ export default class JsonTreeView extends Component {
         this.watch(key, value => {
             this.view[key] = value;
         });
+    }
+
+    viewer() {
+        return this.view;
     }
 
     attached() {
