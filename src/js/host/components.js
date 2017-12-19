@@ -3,6 +3,7 @@
  * Copyright 2017 Ecomfe. All rights reserved.
  *
  * @file 组件相关的公用工具集，可以运行于页面、content script 或者 devtool 上下文。
+ * @author luyuan<luyuan.china@gmail.com>
  */
 
 import utils from '../common/utils';
@@ -63,20 +64,21 @@ function updatePrimitiveTreeDataByPath(root, data, isDeleted) {
         var index = this.getIDListFromTreeData(r).indexOf(e);
         if (!isDeleted) {
             if (index < 0) {
+                let d = {
+                    ...data,
+                    id: e
+                };
                 r.push(i === path.length - 1 ? {
-                    id: e,
-                    text: data.text,
-                    secondaryText: data.secondaryText
+                    ...d,
                 } : {
-                    id: e,
-                    text: data.text,
-                    secondaryText: data.secondaryText,
+                    ...d,
                     treeData: []
                 });
             } else {
                 if (r[index] && r[index].id === data.id) {
                     r[index].text = data.text;
                     r[index].secondaryText = data.secondaryText;
+                    r[index].extras = data.extras;
                 }
             }
             var r0 = index < 0 ? r[r.length - 1] : r[index];

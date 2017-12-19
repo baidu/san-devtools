@@ -27,10 +27,12 @@ export function installSanHook(global) {
         history: [],
         historyIndexBeforeDevtoolPanelCreated: 0,
         routes: [],
+        // Stores 对象及相关信息，与 devtool 保持同步的 mutation list。
         store: {
             stores: {},
             mutations: [],
-            actions: []
+            actions: [],
+            treeData: []
         },
         sub: (event, func) => {
             sanHook.on(event, func);
@@ -94,10 +96,6 @@ export function installSanHook(global) {
         },
         set(value) {
             sanHook._devtoolPanelCreated = !!value;
-            value && window.postMessage({
-                data: sanHook.data.treeData,
-                message: 'treedata'
-            }, '*');
             sanHook.historyIndexBeforeDevtoolPanelCreated
                 = sanHook.history.length;
             console.log('devtool panel created');

@@ -3,6 +3,7 @@
  * Copyright 2017 Ecomfe. All rights reserved.
  *
  * @file Constants
+ * @author luyuan<luyuan.china@gmail.com>
  */
 
 export default {
@@ -22,14 +23,15 @@ export default {
         'store-default-inited',
         'store-connected',
         'store-comp-inited',
-        'store-comp-diposed',
+        'store-comp-disposed',
         'store-listened',
         'store-unlistened',
         'store-dispatched',
         'store-action-added'
     ],
 
-    subTreeKey: 'treeData'
+    subTreeKey: 'treeData',
+
+    gutterSize: 2
 
 };
-
