@@ -94,6 +94,7 @@ export default {
     },
 
     created() {
+        console.log(Navigation);
     },
 
     attached() {
