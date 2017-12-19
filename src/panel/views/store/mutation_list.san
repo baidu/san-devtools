@@ -1,0 +1,203 @@
+<template>
+    <div class="state-list-wrapper">
+        <san-tree-view
+            treeData="{=treeData=}"
+            compact="{{!!0}}"
+            wholeLineSelected="{{!0}}"
+            keepingSelected="{{!0}}"
+            filterBar="{{!0}}"
+            filterIcon="filter_list"
+            filterPlaceholder="Find mutation"
+            filterText="{=filterText=}"
+            initiallyOpen="{{!0}}"
+            primaryTogglesNestedTreeView="{{!0}}"
+            dataSource="JSON"
+        >
+            <san-tree-view-item
+                san-for="item, index in treeData"
+                initiallyOpen="{{!0}}"
+                treeData="{=item=}"
+                filterText="{{filterText}}"
+                dataSource="JSON"
+            >
+            </san-tree-view-item>
+        </san-tree-view>
+    </div>
+</template>
+
+<script>
+import san, {DataTypes} from 'san';
+import _ from 'lodash';
+import Messenger from 'chrome-ext-messenger';
+
+import injector from '../../../js/host/injector';
+
+import Icon from 'san-mui/lib/Icon';
+import Divider from 'san-mui/lib/Divider'
+
+import utils from '../../../js/common/utils';
+import components from '../../../js/host/components';
+import {TreeView, TreeViewItem} from '../../components/TreeView';
+
+import 'san-mui/lib/index.css';
+import 'san-mui/lib/Divider/Divider.styl';
+
+import '../../components/TreeView/index.styl';
+
+export default {
+
+    components: {
+        'san-icon': Icon,
+        'san-tree-view': TreeView,
+        'san-tree-view-item': TreeViewItem,
+        'san-divider': Divider
+    },
+
+    initData() {
+        return {
+            treeData: [],
+            index: 0,
+            actionName: '',
+            inspectingState: {
+                text: 'Inspecting',
+                icon: 'remove_red_eye'
+            }
+        };
+    },
+
+    dataTypes: {
+        treeData: DataTypes.arrayOf(DataTypes.object),
+        index: DataTypes.number,
+        actionName: DataTypes.string,
+        inspectingState: DataTypes.objectOf(DataTypes.string)
+    },
+
+    messages: {
+        'EVENT:click'(arg) {
+            let comp = arg.value.comp;
+            if (!comp) {
+                return;
+            }
+            let extras = comp.data.get('treeData.extras');
+            if (!extras) {
+                comp.data.set('treeData.extras', []);
+            }
+            this.clearExtra('Inspecting');
+            san.nextTick(() => {
+                comp.data.unshift('treeData.extras',
+                    this.data.get('inspectingState'));
+            });
+            this.data.set('actionName', comp.data.get('treeData.text'));
+            this.data.set('index', this.getInspectingIndex(comp));
+        }
+    },
+
+    compiled() {
+        this.messenger = new Messenger();
+        this.mutationConnection = this.messenger.initConnection(
+            'store_mutation',
+            (message, from, sender, sendResponse) => {
+                if (!message || !_.isObject(message)) {
+                    return;
+                }
+                this.data.unshift('treeData', message);
+                this.clearExtra('Current');
+                san.nextTick(() => {
+                    this.setExtra('Current', 'location_on');
+                });
+            }
+        );
+    },
+
+    created() {
+        injector.fromDevtool('window.' + SAN_DEVTOOL + '.store.treeData')
+            .then(data => {
+                if (data.length < 1) {
+                    return;
+                }
+                this.data.set('treeData', data);
+                this.clearExtra('Current');
+                this.setExtra('Current', 'location_on');
+                san.nextTick(() => {
+                    let firstItem = this.el.querySelector('.sm-tree-view-item');
+                    firstItem && firstItem.click();
+                });
+                this.parentComponent.data.set('index', 0);
+            }
+        );
+    },
+
+    getInspectingIndex(comp) {
+        let aid = comp.data.get('treeData.extras').filter(
+            e => e.text.startsWith('Action'))[0].text;
+        let res = -1;
+        this.data.get('treeData').forEach((e, i) => {
+            e.extras.forEach((f, j) => {
+                if (f.text === aid) {
+                    res = i;
+                    return;
+                }
+            });
+        });
+        return res;
+    },
+
+    hasExtra(text) {
+        for (let i of this.data.get('treeData')) {
+            let has =
+                i.extras.map(e => e.text === text).reduce((a, b) => a + b, 0);
+            if (has > 0) {
+                return true;
+            }
+        }
+        return false;
+    },
+
+    clearExtra(text) {
+        this.data.get('treeData').forEach((e, i) => {
+            let n = e.extras.filter(e => e.text !== text);
+            this.data.set('treeData[' + i + '].extras', n);
+        });
+    },
+
+    setExtra(text, icon, index) {
+        index |= 0;
+        this.data.unshift('treeData[' + index + '].extras', {text, icon});
+    }
+
+}
+</script>
+
+<style lang="stylus">
+.state-list-wrapper
+    height: 100%
+    .sm-tree-view
+        padding: 0 !important
+        height: 100%
+        .sm-tree-view-item-wrapper
+            overflow-y: auto
+            height: calc(100% - 48px)
+            .sm-tree-view-item
+                .sm-tree-view-item-content
+                    margin-left: 10px !important
+                    .sm-tree-view-item-extras
+                        position: absolute
+                        right: 20px
+                        top: 10px
+                        zoom: .7
+                        .sm-chip
+                            border-radius: 20px !important
+                            background-color: #afd2ee !important
+                            margin-left: 5px
+                            &.Current
+                                background-color: #e7bccb !important
+                                .sm-avatar
+                                    background-color: #d41656 !important
+                            &.Inspecting
+                                background-color: #b3dbb5 !important
+                                .sm-avatar
+                                    background-color: #319d35 !important
+                            .sm-avatar
+                                background-color: #1b74ba !important
+                                color: #fff !important
+</style>

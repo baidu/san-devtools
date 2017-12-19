@@ -10,13 +10,14 @@ import _ from 'lodash';
 import constants from '../common/constants';
 import utils from '../common/utils';
 import components from './components';
+import stores from './stores';
 
 // 获得 devtool 显示组件树所需要的组件的信息。
 let getComponentTreeItemData = component => ({
     id: component.id,
-    text: '<' + getComponentName(component) + '> '
-        + getComponentRouteData(component),
+    text: '<' + getComponentName(component) + '>',
     secondaryText: component.id,
+    extras: [getComponentRouteExtraData(component)],
     idPath: component.idPath
 });
 
@@ -74,6 +75,14 @@ function getComponentRouteData(component) {
     return data.routeData ? 'Route:' + data.routeData.path : '';
 }
 
+function getComponentRouteExtraData(component) {
+    let data = getRouteInfo(component);
+    return data.routeData ? {
+        icon: 'navigation',
+        text: getComponentRouteData(component)
+    } : null;
+}
+
 function getDevtoolNS() {
     if (!utils.isBrowser()) {
         return;
@@ -115,6 +124,7 @@ function addStoreEventListeners() {
                 case 'store-connected': {
                     let {store, name, isDefault} = args[0];
                     store.isDefault = isDefault;
+                    store.name = name;
                     if (!store) {
                         return;
                     }
@@ -129,6 +139,7 @@ function addStoreEventListeners() {
                             return;
                         }
                         let len = Object.keys(sanDevtool.store.stores).length;
+                        store.name = 'Store' + len;
                         sanDevtool.store.stores['Store' + len] = store;
                     }
                     break;
@@ -152,14 +163,22 @@ function addStoreEventListeners() {
                 case 'store-action-added':
                     sanDevtool.store.actions.push(args[0]);
                     break;
-                case 'store-dispatched':
-                    sanDevtool.store.mutations.push(args[0]);
+                case 'store-dispatched': {
+                    let data = {
+                        ...args[0],
+                        timestamp: Date.now()
+                    };
+                    stores.processMutationData(data.diff);
+                    sanDevtool.store.mutations.unshift(data);
+                    stores.updateMutationList(sanDevtool.store, data);
                     break;
+                }
                 // 替代方案，当使用非官方 connector 并且没有在 connector 中向 devtool
                 // 发送相应的时间的时候有效。
                 case 'store-default-inited': {
                     let store = args[0].store;
                     store.isDefault = true;
+                    store.name = 'Default';
                     break;
                 }
                 case 'store-listened': {
@@ -175,8 +194,8 @@ function addStoreEventListeners() {
                         return;
                     }
                     let len = Object.keys(sanDevtool.store.stores).length;
-                    sanDevtool.store.stores[
-                        store.isDefault ? 'Default' : 'Store' + len] = store;
+                    store.name = store.isDefault ? 'Default' : 'Store' + len;
+                    sanDevtool.store.stores[store.name] = store;
                     break;
                 }
                 case 'store-unlistened': {
@@ -184,6 +203,15 @@ function addStoreEventListeners() {
                         return;
                     }
                     break;
+                }
+            }
+
+            if (sanDevtool.devtoolPanelCreated) {
+                if (e === 'store-dispatched') {
+                    window.postMessage({
+                        message: e,
+                        ...sanDevtool.store.treeData[0]
+                    }, '*');
                 }
             }
         });

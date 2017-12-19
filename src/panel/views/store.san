@@ -1,18 +1,56 @@
 <template>
     <div class="sd-store-wrapper">
         <div class="sd-state-wrapper">
-            <sandevtool-state-list
-
+            <sandevtool-mutation-list
+                index="{=index=}"
             >
-            </sandevtool-state-list>
+            </sandevtool-mutation-list>
         </div>
         <div class="sd-store-detail-wrapper">
+            <div class="title-wrapper">
+                <div class="action-name">{{actionName}}</div>
+                <div class="filter">
+                    <san-text-field
+                        icon="search"
+                        hintText="{{filterPlaceholder}}"
+                        inputValue="{=filterText=}"
+                        fullWidth
+                        s-ref="detailFilterInputBox"
+                        on-input-keypress="doFilter($event)"
+                    />
+                </div>
+            </div>
+            <div class="panel-container">
+                <div class="ex-panel-wrapper" style="display:{{panelVisibility.sv?'block':'none'}}">
+                    <san-expansion-panel title="Store" open="{{!0}}">
+                        <sandevtool-store-viewer
+                            index="{{index}}"
+                            filterText="{{filterText}}"
+                            s-ref="sv"
+                            payloadReadonly="{=payloadReadonly=}"
+                        >
+                        </sandevtool-store-viewer>
+                    </san-expansion-panel>
+                </div>
+                <div class="ex-panel-wrapper" style="display:{{panelVisibility.dv?'block':'none'}}">
+                    <san-expansion-panel title="Diff" open="{{!0}}">
+                        <sandevtool-diff-viewer
+                            index="{{index}}"
+                            filterText="{{filterText}}"
+                            s-ref="dv"
+                        >
+                        </sandevtool-diff-viewer>
+                    </san-expansion-panel>
+                </div>
+
+            </div>
         </div>
     </div>
 </template>
 
 <script>
 import san, {DataTypes} from 'san';
+import Messenger from 'chrome-ext-messenger';
 import Split from 'split.js';
 
 import ExpansionPanel from 'san-mui/lib/ExpansionPanel';
@@ -24,12 +62,25 @@ import 'san-mui/lib/ExpansionPanel/ExpansionPanel.styl';
 import 'san-mui/lib/Button/Button.styl';
 import 'san-mui/lib/Icon/Icon.styl';
 
-import StateList from './store/state_list.san';
+import constants from '../../js/common/constants';
+import injector from '../../js/host/injector';
+
+import MutationList from './store/mutation_list.san';
+import StoreViewer from './store/store_viewer.san';
+import DiffViewer from './store/diff_viewer.san';
+
+let getStoreAndActionName = index =>
+    injector.fromDevtool('({store: window.' + SAN_DEVTOOL + '.store.mutations['
+        + index + '].store.name, action: window.' + SAN_DEVTOOL
+            + '.store.mutations[' + index + '].name})');
 
 export default {
 
     components: {
-        'sandevtool-state-list': StateList,
+        'sandevtool-mutation-list': MutationList,
+        'sandevtool-store-viewer': StoreViewer,
+        'sandevtool-diff-viewer': DiffViewer,
+        'san-expansion-panel': ExpansionPanel,
         'san-text-field': TextField,
         'san-button': Button,
         'san-icon': Icon
@@ -42,18 +93,48 @@ export default {
     initData() {
         return {
             filterPlaceholder: 'Search keyword',
-            filterText: ''
+            filterText: '',
+            payloadReadonly: false,
+            index: -1,
+            storeName: '',
+            actionName: '',
+            panelVisibility: {
+                sv: true,
+                dv: true
+            }
         };
     },
 
     dataTypes: {
         filterPlaceholder: DataTypes.string,
-        filterText: DataTypes.string
+        filterText: DataTypes.string,
+        payloadReadonly: DataTypes.bool,
+        index: DataTypes.number,
+        storeName: DataTypes.string,
+        actionName: DataTypes.string,
+        panelVisibility: DataTypes.objectOf(DataTypes.bool)
+    },
+
+    inited() {
+        this.messenger = new Messenger();
+        let connector = this.messenger.initConnection('options_updated', res => {
+            this.data.set('payloadReadonly', !!+res['readonly_for_store']);
+        });
+    },
+
+    created() {
+        this.watch('index', value => {
+            /*getStoreAndActionName(value).then(data => {
+                this.data.set('storeName', data.store);
+                //this.data.set('actionName', data.action);
+            });*/
+        });
     },
 
     attached() {
         Split(['.sd-state-wrapper', '.sd-store-detail-wrapper'], {
             sizes: [50, 50],
+            gutterSize: constants.gutterSize,
             minSize: 300
         });
     }
@@ -74,13 +155,47 @@ export default {
     .sd-store-detail-wrapper
         position: relative
         height: 100%
+    .panel-container
+        height: calc(100% - 50px)
+        overflow-y: auto
+        .ex-panel-wrapper
+            padding: 0 10px
+            margin: 10px 0
+            box-sizing: border-box
+            width: 100%
+            .sm-expansion-panel
+                &.state-open
+                    margin: 0;
 
-.ex-panel-wrapper
-    padding: 0 10px
-    margin: 10px 0
-    box-sizing: border-box
-    width: 100%
-    .sm-expansion-panel
-        &.state-open
-            margin: 0;
+.title-wrapper
+    background-image: linear-gradient(white,white 35px,rgba(255,255,255,0))
+    height: 50px
+    position: relative
+    z-index: 1000
+    &>div
+        height: 34px
+    .action-name
+        float: left
+        color: #2196f3
+        font-weight: bold
+        font-size: 160%
+        padding: 2px 10px
+        box-sizing: border-box
+    .filter
+        overflow: hidden
+        position: relative
+        .sm-text-field
+            zoom: .9
+            position: absolute
+            left: 10px
+            right: 10px
+            width: auto
+            .sm-icon
+                left: 12px
+                top: 10px
+            .sm-text-field-content
+                width: 100%
+                .sm-text-field-line
+                .sm-text-field-focus-line
+                    left: 0
 </style>
