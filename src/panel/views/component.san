@@ -57,6 +57,7 @@
                             <sandevtool-component-data-viewer
                                 cid="{{cid}}"
                                 s-ref="cdv"
+                                dataReadonly="{=dataReadonly=}"
                                 filterText="{{filterText}}"
                             >
                             </sandevtool-component-data-viewer>
@@ -110,6 +111,7 @@
 
 <script>
 import san, {DataTypes} from 'san';
+import Messenger from 'chrome-ext-messenger';
 import Split from 'split.js';
 
 import ExpansionPanel from 'san-mui/lib/ExpansionPanel';
@@ -160,6 +162,7 @@ export default {
             cid: '',
             version: '',
             logoVisibility: false,
+            dataReadonly: false,
             panelVisibility: {
                 bi: true,
                 dv: true,
@@ -177,10 +180,22 @@ export default {
         cid: DataTypes.string,
         version: DataTypes.string,
         logoVisibility: DataTypes.bool,
+        dataReadonly: DataTypes.bool,
         panelVisibility: DataTypes.objectOf(DataTypes.bool),
         componentName: DataTypes.string,
         filterPlaceholder: DataTypes.string,
         filterText: DataTypes.string
+    },
+
+    setDataReadonly(options) {
+        this.data.set('dataReadonly', !!+options['readonly_for_component_data']);
+    },
+
+    inited() {
+        this.messenger = new Messenger();
+        let connector = this.messenger.initConnection('options_updated', res => {
+            this.setDataReadonly(res);
+        });
     },
 
     attached() {
@@ -189,7 +204,14 @@ export default {
             gutterSize: constants.gutterSize,
             minSize: 300
         });
+
         this.data.set('version', chrome.runtime.getManifest().version);
+
+        let connector = this.messenger.initConnection('component_view', () => {});
+        connector.sendMessage('background:options', {}).then(res => {
+            this.setDataReadonly(res);
+        });
+
         setTimeout(() => {
             this.data.set('logoVisibility', true);
         }, 100);
