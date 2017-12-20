@@ -39,6 +39,14 @@
         text-overflow ellipsis
         white-space nowrap
 
+@supports ((-webkit-backdrop-filter: blur(3px)) or (backdrop-filter: blur(3px)))
+    .sm-tree-view-loading-toast
+        background-color rgba(192, 192, 192, .3) !important
+        &.show
+            backdrop-filter blur(3px)
+        &.hide
+            backdrop-filter none
+
 .sm-tree-view-loading-toast
     position absolute
     left 50%
@@ -48,18 +56,21 @@
     width 70%
     text-align center
     overflow hidden
-    background-color rgba(192, 192, 192, .3)
+    background-color rgba(192, 192, 192, .7)
     pointer-events none
-    transition all .3s
+    transition all .5s
     z-index 1000
-    backdrop-filter blur(3px)
     padding 10px
     border-radius 10px
+    &.show
+        opacity 1
+    &.hide
+        opacity 0
 
     > .sm-tree-view-loading-toast-content
         -webkit-text-fill-color transparent
         -webkit-background-clip text
-        background-image linear-gradient(to right, #000, #000);
+        background-image linear-gradient(to right, #000, #000)
 
 .sm-tree-view-item-wrapper
     position relative

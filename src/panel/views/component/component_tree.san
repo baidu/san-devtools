@@ -369,25 +369,42 @@ export default {
 
 <style lang="stylus">
 .sm-tree-view-wrapper
-    width: 100%
-    height: 100%
+    width 100%
+    height 100%
     .sm-tree-view
         height: 100%
         .sm-tree-view-filter-bar
-            background-image: linear-gradient(#fff, #fff 35px, rgba(255,255,255,0))
-            height: 50px
-            z-index: 1000
-            position: relative
-            pointer-events: none
-            margin-right: 15px
+            box-sizing border-box
+            width 100%
+            height 36px
+            overflow hidden
+            z-index 1000
+            position absolute
+            pointer-events none
+            padding 0 !important
             .sm-text-field
                 pointer-events: auto
+                position relative
+                width 100%
+                height 100%
+                zoom 1 !important
+                padding 0 !important
+                .sm-text-field-icon
+                    top 8px !important
+                .sm-text-field-content
+                    position absolute
+                    width calc(100% - 50px)
+                    height 32px
+                    top 0
+                    left 50px
+                    padding 4px 0 0 !important
+                    .sm-text-field-line
+                        top 35px
         .sm-tree-view-item-wrapper
-            height: calc(100% - 34px)
-            overflow: auto
-            margin-top: -35px
-            &>.sm-tree-view-item:first-child
-                margin-top: 25px
+            height 100%
+            overflow auto
+            > .sm-tree-view-item:first-child
+                margin-top 46px
             .sm-tree-view-item
                 .sm-touch-ripple.selected:hover
                     &~.sm-tree-view-item-content.selected
