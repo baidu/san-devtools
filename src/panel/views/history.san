@@ -14,7 +14,7 @@
                 <san-icon>clear</san-icon> Clear
             </san-button>
         </div>
-        <div class="table-head-wrapper">
+        <div class="table-head-wrapper backdrop-blur">
             <san-table>
                 <san-thead>
                     <san-tr>
@@ -249,48 +249,54 @@ export default {
 
 <style lang="stylus">
 .blue
-    color: #2196f3
+    color #2196f3
 .sd-history
     thead, tbody
         th, td
-            box-sizing: border-box
+            box-sizing border-box
         th:nth-child(1), td:nth-child(1)
-            width: 170px
+            width 170px
         th:nth-child(2), td:nth-child(2)
-            width: 90px
+            width 90px
         th:nth-child(3), td:nth-child(3)
-            width: 240px
+            width 240px
         th:nth-child(4), td:nth-child(4)
             overflow: auto
     td
         span
-            margin-left: 5px
-            font-family: 'Consolas'
+            margin-left 5px
+            font-family 'Consolas'
         .button-wrapper
-            display: inline-block
+            display inline-block
             .sm-button
-                font-size: 12px
-                line-height: 20px
+                font-size 12px
+                line-height 20px
     .table-head-wrapper
-        position: absolute
-        top: 0
-        background-color: #000
-        z-index: 10
+        position absolute
+        top 0
+        left -5px
+        right -5px
+        background-color rgba(236, 236, 236, .9)
+        z-index 10
+        .sm-table
+            background transparent
+        th
+            padding 0 22px
     .table-body-wrapper
         table:nth-child(1)
-            margin-top: 51px
+            margin-top 51px
 
 .loading-all-wrapper
     button
-        width: 100%
-        margin-top: 26px
+        width 100%
+        margin-top 26px
 
 .toolbar
-    position: absolute
-    z-index: 10000
-    right: 5px
-    top: 5px
+    position absolute
+    z-index 10000
+    right 5px
+    top 5px
     .sm-button
-        float: right
-        margin-left: 5px
+        float right
+        margin-left 5px
 </style>

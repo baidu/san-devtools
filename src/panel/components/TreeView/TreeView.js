@@ -26,8 +26,7 @@ export default san.defineComponent({
                 />
             </div>
             <div
-                class="sm-tree-view-loading-toast"
-                style="opacity:{{loading ? 1 : 0}}"
+                class="sm-tree-view-loading-toast {{loading ? 'show' : 'hide'}}"
             >
                 <div
                     class="sm-tree-view-loading-toast-content"
