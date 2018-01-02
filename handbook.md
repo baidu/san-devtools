@@ -1,13 +1,27 @@
 # &lt;san-devtool /&gt; 使用指南
 
-## 概述
 San-devtool 为 **San** 基于浏览器扩展的开发者工具。目前暂时支持 Google Chrome 及以 Chromium 为核心的浏览器（以下全部以 Chrome 指代）。并且提供了一个基于 Node.js 的全局命令行工具 `san-devtool` 用于直接打开 *默认/制定* 的 Chrome 浏览器并自动加载 san-devtool 扩展调试页面。
 
 ### 版本依赖
  - san-devtool 的运行需要 **San 3.0.3-rc.17** 及以上的版本。
  - Store tab 的展现需要 **san-store 1.1.0** 及以上的版本。
 
-注意：san-devtool 在 **San 3.1.4** 之前的版本中会向 `Object.prototype` 中设置 `__san_devtool__` 只读属性。在 3.1.4 之后的版本仅会向 `window`  对象设置。
+> 提示：san-devtool 在 **San 3.1.4** 之前的版本中会向 `Object.prototype` 中设置 `__san_devtool__` 只读属性。在 3.1.4 之后的版本仅会向 `window`  对象设置。
+
+- [下载](#下载)
+- [安装](#安装)
+    - [更新](#更新)
+- [命令行工具](#命令行工具)
+- [开发者工具](#开发者工具)
+    - [图标](#图标)
+    - [首页](#首页)
+    - [Component](#Component)
+    - [Store](#Store)
+    - [History](#History)
+    - [Routes](#Routes)
+- [console 直接调试](#console 直接调试) 
+- [新功能预告](#新功能预告)
+
 
 ## 下载
 目前支持以下的下载途径：
@@ -103,7 +117,7 @@ Store tab 反映了在使用了 **San 框架的官方应用状态管理套件** 
  - Store：标示了所选的状态变更的 action 对应的 store（缺省 store 还是其他 store），payload，以及 action handler。
  - Diff：可以查看该 action dispatch 时， payload 变化前后的所有差异。
 
-注意：当使用了非官方的 connector 时，要确保在必要的时刻向 san-devtool 发送 `store-connected` `store-comp-inited` `store-comp-disposed` 事件，这样 san-devtool 才可以更好的生成 Store tab 中所需要状态变更快照。虽然已对无法收到上述事件做了替代方案，但这样可能会导致 Store tab 中某些地方为空。
+> 提示：当使用了非官方的 connector 时，要确保在必要的时刻向 san-devtool 发送 `store-connected` `store-comp-inited` `store-comp-disposed` 事件，这样 san-devtool 才可以更好的生成 Store tab 中所需要状态变更快照。虽然已对无法收到上述事件做了替代方案，但这样可能会导致 Store tab 中某些地方为空。
 
 
 ### History
