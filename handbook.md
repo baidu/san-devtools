@@ -15,11 +15,11 @@ San-devtool 为 **San** 基于浏览器扩展的开发者工具。目前暂时�
 - [开发者工具](#开发者工具)
     - [图标](#图标)
     - [首页](#首页)
-    - [Component](#Component)
-    - [Store](#Store)
-    - [History](#History)
-    - [Routes](#Routes)
-- [console 直接调试](#console 直接调试) 
+    - [Component](#component)
+    - [Store](#store)
+    - [History](#history)
+    - [Routes](#routes)
+- [控制台直接调试](#控制台直接调试) 
 - [新功能预告](#新功能预告)
 
 
@@ -153,7 +153,7 @@ Routes tab 中按照由新至旧的顺序列出了页面路由变化。每一条
  - 时间戳：路由跳转时的时间戳，包括日期及时间，精确到秒。
  - 路由信息：包括了路径，hash（若有），query string（若有），referer（若有）。
 
-## console 直接调试
+## 控制台直接调试
 默认情况下，san-devtool 会在全局写入一个对象 `window.__san_devtool__`，里面包含了 san-devtool 用于展示开发者工具的所有源信息。包括：
 
  - san：**San** 全局对象。用于版本检测及 **San** hook 检测。
