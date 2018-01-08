@@ -139,7 +139,7 @@ Store tab 反映了在使用了 **San 框架的官方应用状态管理套件** 
 
 <p>
     <a href="https://raw.githubusercontent.com/ecomfe/san-devtool/master/docs/images/store_group.png">
-        <img align="right" src="https://raw.githubusercontent.com/ecomfe/san-devtool/master/docs/images/store_group.png" alt="store_group" width="40%">
+        <img align="right" src="https://raw.githubusercontent.com/ecomfe/san-devtool/master/docs/images/store_group.png" alt="store_group" height="300">
     </a>
 </p>
 
