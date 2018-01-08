@@ -139,13 +139,13 @@ Store tab 反映了在使用了 **San 框架的官方应用状态管理套件** 
 
 <p>
     <a href="https://raw.githubusercontent.com/ecomfe/san-devtool/master/docs/images/store_group.png">
-        <img align="left" src="https://raw.githubusercontent.com/ecomfe/san-devtool/master/docs/images/store_group.png" alt="store_group" width="50%">
+        <img src="https://raw.githubusercontent.com/ecomfe/san-devtool/master/docs/images/store_group.png" alt="store_group" width="40%">
     </a>
     <a href="https://raw.githubusercontent.com/ecomfe/san-devtool/master/docs/images/diff_group.png">
-        <img align="right" src="https://raw.githubusercontent.com/ecomfe/san-devtool/master/docs/images/diff_group.png" alt="diff_group" width="50%">
+        <img src="https://raw.githubusercontent.com/ecomfe/san-devtool/master/docs/images/diff_group.png" alt="diff_group" width="40%">
     </a>
 </p>
-<br /><br /><br /><br /><br />
+<br />
 
 点击列表中的项目，右侧的详细信息区域会发生变化。从上之下包括：
 
