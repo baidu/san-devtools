@@ -90,7 +90,7 @@ San-devtool 集成在浏览器内的开发者工具界面，位于浏览器开�
 
 <p>
     <a href="https://raw.githubusercontent.com/ecomfe/san-devtool/master/docs/images/building_component_tree.png">
-        <img align="right" src="https://raw.githubusercontent.com/ecomfe/san-devtool/master/docs/images/building_component_tree.png" alt="building_component_tree" width="30%">
+        <img align="right" src="https://raw.githubusercontent.com/ecomfe/san-devtool/master/docs/images/building_component_tree.png" alt="building_component_tree" width="45%">
     </a>
 </p>
 第一次进入时，页面当前状态下的组件结构树会被一次性的加载。当组件较多的时候，加载可能会花费些时间，由于组件结构树的加载过程为异步的，这并不影响我们选择已经被加载出来的组件项目。其中每一条组件项目包含了三个内容：
@@ -140,9 +140,6 @@ Store tab 反映了在使用了 **San 框架的官方应用状态管理套件** 
 <p>
     <a href="https://raw.githubusercontent.com/ecomfe/san-devtool/master/docs/images/store_group.png">
         <img align="right" src="https://raw.githubusercontent.com/ecomfe/san-devtool/master/docs/images/store_group.png" alt="store_group" width="40%">
-    </a>
-    <a href="https://raw.githubusercontent.com/ecomfe/san-devtool/master/docs/images/diff_group.png">
-        <img align="right" src="https://raw.githubusercontent.com/ecomfe/san-devtool/master/docs/images/diff_group.png" alt="diff_group" width="40%">
     </a>
 </p>
 
