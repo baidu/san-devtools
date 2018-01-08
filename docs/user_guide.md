@@ -1,4 +1,4 @@
- # &lt;san-devtool /&gt; 使用指南
+# &lt;san-devtool /&gt; 使用指南
 
 San-devtool 为 **San** 基于浏览器扩展的开发者工具。目前暂时支持 Google Chrome 及以 Chromium 为核心的浏览器（以下全部以 Chrome 指代）。并且提供了一个基于 Node.js 的全局命令行工具 `san-devtool` 用于直接打开 *默认/制定* 的 Chrome 浏览器并自动加载 san-devtool 扩展调试页面。
 
@@ -52,11 +52,16 @@ $ cd dist
 
 ## 命令行工具
 通过 NPM 全局安装的 san-devtool 会提供一个名为 `san-devtool` 的全局命令行工具，执行 `san-devtool --help` 可以查看各参数的含义。这个工具可以在不通过 Chrome Web Store 及手动安装的情况下自动打开 Chrome 浏览器并加载 NPM 所安装的 san-devtool 来调试页面。
-![global_executable](https://raw.githubusercontent.com/ecomfe/san-devtool/master/docs/images/global_executable.png)
+
+![global_executable](https://raw.githubusercontent.com/ecomfe/san-devtool/master/docs/images/global_executable.png#right)
 
 ## 开发者工具
 ### 图标
-![browser_action](https://raw.githubusercontent.com/ecomfe/san-devtool/master/docs/images/browser_action.png)
+<p>
+    <a href="https://ecomfe.github.io/san/">
+        <img align="right" src="https://raw.githubusercontent.com/ecomfe/san-devtool/master/docs/images/browser_action.png" alt="browser_action" height="100">
+    </a>
+</p>
 在 Chrome 浏览器中安装好 san-devtool 扩展之后，我们会在 Chrome 的工具栏中看到 **San** 的图标，图标的默认状态为灰色。刷新当前页面，若检测到当前页面有使用 **San**，并且 `san.debug` 为 `true`，图标会变为 **San** 标准的蓝色，并且下方会显示出检测到的 **San** 的版本号。
 
 #### Popup 窗口
