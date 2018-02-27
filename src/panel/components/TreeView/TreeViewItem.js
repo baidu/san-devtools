@@ -10,7 +10,6 @@ import Icon from 'san-mui/lib/Icon';
 import Chip from 'san-mui/lib/Chip';
 import Avatar from 'san-mui/lib/Avatar';
 import Checkbox from 'san-mui/lib/Checkbox';
-import {Highlight} from './highlight';
 
 export default san.defineComponent({
 
@@ -22,7 +21,7 @@ export default san.defineComponent({
             on-mouseout="handleContainerMouseout($event)"
             style="{{itemStyle}}"
         >
-            <div class="pad" s-if="renderable">
+            <div class="pad {{selectedClass}}" s-if="renderable">
                 <san-touch-ripple s-if="!disableRipple && !disabled"
                     style="{{touchRippleStyle}}"
                     class="{{selectedClass}} {{hiddenClass}}"
@@ -82,7 +81,10 @@ export default san.defineComponent({
                     <san-tree-view-item
                         s-else
                         s-for="item, index in treeData.treeData"
+                        s-ref="{{ref}}_{{index}}"
                         index="{{index}}"
+                        ref="{{ref}}_{{index}}"
+                        identity="{{item.identity}}"
                         treeData="{=item=}"
                         filterText="{{filterText}}"
                         initiallyOpen="{{initiallyOpen}}"
@@ -93,31 +95,6 @@ export default san.defineComponent({
             </div>
         </div>
     `,
-
-    defaultData() {
-        return {
-            /* 是否可用 */
-            disabled: false,
-            /* 是否隐藏（高亮过滤时启用） */
-            hidden: false,
-            /* 是否选中 */
-            selected: false,
-            /* 是否取消波纹效果 */
-            disableRipple: true,
-            /* 点击时优先展开/折叠子项 */
-            primaryTogglesNestedTreeView: true,
-            /* 初始展开状态 */
-            initiallyOpen: false,
-            /* 复选框状态
-               （null：禁用，undefined：由父项决定，true：选中，false：未选中） */
-            checked: null,
-            /* 数据源
-              （ATTRIBUTE：属性定义（静态），JSON：传入 treeData 数据定义（动态）） */
-            dataSource: 'ATTRIBUTE',
-            /* 是否高亮关键字 */
-            highlighted: false
-        };
-    },
 
     dataTypes: {
         disabled: DataTypes.bool,
@@ -140,7 +117,6 @@ export default san.defineComponent({
         checkboxIndeterminate: DataTypes.bool,
         filterText: DataTypes.string,
         filtered: DataTypes.bool,
-        highlighted: DataTypes.bool,
         primaryText: DataTypes.string,
         secondaryText: DataTypes.string,
         extras: DataTypes.arrayOf(DataTypes.objectOf(DataTypes.string))
@@ -216,7 +192,25 @@ export default san.defineComponent({
             checkboxInputValue: [],
             checkboxIndeterminate: false,
             filterText: '',
-            filtered: true
+            filtered: true,
+            /* 是否可用 */
+            disabled: false,
+            /* 是否隐藏（高亮过滤时启用） */
+            hidden: false,
+            /* 是否选中 */
+            selected: false,
+            /* 是否取消波纹效果 */
+            disableRipple: false,
+            /* 点击时优先展开/折叠子项 */
+            primaryTogglesNestedTreeView: true,
+            /* 初始展开状态 */
+            initiallyOpen: false,
+            /* 复选框状态
+               （null：禁用，undefined：由父项决定，true：选中，false：未选中） */
+            checked: null,
+            /* 数据源
+              （ATTRIBUTE：属性定义（静态），JSON：传入 treeData 数据定义（动态）） */
+            dataSource: 'ATTRIBUTE'
         };
     },
 
@@ -296,6 +290,8 @@ export default san.defineComponent({
     },
 
     inited() {
+        this.data.set('defaultSelectedIdentity',
+            this.parentComponent.data.get('defaultSelectedIdentity'));
         this.data.set('checked', this.data.get('checked'));
         this.data.set('open', this.data.get('initiallyOpen'));
         this.data.set('dataSource',
@@ -344,14 +340,6 @@ export default san.defineComponent({
         });
         this.watch('filtered', value => {
             this.watchFiltered(value);
-        });
-        this.watch('highlighted', value => {
-            if (value) {
-                let text = this.data.get('filterText');
-                text !== '' && this.highlight(text, filterInputBoxEl);
-            } else {
-                this.highlight(null, filterInputBoxEl);
-            }
         });
 
         this.watch('treeData.checked', value => {
@@ -412,6 +400,15 @@ export default san.defineComponent({
             }, index);
         } else {
             this.data.set('renderable', true);
+        }
+
+        const defaultSelectedIdentity = this.data.get('defaultSelectedIdentity');
+        const identity = this.data.get('identity');
+        console.log(defaultSelectedIdentity, identity);
+        if (defaultSelectedIdentity && identity && defaultSelectedIdentity === identity) {
+            console.log('bingo!!!');
+            let evt = document.createEvent('MouseEvent');
+            this.toggleTreeView(evt, 'FORCE');
         }
 
         let slotChilds = this.slotChilds;
@@ -480,6 +477,7 @@ export default san.defineComponent({
     },
 
     updated() {
+        this.data.get('loadingToast') && this.dispatch('UI:item-rendering');
     },
 
     watchFiltered(filtered) {
@@ -510,12 +508,16 @@ export default san.defineComponent({
         if (this.data.get('disabled')) {
             return;
         }
-        if (evt.target.tagName !== 'LABEL' && evt.target.tagName !== 'INPUT') {
+        if ((evt.target && evt.target.tagName !== 'LABEL'
+                        && evt.target.tagName !== 'INPUT')
+                            || (driver === 'FORCE')) {
             this.fire('click', {event: evt, comp: this});
             this.dispatch('EVENT:click', {event: evt, comp: this});
         }
 
-        (driver === 'EXPAND' || forceSelected) && this.toggleRipple();
+        if (driver === 'EXPAND' || forceSelected) {
+            this.toggleRipple();
+        }
         if (driver !== 'EXPAND' && !forceOpen
                 && !this.data.get('primaryTogglesNestedTreeView')
                 || (evt && evt.target && (evt.target.tagName === 'INPUT'
@@ -570,29 +572,6 @@ export default san.defineComponent({
         }
     },
 
-    highlight(word, input, backColor = 'coral', foreColor = 'white') {
-        let el = this.el;
-        if (!el) {
-            return;
-        }
-        let contentSelector = '.sm-tree-view-item-content';
-        let primaryTextSelector = 'p.sm-tree-view-item-primary-text';
-        let secondaryTextSelector = 'p.sm-tree-view-item-secondary-text';
-        let primary
-            = el.querySelector(contentSelector + '>' + primaryTextSelector);
-        let secondary
-            = el.querySelector(contentSelector + '>' + secondaryTextSelector);
-
-        if (typeof word === 'string' && word !== '') {
-            Highlight.highlight(primary, word, input, backColor, foreColor);
-            Highlight.highlight(secondary, word, input, backColor, foreColor);
-        }
-        else {
-            Highlight.unhighlight(primary, input);
-            Highlight.unhighlight(secondary, input);
-        }
-    },
-
     updateChildsCheckboxState(value, driver) {
         this.data.set('checkboxInputValue',
             value ? [this.data.get('checkboxValue')] : ['']);
@@ -626,6 +605,9 @@ export default san.defineComponent({
     getNestedAndCheckedSlotChilds() {
         let items = [];
         let slotChilds = this.slotChilds;
+        if (!slotChilds) {
+            return items;
+        }
         if (slotChilds.length <= 0) {
             return items;
         }

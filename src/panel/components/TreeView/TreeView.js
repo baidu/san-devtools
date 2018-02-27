@@ -40,7 +40,11 @@ export default san.defineComponent({
                 <san-tree-view-item
                     s-else
                     s-for="item, index in treeData"
+                    s-ref="{{ref}}_{{index}}"
                     index="{{index}}"
+                    ref="{{ref}}_{{index}}"
+                    identity="{{item.identity}}"
+                    defaultSelectedIdentity="{{defaultSelectedIdentity}}"
                     treeData="{=item=}"
                     filterText="{{filterText}}"
                     initiallyOpen="{{initiallyOpen}}"
@@ -55,6 +59,7 @@ export default san.defineComponent({
         compact: DataTypes.bool,
         wholeLineSelected: DataTypes.bool,
         keepingSelected: DataTypes.bool,
+        defaultSelectedIdentity: DataTypes.string,
         filterBar: DataTypes.bool,
         filterBarHintText: DataTypes.string,
         dataSource: DataTypes.oneOf(['ATTRIBUTE', 'JSON']),
