@@ -4,10 +4,11 @@ ChangeLog
 1.1.0
 -------
  - [Add]
-   - Store panel for san-store.
+   - Store panel for inspecting san-store.
    - Date viewer can be readonly.
  - [Update]
    - Optimize and asynchronize component tree.
+   - Auto reload when navigating.
 
 1.0.0-rc.6
 -------
