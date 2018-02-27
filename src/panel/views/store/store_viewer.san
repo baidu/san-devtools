@@ -1,16 +1,9 @@
 <template>
     <div class="store-wrapper">
         <div class="store">
-            <san-sub-header inset="{{!!0}}">{{storeName}}</san-sub-header>
-            <san-button
-                class="save"
-                variants="raised info"
-                on-click="save(storeName)"
-                s-if="{{!!0}}"
-            >
-                <san-icon style="margin-right:5px">save</san-icon>
-                Save {{storeName}}
-            </san-button>
+            <san-sub-header inset="{{!!0}}">
+                Store name: <b>{{storeName}}</b>
+            </san-sub-header>
             <san-json-tree-view
                 s-ref="store-viewer"
                 alwaysShowRoot="{{!0}}"
@@ -128,7 +121,7 @@ let requestMutationData = index => {
     let mutation = window[SAN_DEVTOOL].store.mutations[index];
     return {
         storeData: mutation.store.raw,
-        storeName: mutation.store.name,
+        storeName: mutation.store.name === '__default__' ? 'Default' : mutation.store.name,
         actionName: mutation.name,
         actionHandler: mutation.store.actions[mutation.name].toString(),
         relatedComponents: ({}).constructor.keys(mutation.store.components),
@@ -213,6 +206,8 @@ export default {
         margin-right: 5px
         button
             text-transform: none !important
+b
+    color #2196f3 !important
 button.dispatch
     position: absolute
     top: 20px

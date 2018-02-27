@@ -191,7 +191,6 @@ export default {
         this.historyInfoConnection = this.messenger.initConnection(
             'history_info',
             (message, from, sender, sendResponse) => {
-                console.log(message);
                 this.data.unshift('historyAfterDevtoolPanelCreated',
                     generateHistoryInfoData(message));
             }

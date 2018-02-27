@@ -2,6 +2,7 @@
     <div class="sm-tree-view-wrapper custom">
         <san-tree-view
             s-ref="tv"
+            ref="tv"
             treeData="{=treeData=}"
             compact="{{!0}}"
             wholeLineSelected="{{!0}}"
@@ -13,7 +14,7 @@
             initiallyOpen="{{!0}}"
             primaryTogglesNestedTreeView="{{!0}}"
             dataSource="JSON"
-            loadingToast="{{loadingToast}}"
+            loadingToast="{{loadingToast}} {{processingComponentInfo}}"
             loading="{=loading=}"
             loadingToastContentFromColor="#2196f3"
             loadingToastContentToColor="#000"
@@ -33,6 +34,7 @@ import Chip from 'san-mui/lib/Chip';
 import Avatar from 'san-mui/lib/Avatar';
 import Divider from 'san-mui/lib/Divider'
 
+import TaskDelayer from '../../../js/common/task_delayer';
 import utils from '../../../js/common/utils';
 import components from '../../../js/host/components';
 import {TreeView, TreeViewItem} from '../../components/TreeView';
@@ -61,8 +63,9 @@ export default {
             // 默认不对执行代码进行合并处理
             maxLengthOfExecutionCodeQueue: 10,
             cid: '',
-            loadingToast: 'Building and loading component tree...',
-            loading: true
+            loadingToast: 'Building component tree... ',
+            loading: true,
+            processingComponentInfo: ''
         };
     },
 
@@ -70,7 +73,8 @@ export default {
         maxLengthOfExecutionCodeQueue: DataTypes.number,
         cid: DataTypes.string,
         loadingToast: DataTypes.string,
-        loading: DataTypes.bool
+        loading: DataTypes.bool,
+        processingComponentInfo: DataTypes.string
     },
 
     messages: {
@@ -90,6 +94,8 @@ export default {
             }
             this.data.set('cid', d.id);
             this.dispatch('UI:current_component_id', d);
+            this.pageEval('window.' + SAN_DEVTOOL
+                + '.data.selectedComponentId = "' + d.id + '"');
         }
     },
 
@@ -103,10 +109,15 @@ export default {
     },
 
     inited() {
-        window.ct = this;
-        this.excutionIndex = 0;
-        this.excutionCodeQueue = [];
-        this.excutionCodeQueueChecker = null;
+        this.sanCompInfoDelayer = new TaskDelayer({
+            count: this.data.get('maxLengthOfExecutionCodeQueue'),
+            delay: 500,
+            task: queue => {
+                this.retrieveComponentDataFromPage(
+                    this.attachToTree.bind(this), queue);
+            }
+        });
+
         // 获取页面当前拥有 _san_XXX 的元素的个数，用来决定是否开启代码合并执行模式，
         // 以及合并的条数。
         this.pageEval('(' + utils.getSanIdElementCount.toString() + ')()',
@@ -128,23 +139,19 @@ export default {
                 return;
             }
             // 首次打开 San devtool panel，一次性从 content script 加载。
-            let connection = this.messenger.initConnection(
+            this.sanMsgConnection = this.messenger.initConnection(
                 'component_tree',
                 (message, from, sender, sendResponse) => {
                     this.lastSanMessageTimestamp = Date.now();
                     // 只有历史记录列表处于正在记录的状态时才向其发送事件。
                     let recording = this.data.get('recording');
                     if (recording) {
-                        connection.sendMessage('devtool:history_info', message,
+                        this.sanMsgConnection.sendMessage('devtool:history_info', message,
                             () => {});
                     }
-                    // 对于 maxLengthOfExecutionQueue 大于 1 的页面进行代码队列检查。
-                    if (this.data.get('maxLengthOfExecutionCodeQueue') > 1) {
-                        this.dirtyCheckExecutionCodeQueue();
-                    }
+
                     // 更新 treeData 组件树。
-                    this.updateTreeData(message.message, message.idPath,
-                        message.data, message.indexList, message.count);
+                    this.updateTreeData(message);
                 }
             );
             // 更新 component tree 的变化
@@ -155,13 +162,13 @@ export default {
                         || !_.isArray(message.queue)) {
                         return;
                     }
-                    if (this.data.get('progress') === 100) {
+                    if (this.data.get('progress') >= 100) {
                         this.data.set('progress', .1);
                     }
                     this.data.set('loading', true);
                     for (let m of message.queue) {
-                        this.updateTreeData(m.message, m.idPath, m.data,
-                            m.indexList, m.count, true);
+                        this.isMutation = true;
+                        this.updateTreeData(m);
                     }
                 }
             );
@@ -173,20 +180,23 @@ export default {
     created() {
         // 面板初始化时一次性从 __san_devtool__.data 中读取整个组件树结构。
         // FIXME: 组件树很大时的效率问题需要解决。
-        this.pageEval('window.' + SAN_DEVTOOL + '.data.treeData', (res, ex) => {
-            if (!res || !_.isObject(res)) {
+        this.pageEval('window.' + SAN_DEVTOOL + '.data', (res, ex) => {
+            if (!res || !_.isObject(res) || !res.treeData) {
                 return;
             }
-            this.data.set('treeData', res);
+            if (!res.treeData.length) {
+                this.data.set('loadingToast', 'No component found');
+                return;
+            }
+            this.data.set('treeData', res.treeData);
+            san.nextTick(() => {
+                this.ref('tv').data.set('defaultSelectedIdentity',
+                    res.selectedComponentId);
+            });
         });
     },
 
     attached() {
-        setInterval(() => {
-            if (Date.now() - this.lastSanMessageTimestamp > 1000) {
-                this.dirtyCheckExecutionCodeQueue();
-            }
-        }, 1000);
     },
 
     // 通过 indexList 获取组件及其父组件的 key 与 data 信息。
@@ -221,25 +231,22 @@ export default {
         return res;
     },
 
-    // 定时检查合并执行队列里是否还有未执行的代码。
-    // FIXME: 经合理优化后，应取消此检查。
-    dirtyCheckExecutionCodeQueue() {
-        if (!this.excutionCodeQueueChecker) {
-            let max = this.data.get('maxLengthOfExecutionCodeQueue');
-            this.excutionCodeQueueChecker = setInterval(() => {
-                let len = this.excutionCodeQueue.length;
-                if (len > 0 && len <= max) {
-                    this.retrieveComponentDataFromPage(
-                        this.attachToTree.bind(this));
-                    this.excutionCodeQueue.splice(0, len);
-                    this.excutionIndex = 0;
-                }
-            }, 500);
+    // 根据 TreeView 的 ref 信息通过 indexList 返回 item 组件的实例。
+    getItemComponentInstance(indexList, isAttachedOrDetached) {
+        if (!indexList || indexList.length === 0) {
+            return null;
         }
+        let list = _.clone(indexList);
+        if (isAttachedOrDetached) {
+            list.pop();
+        }
+        let refKey = 'tv' + list.join('_');
+        let ref = this.ref(refKey);
+        return ref ? ref : null;
     },
 
-    // 将新组件 attach 到 treeData 组件树结构中。
-    attachToTree(data, indexList, root) {
+    // Attach new component item to "treeData" of component tree.
+    attachToTree(data, oldIndexList, indexList, root) {
         const d = this.getDataByPathIndexList(indexList, root);
         if (!d.parentKey) {
             d.parentKey = 'treeData';
@@ -249,28 +256,60 @@ export default {
         if (!d.selfKey) {
             d.selfKey = 'treeData[' + indexList[0] + ']';
         }
+
         if (this.data.get(d.parentKey) && !data.self) {
             this.data.push(d.parentKey, data);
         }
     },
 
-    // 将组件从 treeData 组件树结构中 detach。
-    detachFromTree(data, indexList, root) {
+    // Detach component item from "treeData" of component tree.
+    detachFromTree(data, oldIndexList, indexList, root) {
         const d = this.getDataByPathIndexList(indexList, root);
         if (d.self && d.parent) {
             san.nextTick(() => {
-            this.data.splice(
-                d.parentKey + '.treeData', [indexList[indexList.length - 1]]);
+                this.data.splice(d.parentKey + '.treeData',
+                    [indexList[indexList.length - 1]]);
             });
+        }
+    },
+
+    // Update the component data from "comp-updated" event.
+    updateTreeItem(data, oldIndexList, indexList, root) {
+        // Refresh component data for selected component id.
+        if (data.secondaryText === this.data.get('cid')) {
+            this.data.set('cid', '');
+            this.dispatch('UI:current_component_id', {});
+            let id = data['secondaryText'];
+            let compName = (data['text'].match(/<.+>/) || [])[0];
+
+            if (id && compName) {
+                san.nextTick(() => {
+                    this.data.set('cid', id);
+                    this.dispatch('UI:current_component_id', {id, compName});
+                });
+            }
+        }
+        // Only consider the key "extras".
+        if (!data.extras || !data.extras[0]) {
+            return;
+        }
+        const d = this.getDataByPathIndexList(indexList, root);
+        if (d.self && d.parent) {
+            let keys = ['extras'];
+            let key = (d.parentKey ? d.parentKey + '.' : '')
+                + 'treeData[' + indexList[indexList.length - 1] + '].';
+            for (let k of keys) {
+                this.data.set(key + k, data[k]);
+            }
         }
     },
 
     // 偷懒的做法，直接从页面上下文的原始组件树中获取数据。此处异步读取与转换页面 context
     // 的执行结果存在时间损耗。
-    retrieveComponentDataFromPage(callback) {
-        let code = '[' + this.excutionCodeQueue.join(',') + ']';
+    retrieveComponentDataFromPage(callback, queue) {
+        let code = '[' + queue.join(',') + ']';
         this.pageEval(code, (resList, ex) => {
-            if (!resList || !(resList instanceof Array)) {
+            if (!resList || !_.isArray(resList)) {
                 return;
             }
             for (let res of resList) {
@@ -279,38 +318,50 @@ export default {
                 }
                 let data = res.data;
                 let indexList = res.indexList;
+                let oldIndexList = res.oldIndexList;
                 if (!data || !indexList) {
                     return;
                 }
-                callback(data, indexList, this.data.raw);
+                callback(data, oldIndexList, indexList, this.data.raw);
             }
         });
     },
 
-    // 对于 comp-attached 与 comp-detached 事件更新组件树结构。
-    updateTreeData(message, path, data, indexList, count) {
-        if (!data || !path) {
-            return;
-        }
-        if (message !== 'comp-attached' && message !== 'comp-detached') {
+    // Update component tree by comp-updated, comp-attached and comp-detached
+    // events.
+    updateTreeData(messageData) {
+        let {message, idPath, data, oldIndexList, indexList, count}
+            = messageData;
+        if (!data || !idPath) {
             return;
         }
         this.count = count;
         let root = this.data.raw;
         let pathIndexList = components.getIndexListFromPathAndTreeData(
-            path, root.treeData);
-        let parentPath = path.slice(0, path.length - 1);
+            idPath, root.treeData);
+        let parentPath = idPath.slice(0, idPath.length - 1);
         let max = this.data.get('maxLengthOfExecutionCodeQueue');
 
         switch (message) {
+            case 'comp-updated': {
+                this.updateTreeItem(data, oldIndexList, indexList, root);
+                break;
+            }
             case 'comp-attached': {
-                // 父组件还未 attached。暂不考虑。
-                if (path.length > 1 && pathIndexList[0] === -1) {
+                // Do nothing if parent component has not attached yet.
+                if (idPath.length > 1 && pathIndexList[0] === -1) {
+                    if (this.data.get('progress') >= 100) {
+                        this.data.set('progress', .1);
+                    }
+                    this.data.set('processingComponentInfo',
+                        '[' + data.secondaryText + ']');
+                    this.data.set('loading', true);
                     return;
                 }
 
-                for (let [i, p] of path.entries()) {
-                    if (i < path.length - 1) {
+                this.data.set('processingComponentInfo', '');
+                for (let [i, p] of idPath.entries()) {
+                    if (i < idPath.length - 1) {
                         continue;
                     }
                     let currentIndexList = indexList.slice(0, i + 1);
@@ -318,27 +369,27 @@ export default {
                     for (let index of currentIndexList) {
                         code += '.treeData[' + index + ']';
                     }
-                    // 执行合并后的代码。
-                    if (this.excutionIndex % max === 0
-                        && this.excutionCodeQueue.length > 0) {
-                        this.retrieveComponentDataFromPage(
-                            this.attachToTree.bind(this));
-                        this.excutionCodeQueue.splice(0,
-                            this.excutionCodeQueue.length);
-                    }
-                    // 合并代码。
-                    this.excutionCodeQueue.push('{data:' + code
-                        + ',indexList:[' + currentIndexList + ']}');
-                    this.excutionIndex++;
+
+                    this.sanCompInfoDelayer.count = max;
+                    this.sanCompInfoDelayer.spawn('{data:' + code
+                        + ',oldIndexList:[' + oldIndexList + '],indexList:['
+                        + currentIndexList + ']}');
                 }
                 break;
             }
             case 'comp-detached': {
-                this.detachFromTree(data, pathIndexList, root);
+                this.detachFromTree(data, oldIndexList, pathIndexList, root);
                 if (data && data.id === this.data.get('cid')) {
                     if (this.parentComponent) {
                         let panels = ['cbi', 'cdv', 'cc', 'cf', 'cm', 'cl'];
-                        let keys = ['infoList', 'data', 'computed', 'filters', 'messages', 'listeners'];
+                        let keys = [
+                            'infoList',
+                            'data',
+                            'computed',
+                            'filters',
+                            'messages',
+                            'listeners'
+                        ];
                         for (let [i, p] of panels.entries()) {
                             let ref = this.parentComponent.ref(p);
                             if (ref) {
@@ -409,44 +460,45 @@ export default {
                 .sm-touch-ripple.selected:hover
                     &~.sm-tree-view-item-content.selected
                         .sm-tree-view-item-primary-text
-                            background-image: linear-gradient(to right, #c96 calc(100% - 40px), transparent)
+                            background-image linear-gradient(to right, #c96 calc(100% - 40px), transparent)
                 .sm-tree-view-item-content
                     .sm-tree-view-item-primary-text
                     &:hover
-                        font-family: 'Consolas'
-                        font-size: 1.2em
-                        font-weight: bold
-                        color: #c96
-                        width: 100%;
-                        background-image: linear-gradient(to right, #c96 calc(100% - 40px), transparent)
-                        -webkit-background-clip: text
-                        -webkit-text-fill-color: transparent
-                        background-size: calc(100% - 80px) auto
-                        background-repeat-x: no-repeat
+                        font-family 'Consolas'
+                        font-size 1.2em
+                        font-weight bold
+                        color #c96
+                        width 100%
+                        background-image linear-gradient(to right, #c96 calc(100% - 40px), transparent)
+                        -webkit-background-clip text
+                        -webkit-text-fill-color transparent
+                        background-size calc(100% - 80px) auto
+                        background-repeat-x no-repeat
                     &.selected
                         .sm-tree-view-item-primary-text
-                            background-image: linear-gradient(90deg,#fff calc(100% - 40px),transparent)
+                            background-image linear-gradient(90deg, #fff calc(100% - 40px), transparent)
                     .sm-tree-view-item-extras
-                        right: 200px
+                        left 50%
+                        transform translateX(-50%)
                     .sm-tree-view-item-secondary-text
-                        margin-right: 5px
+                        margin-right 5px
                     .sm-chip
-                        background-color: #afd2ee !important
-                        margin-left: 5px
+                        background-color #afd2ee !important
+                        margin-left 5px
                         .sm-avatar
-                            background-color: #1b74ba !important
-                            color: #fff !important
+                            background-color #1b74ba !important
+                            color #fff !important
 
     .sm-text-field
         .sm-text-field-hint
-            width: 100%
-            white-space: nowrap
-            text-overflow: ellipsis
-            overflow: hidden
+            width 100%
+            white-space nowrap
+            text-overflow ellipsis
+            overflow hidden
     .sm-tree-view-container
-        width: 100%
-        overflow: auto
-        position: absolute
-        top: 34px
-        bottom: 0
+        width 100%
+        overflow auto
+        position absolute
+        top 34px
+        bottom 0
 </style>

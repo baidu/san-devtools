@@ -1,5 +1,5 @@
 /**
- * San Devtools
+ * San Devtool
  * Copyright 2017 Ecomfe. All rights reserved.
  *
  * @file Devtool panel main entry.
@@ -17,6 +17,10 @@ let messenger = new Messenger();
 let connector = messenger.initConnection('panel_index', () => {
     // Nothing
 });
+// Reload whole devtool page when tab's URL updated.
+let rebuildConn = messenger.initConnection('rebuild', () => {
+    window.location.reload();
+});
 
 document.addEventListener('DOMContentLoaded', () => {
     connector.sendMessage('background:version_visibility', {
@@ -25,5 +29,3 @@ document.addEventListener('DOMContentLoaded', () => {
         version: ''
     });
 });
-
-
