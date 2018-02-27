@@ -11,7 +11,7 @@ import constants from '../common/constants';
 
 // 得到当前组件树节点的子组件 id 列表。
 function getIDListFromTreeData(root) {
-    var ids = [];
+    let ids = [];
     if (!root) {
       return ids;
     }
@@ -57,11 +57,11 @@ function getIndexListFromPathAndTreeData(path, root) {
 
 // 更新和生成基础组件树的具体实现。
 function updatePrimitiveTreeDataByPath(root, data, isDeleted) {
-    var r = root;
-    var owner;
-    var path = data.idPath;
+    let r = root;
+    let owner;
+    let path = data.idPath;
     for (let [i, e] of path.entries()) {
-        var index = this.getIDListFromTreeData(r).indexOf(e);
+        let index = this.getIDListFromTreeData(r).indexOf(e);
         if (!isDeleted) {
             if (index < 0) {
                 let d = {
@@ -79,9 +79,10 @@ function updatePrimitiveTreeDataByPath(root, data, isDeleted) {
                     r[index].text = data.text;
                     r[index].secondaryText = data.secondaryText;
                     r[index].extras = data.extras;
+                    r[index].identity = data.secondaryText;
                 }
             }
-            var r0 = index < 0 ? r[r.length - 1] : r[index];
+            let r0 = index < 0 ? r[r.length - 1] : r[index];
             if (i < path.length - 1 && !r0.treeData) {
               r0.treeData = [];
             }
@@ -137,7 +138,8 @@ function serialize(component, includingParent, keepJSON) {
         constructor: component.constructor.name,
         // For TreeView
         text: '<' + (component.subTag || component.constructor.name) + '>',
-        secondaryText: component.id
+        secondaryText: component.id,
+        identity: component.id
     };
 }
 

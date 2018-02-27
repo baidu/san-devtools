@@ -2,13 +2,15 @@
  * San DevTool
  * Copyright 2017 Ecomfe. All rights reserved.
  *
- * @file Interchange station for page context and content script context.
+ * @file Interchange station for exchanging messages between page context and
+ *       content script context.
  */
 
 import Messenger from 'chrome-ext-messenger';
 
 import highlighter from './highlighter';
 import utils from '../common/utils';
+import TaskDelayer from '../common/task_delayer';
 
 let messenger = new Messenger();
 let c = messenger.initConnection('interchange', () => {});
@@ -17,15 +19,31 @@ const INTERVAL = 1000;
 let sanMessageQueue = [];
 let lastSanMessageQueueSent = 0;
 let onceSanMessageChecker = null;
+let selectedSanId = null;
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (!request || request.message !== 'tabUpdated') {
+        return;
+    }
+    c.sendMessage('devtool:rebuild', {}, () => {});
+});
 
 function init() {
+    let sanMsgDelayer = new TaskDelayer({
+        interval: 1000,
+        delay: 100,
+        task: queue => {
+            c.sendMessage('devtool:component_tree_mutations',
+                {queue: _.clone(queue)}, () => {});
+        }
+    });
     window.addEventListener('message', e => {
         let eventData = e.data;
         if (!eventData) {
             return;
         }
         let message = eventData.message;
-        if (!message) {
+        if (typeof message !== 'object') {
             return;
         }
         if (message.startsWith('store-')) {
@@ -44,36 +62,12 @@ function init() {
         }
         // Component 的 7 种事件。
         if (message.startsWith('comp-')) {
-            postSanMessageToDevtool(eventData);
+            //postSanMessageToDevtool(eventData);
+            eventData.count = utils.getSanIdElementCount();
+            sanMsgDelayer.spawn(eventData);
         }
     });
     initHighlightEvent();
-}
-
-function checkSanMessageQueue() {
-    onceSanMessageChecker = window.setTimeout(() => {
-        c.sendMessage('devtool:component_tree_mutations',
-            {queue: _.clone(sanMessageQueue)}, () => {});
-        sanMessageQueue.splice(0, sanMessageQueue.length);
-        window.clearTimeout(onceSanMessageChecker);
-    }, INTERVAL / 10);
-}
-
-function postSanMessageToDevtool(data) {
-    data.count = utils.getSanIdElementCount();
-    if (!lastSanMessageQueueSent) {
-        lastSanMessageQueueSent = Date.now();
-    }
-    if (Date.now() - lastSanMessageQueueSent < INTERVAL) {
-        window.clearTimeout(onceSanMessageChecker);
-        sanMessageQueue.push(data);
-        checkSanMessageQueue();
-    } else {
-        lastSanMessageQueueSent = Date.now();
-        c.sendMessage('devtool:component_tree_mutations',
-            {queue: _.clone(sanMessageQueue)}, () => {});
-        sanMessageQueue.splice(0, sanMessageQueue.length);
-    }
 }
 
 function postRouteMessageToDevtool(data) {

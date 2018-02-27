@@ -195,6 +195,7 @@ export default {
     },
 
     helpClick() {
+        this.data.set('currentTab', 'component');
         this.parentComponent.ref('comp').data.set('cid', '');
     }
 

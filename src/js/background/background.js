@@ -73,3 +73,12 @@ let versionVisibilityConnector = messenger.initConnection(
 
 let optionsConnector = messenger.initConnection(
     'options', optionsMessageHandler);
+
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+    if (typeof changeInfo !== 'object' || changeInfo.status !== 'complete') {
+        return;
+    }
+    chrome.tabs.sendMessage(tabId, {
+        message: 'tabUpdated'
+    });
+});

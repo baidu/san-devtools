@@ -17,6 +17,7 @@ let getComponentTreeItemData = component => ({
     id: component.id,
     text: '<' + getComponentName(component) + '>',
     secondaryText: component.id,
+    identity: component.id,
     extras: [getComponentRouteExtraData(component)],
     idPath: component.idPath
 });
@@ -122,9 +123,12 @@ function addStoreEventListeners() {
         sanDevtool.on(e, (...args) => {
             switch (e) {
                 case 'store-connected': {
-                    let {store, name, isDefault} = args[0];
-                    store.isDefault = isDefault;
-                    store.name = name;
+                    let {store, mapStates, mapActions} = args[0];
+                    if (!store) {
+                        return;
+                    }
+                    let name = store.name;
+                    store.isDefault = store.name === '__default__';
                     if (!store) {
                         return;
                     }
@@ -156,6 +160,9 @@ function addStoreEventListeners() {
                 }
                 case 'store-comp-disposed': {
                     let {store, component} = args[0];
+                    if (!store) {
+                        return;
+                    }
                     delete store.components[component.id];
                     delete component.store;
                     break;
@@ -177,8 +184,13 @@ function addStoreEventListeners() {
                 // 发送相应的时间的时候有效。
                 case 'store-default-inited': {
                     let store = args[0].store;
+                    if (!store) {
+                        return;
+                    }
                     store.isDefault = true;
-                    store.name = 'Default';
+                    if (!store.name) {
+                        store.name = '__default__';
+                    }
                     break;
                 }
                 case 'store-listened': {
@@ -194,7 +206,9 @@ function addStoreEventListeners() {
                         return;
                     }
                     let len = Object.keys(sanDevtool.store.stores).length;
-                    store.name = store.isDefault ? 'Default' : 'Store' + len;
+                    if (!store.name && !store.isDefault) {
+                        store.name = 'Store' + len;
+                    }
                     sanDevtool.store.stores[store.name] = store;
                     break;
                 }
@@ -228,8 +242,8 @@ function addSanEventListeners() {
     }
 
     // 8 种事件。
-    for (let e of constants.sanEventNames) {
-        sanDevtool.on(e, (...args) => {
+    for (let message of constants.sanEventNames) {
+        sanDevtool.on(message, (...args) => {
             // 默认第一个参数均为 Component 实例。
             const component = args[0];
 
@@ -237,10 +251,12 @@ function addSanEventListeners() {
                 return;
             }
 
-            if (e === 'comp-route') {
+            let id = component.id;
+
+            if (message === 'comp-route') {
                 let data = buildRoutes(args[0], sanDevtool);
                 if (sanDevtool.devtoolPanelCreated) {
-                    window.postMessage({...data, message: e}, '*');
+                    window.postMessage({...data, message}, '*');
                 }
                 return;
             }
@@ -249,18 +265,20 @@ function addSanEventListeners() {
                 return;
             }
 
-            let path = generatePath(component);
+            let idPath = generatePath(component);
             let data = getComponentTreeItemData(component);
-            component.idPath = data.idPath = path;
+            let oldIndexList = components.getIndexListFromPathAndTreeData(idPath,
+                sanDevtool['data'].treeData);
+            component.idPath = data.idPath = idPath;
 
-            buildHistory(component, sanDevtool, e);
-            components.updatePrimitiveTree(data, e, sanDevtool['data']);
-            let indexList = components.getIndexListFromPathAndTreeData(path,
+            buildHistory(component, sanDevtool, message);
+            components.updatePrimitiveTree(data, message, sanDevtool['data']);
+            let indexList = components.getIndexListFromPathAndTreeData(idPath,
                 sanDevtool['data'].treeData);
             let compData = component.data.raw || component.data.data;
 
             component.el['__san_component__'] = component;
-            component.el['__san_path__'] = path;
+            component.el['__san_path__'] = idPath;
             component.el['__san_data__'] = compData;
             component.el['__san_tree_index__'] = indexList;
 
@@ -270,7 +288,7 @@ function addSanEventListeners() {
                     get() {
                         return {
                             ...components.serialize(component),
-                            idPath: path
+                            idPath
                         };
                     }
                 });
@@ -279,11 +297,12 @@ function addSanEventListeners() {
             // 只有当 devtool 面板创建之后才向 content script 发送组件信息。
             if (sanDevtool.devtoolPanelCreated) {
                 window.postMessage({
-                    message: e,
-                    id: component.id,
-                    idPath: path,
-                    indexList: indexList,
-                    data: data,
+                    message,
+                    id,
+                    idPath,
+                    oldIndexList,
+                    indexList,
+                    data,
                     timestamp: Date.now(),
                     componentName: getComponentName(component),
                     compData: JSON.parse(JSON.stringify(compData))
