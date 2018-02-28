@@ -44,6 +44,9 @@ san-devtool command will launch default Chrome browser to inspect the specified 
 
 [San Devtool](https://chrome.google.com/webstore/detail/san-devtool/pjnngoafflflkagpebgfifjejlnfhahc?utm_source=chrome-ntp-icon)
 
+## User Guide
+ - [简体中文](https://github.com/ecomfe/san-devtool/blob/master/docs/user_guide.md)
+
 
 ## ChangeLog
 
