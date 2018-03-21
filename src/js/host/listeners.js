@@ -16,6 +16,13 @@ import stores from './stores';
 let getComponentTreeItemData = component => ({
     id: component.id,
     text: '<' + getComponentName(component) + '>',
+    component: {
+        name: getComponentName(component),
+        id: component.id,
+        data: component.data.raw || component.data.data,
+        class: component.el.className,
+        style: component.el.style.cssText
+    },
     secondaryText: component.id,
     identity: component.id,
     extras: [getComponentRouteExtraData(component)],
