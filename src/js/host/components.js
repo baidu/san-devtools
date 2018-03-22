@@ -80,6 +80,8 @@ function updatePrimitiveTreeDataByPath(root, data, isDeleted) {
                     r[index].secondaryText = data.secondaryText;
                     r[index].extras = data.extras;
                     r[index].identity = data.secondaryText;
+                    r[index].component = data.component;
+                    r[index].idPath = data.idPath;
                 }
             }
             let r0 = index < 0 ? r[r.length - 1] : r[index];
