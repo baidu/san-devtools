@@ -1,6 +1,6 @@
 {
   "name": "san-devtool",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Browser developer tools extension for debugging San.",
   "keywords": [
     "san",
