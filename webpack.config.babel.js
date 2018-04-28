@@ -1,6 +1,6 @@
 /**
- * San DevTool
- * Copyright 2017 Ecomfe. All rights reserved.
+ * San DevHook
+ * Copyright 2017 Baidu Inc. All rights reserved.
  *
  * @file Webpack configure
  */
@@ -14,13 +14,11 @@ import path from 'path';
 const productionMode = process.env.NODE_ENV === 'production';
 
 const productionConfig = {
-    devtool: 'source-map',
     plugins: [
         new webpack.optimize.UglifyJsPlugin({
             compress: {
                 warnings: false
-            }/*,
-            exclude: /invasion/i*/
+            }
         })
     ]
 };
@@ -93,16 +91,7 @@ let baseConfig = {
                 test: /\.(html|tpl)(\?.*)?$/,
                 loader: 'html-loader'
             }
-        ],
-        // require
-        unknownContextRegExp: /$^/,
-        unknownContextCritical: false,
-        // require(expr)
-        exprContextRegExp: /$^/,
-        exprContextCritical: false,
-        // require("prefix" + expr + "surfix")
-        wrappedContextRegExp: /$^/,
-        wrappedContextCritical: false
+        ]
     },
     plugins: [
         new webpack.DefinePlugin({
