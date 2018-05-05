@@ -8,18 +8,22 @@
 
 
 import {SUB_KEY, NOOP} from './constants';
+import {getDevtoolNS, toVar} from './utils';
+
+
+const NOOP_STR = NOOP + '';
 
 
 export const defaultConfig = {
     hookOnly: false,
     subKey: SUB_KEY,
-    treeDataGenerator: NOOP,
-    beforeSanEventListener: NOOP,
-    onSanMessage: NOOP,
-    afterSanEventListener: NOOP,
-    beforeStoreEventListener: NOOP,
-    onStoreMessage: NOOP,
-    afterStoreEventListener: NOOP
+    treeDataGenerator: NOOP_STR,
+    beforeSanEventListener: NOOP_STR,
+    onSanMessage: NOOP_STR,
+    afterSanEventListener: NOOP_STR,
+    beforeStoreEventListener: NOOP_STR,
+    onStoreMessage: NOOP_STR,
+    afterStoreEventListener: NOOP_STR
 };
 
 
@@ -27,6 +31,10 @@ let config = {...defaultConfig};
 
 
 export function getConfig() {
+    /*if (!getDevtoolNS()) {
+        return config;
+    }
+    return toVar(getDevtoolNS()._config || config);*/
     return config;
 }
 
@@ -37,3 +45,5 @@ export function setConfig(c) {
     }
     config = Object.assign(config, c);
 }
+
+
