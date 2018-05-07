@@ -8,7 +8,7 @@
 /*eslint-disable*/
 
 export function installSanHook(global) {
-    const ns = global[SAN_DEVTOOL];
+    const ns = SAN_DEVTOOL;
     if (global[ns]) {
         return;
     }

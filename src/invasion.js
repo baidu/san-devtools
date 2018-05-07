@@ -29,8 +29,8 @@ export function initHook(config = defaultConfig) {
     switch (getContext()) {
         case CONTEXT_TYPE.BROWSER:
             installSanHook(window);
-            if (getDevtoolNS()) {
-                getDevtoolNS().initHook = initHook;
+            if (ns) {
+                ns.initHook = initHook;
             }
             addSanEventListeners();
             addStoreEventListeners();

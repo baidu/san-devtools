@@ -6,11 +6,8 @@
  */
 
 
-import {getDevtoolNS} from './utils';
-
-
 function generateCodeString(codeArg, thisArg, mountingKey) {
-    const ns = getDevtoolNS();
+    const ns = SAN_DEVTOOL;
     let code = '';
 
     if (mountingKey) {

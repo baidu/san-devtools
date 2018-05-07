@@ -144,7 +144,6 @@ export function toVar(string) {
         return string;
     }
     function toVarient(v) {
-        console.log(v, typeof v);
         if (typeof v === 'object') {
             if (Array.isArray(v)) {
                 v.forEach((e, i) => {

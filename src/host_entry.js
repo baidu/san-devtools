@@ -7,7 +7,7 @@
 
 
 import {addSanEventListeners, addStoreEventListeners} from './listeners';
-import {parseUrl, getDevtoolNS, toStr, toVar} from './utils';
+import {parseUrl, getDevtoolNS, toVar} from './utils';
 import {setConfig, getConfig} from './config';
 
 
