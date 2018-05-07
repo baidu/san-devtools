@@ -24,7 +24,6 @@ export default class {
         }
         this._root = root;
         this.SUB_KEY = getConfig().subKey;
-        console.log(this.SUB_KEY)
     }
 
     getRoot() {

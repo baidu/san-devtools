@@ -100,3 +100,82 @@ export function getSanIdElementCount() {
     return document.evaluate('//*[contains(@id,"_san_")]', document, null,
         XPathResult.ORDERED_NODE_SNAPSHOT_TYPE).snapshotLength;
 }
+
+
+export function toStr(varient) {
+    function toString(va) {
+        if (va instanceof RegExp) {
+            return va.toString();
+        }
+        switch (typeof va) {
+            case 'function':
+                return va.toString();
+            case 'object': {
+                if (Array.isArray(va)) {
+                    let v = Object.assign([], va);
+                    v.forEach((e, i) => {
+                        v[i] = toString(v[i]);
+                    });
+                    return v;
+                }
+                else {
+                    let v = Object.assign({}, va);
+                    for (let k in v) {
+                        v[k] = toString(v[k]);
+                    }
+                    return v;
+                }
+            }
+            case 'number':
+            case 'string':
+            case 'boolean':
+            default:
+                return va + '';
+        }
+    }
+
+    let s = toString(varient);
+    return typeof s === 'object' ? JSON.stringify(s) : s;
+}
+
+
+export function toVar(string) {
+    if (typeof string !== 'string') {
+        return string;
+    }
+    function toVarient(v) {
+        console.log(v, typeof v);
+        if (typeof v === 'object') {
+            if (Array.isArray(v)) {
+                v.forEach((e, i) => {
+                    v[i] = toVarient(v[i]);
+                });
+                return v;
+            }
+            else {
+                for (let k in v) {
+                    v[k] = toVarient(v[k]);
+                }
+                return v;
+            }
+        }
+        try {
+            if (!v) {
+                throw new Error();
+            }
+            return eval(`(function(){return ${v}})()`);
+        }
+        catch (ex) {
+            return v;
+        }
+    }
+
+    let va;
+    try {
+        va = JSON.parse(string);
+    }
+    catch (ex) {
+        va = string;
+    }
+    return toVarient(va);
+}
