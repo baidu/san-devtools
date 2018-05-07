@@ -31,10 +31,6 @@ let config = {...defaultConfig};
 
 
 export function getConfig() {
-    /*if (!getDevtoolNS()) {
-        return config;
-    }
-    return toVar(getDevtoolNS()._config || config);*/
     return config;
 }
 
@@ -45,5 +41,3 @@ export function setConfig(c) {
     }
     config = Object.assign(config, c);
 }
-
-

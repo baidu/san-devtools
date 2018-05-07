@@ -1,5 +1,5 @@
 /**
- * San DevTool Hook
+ * San DevHook
  * Copyright 2017 Baidu Inc. All rights reserved.
  *
  * @file Hook.
@@ -7,13 +7,15 @@
 
 
 export function installSanHook(global) {
-    if (global[SAN_DEVTOOL]) {
+    const ns = SAN_DEVTOOL;
+    if (global[ns]) {
         return;
     }
     const sanHook = {
+        _config: null,
         _listeners: {},
-        // 是否为第一次触发。
-        _initialEmitting: false,
+        /* // 是否为第一次触发。
+        _initialEmitting: false, */
         // 判断 devtool 面板是否打开。
         _devtoolPanelCreated: false,
         // 判定此挂钩的运行上下文。
@@ -50,7 +52,7 @@ export function installSanHook(global) {
             if (!sanHook._listeners[event]) {
                 return;
             }
-            var index = sanHook._listeners[event].indexOf(func);
+            let index = sanHook._listeners[event].indexOf(func);
             if (index !== -1) {
                 sanHook._listeners[event].splice(index, 1);
             }
@@ -59,13 +61,13 @@ export function installSanHook(global) {
             }
         },
         emit: (event, data) => {
-            // 兼容 San 3.1.3 以前的版本。在 3.1.3 之后仅挂在到 window 对象上。
+            /* // 兼容 San 3.1.3 以前的版本。在 3.1.3 之后仅挂在到 window 对象上。
             if (!sanHook._initialEmitting && event === 'san') {
                 if (sanHook._this === window) {
                     delete Object.prototype[SAN_DEVTOOL];
                 }
                 sanHook._initialEmitting = true;
-            }
+            }*/
             if (sanHook._listeners[event]) {
                 sanHook._listeners[event].map(func => func(data));
             }
@@ -95,14 +97,16 @@ export function installSanHook(global) {
     });
 
     // FIXME
-    let defineProperty = ({}).constructor.defineProperty;
-    let hookAccessor = {
+    const defineProperty = ({}).constructor.defineProperty;
+    const hookAccessor = {
         configurable: true,
         get() {
             sanHook._this = this;
             return sanHook;
         }
     };
-    defineProperty(Object.prototype, SAN_DEVTOOL, hookAccessor);
-    defineProperty(window.constructor.prototype, SAN_DEVTOOL, hookAccessor);
+    // Stop supporting older San.
+    // defineProperty(Object.prototype, SAN_DEVTOOL, hookAccessor);
+    defineProperty(window.constructor.prototype, ns, hookAccessor);
 }
+

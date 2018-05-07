@@ -7,6 +7,13 @@
 
 
 import {addSanEventListeners, addStoreEventListeners} from './listeners';
+import {parseUrl, getDevtoolNS, toStr, toVar} from './utils';
+import {setConfig, getConfig} from './config';
+
+
+const ns = getDevtoolNS();
+ns._config = toVar(JSON.stringify(ns._config));
+setConfig(ns._config);
 
 addSanEventListeners();
 addStoreEventListeners();

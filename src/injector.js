@@ -1,26 +1,27 @@
 /**
- * San DevTool Hook
+ * San DevHook
  * Copyright 2017 Baidu Inc. All rights reserved.
  *
  * @file Inject the script to page context.
  */
 
 function generateCodeString(codeArg, thisArg, mountingKey) {
+    const ns = SAN_DEVTOOL;
     let code = '';
 
     if (mountingKey) {
-        code = 'window["' + SAN_DEVTOOL + '"].' + mountingKey + '=' + codeArg;
+        code = `window.${ns}.${mountingKey} = ${codeArg}`;
         return code;
     }
 
     switch (typeof codeArg) {
         case 'string':
             code = /^function/i.test(codeArg)
-                ? '(' + codeArg + ')(' + thisArg + ');' 
-                : '(function(){' + codeArg + '}).call(' + thisArg + ');'; 
+                ? `(${codeArg})(${thisArg})`
+                : `(function(){${codeArg}}).call(${thisArg})`; 
             break;
         case 'function':
-            code = '(' + codeArg.toString() + ').call(' + thisArg + ');';
+            code = `(${codeArg.toString()}).call(${thisArg})`;
             break;
         default:
             break;
@@ -92,7 +93,7 @@ export function fromExtensionUrlSync(url) {
 
 export function fromDevtool(code, ...args) {
     if (typeof code === 'function') {
-        code = '(' + code.toString() + ').apply(null, [' + args.toString() + '])';
+        code = `(${code.toString()}).apply(null, [${args.toString()}])`;
     }
     return executeJavaScriptFromDevtool(code);
 }

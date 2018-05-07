@@ -6,44 +6,50 @@
  */
 
 
-import {defaultConfig, setConfig} from './config';
+import {defaultConfig, setConfig, getConfig} from './config';
 import {getContext, CONTEXT_TYPE, isExtension} from './context';
 import {installSanHook} from './hook';
-import injector from './injector';
+import {fromContentScript, fromExtensionUrlSync} from './injector';
 import {addSanEventListeners, addStoreEventListeners} from './listeners';
-import {parseUrl, getDevtoolNS} from './utils';
+import {parseUrl, getDevtoolNS, toStr, toVar} from './utils';
 
 
 const AUTO_HOOK = 'autohook';
 
 
 export function initHook(config = defaultConfig) {
+    const ns = SAN_DEVTOOL;
+    console.log(defaultConfig)
     if (config !== defaultConfig) {
         setConfig(config);
     }
     switch (getContext()) {
         case CONTEXT_TYPE.BROWSER:
+            installSanHook(window);
+            if (getDevtoolNS()) {
+                getDevtoolNS().initHook = initHook;
+            }
             addSanEventListeners();
             addStoreEventListeners();
             break;
         case CONTEXT_TYPE.EXTENSION:
-            injector.fromContentScript(installSanHook.toString(), 'window');
-            injector.fromExtensionUrlSync(chrome.runtime.getURL('host_entry.js'));
+            fromContentScript(installSanHook.toString(), 'window');
+            console.log(toStr(getConfig()))
+            fromContentScript(toStr(getConfig()), 'window', '_config');
+            fromExtensionUrlSync(chrome.runtime.getURL('host_entry.js'));
             break;
     }
 }
 
 
-if (getContext() === CONTEXT_TYPE.BROWSER) {
-    installSanHook(window);
-    if (getDevtoolNS()) {
-        getDevtoolNS().initHook = initHook;
-    }
-}
-
+// Auto hook
+let currentScript = document.currentScript;
 if (typeof location === 'object' && AUTO_HOOK in parseUrl(location.href)) {
     initHook();
 }
-else if (document.currentScript && AUTO_HOOK in parseUrl(document.currentScript.src)) {
+else if (currentScript && AUTO_HOOK in parseUrl(currentScript.src)) {
     initHook();
+}
+else if (typeof sanDevHook === 'object' && sanDevHook.autohook) {
+    initHook(sanDevHook.config);
 }

@@ -24,12 +24,15 @@
         "persistent": false
     },
     "web_accessible_resources": [
+        "host_entry.js",
+        "invasion.js",
         "devtool_background.html",
         "popup.html"
     ],
     "content_scripts": [{
         "matches": ["<all_urls>"],
         "js": [
+            "init.js",
             "invasion.js"
         ],
         "run_at": "document_start"
