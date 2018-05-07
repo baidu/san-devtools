@@ -12,7 +12,7 @@ window.sanDevHook = {
         subKey: 'sub',
         hookOnly: false,
         treeDataGenerator: (message, component, config) => {
-            component.el.dataset.san_id = component.id;
+            component.el.dataset['san_id'] = component.id;
             return {hello: 'world'};
         }
     }

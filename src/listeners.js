@@ -290,7 +290,7 @@ export function addSanEventListeners() {
             let data = getComponentTreeItemData(component);
             const treeDataGeneratorFunc = getConfig().treeDataGenerator;
             if (typeof treeDataGeneratorFunc === 'function') {
-                let res = treeDataGeneratorFunc.call(this, message, ...args, getConfig())
+                let res = treeDataGeneratorFunc.call(this, message, ...args, getConfig());
                 if (typeof res === 'object') {
                     data = {
                         ...data,
