@@ -6,6 +6,8 @@
  */
 
 
+/* globals SAN_DEVTOOL */
+
 function generateCodeString(codeArg, thisArg, mountingKey) {
     const ns = SAN_DEVTOOL;
     let code = '';

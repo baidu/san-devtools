@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * San DevTool Hook
+ * San DevHook
  * Copyright 2017 Baidu Inc. All rights reserved.
  *
  * @file Extension test.
