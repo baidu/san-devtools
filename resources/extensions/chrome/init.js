@@ -11,6 +11,9 @@ window.sanDevHook = {
     config: {
         subKey: 'sub',
         hookOnly: false,
-        afterSanEventListener: () => {}
+        treeDataGenerator: (message, component, config) => {
+            component.el.dataset.san_id = component.id;
+            return {hello: 'world'};
+        }
     }
 };

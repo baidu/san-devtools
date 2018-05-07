@@ -274,7 +274,7 @@ export function addSanEventListeners() {
         sanDevtool.on(message, (...args) => {
             const onMessageFunc = getConfig().onSanMessage;
             if (typeof onMessageFunc === 'function') {
-                if (onMessageFunc.call(this, message, ...args)) {
+                if (onMessageFunc.call(this, message, ...args, getConfig())) {
                     return;
                 }
             }
@@ -287,10 +287,17 @@ export function addSanEventListeners() {
 
             const id = component.id;
             const idPath = getComponentPath(component);
-            const data = {
-                ...getComponentTreeItemData(component),
-                ...getConfig().treeDataGenerator(component)
-            };
+            let data = getComponentTreeItemData(component);
+            const treeDataGeneratorFunc = getConfig().treeDataGenerator;
+            if (typeof treeDataGeneratorFunc === 'function') {
+                let res = treeDataGeneratorFunc.call(this, message, ...args, getConfig())
+                if (typeof res === 'object') {
+                    data = {
+                        ...data,
+                        ...res
+                    };
+                }
+            }
             const oldIndexList = builder.getIndexListByPath(idPath);
             component.idPath = data.idPath = idPath;
             buildHistory(component, sanDevtool, message);
