@@ -14,12 +14,15 @@ import {addSanEventListeners, addStoreEventListeners} from './listeners';
 import {parseUrl, getDevtoolNS, toStr, toVar} from './utils';
 
 
+/* globals sanDevHook */
+/* globals chrome */
+
+
 const AUTO_HOOK = 'autohook';
 
 
 export function initHook(config = defaultConfig) {
-    const ns = SAN_DEVTOOL;
-    console.log(defaultConfig)
+    const ns = getDevtoolNS();
     if (config !== defaultConfig) {
         setConfig(config);
     }
@@ -34,7 +37,6 @@ export function initHook(config = defaultConfig) {
             break;
         case CONTEXT_TYPE.EXTENSION:
             fromContentScript(installSanHook.toString(), 'window');
-            console.log(toStr(getConfig()))
             fromContentScript(toStr(getConfig()), 'window', '_config');
             fromExtensionUrlSync(chrome.runtime.getURL('host_entry.js'));
             break;

@@ -1,5 +1,5 @@
 /**
- * San DevTool Hook
+ * San DevHook
  * Copyright 2017 Baidu Inc. All rights reserved.
  *
  * @file Bind component data to DOM object.

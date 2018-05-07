@@ -5,9 +5,10 @@
  * @file Hook.
  */
 
+/*eslint-disable*/
 
 export function installSanHook(global) {
-    const ns = SAN_DEVTOOL;
+    const ns = global[SAN_DEVTOOL];
     if (global[ns]) {
         return;
     }
@@ -109,4 +110,6 @@ export function installSanHook(global) {
     // defineProperty(Object.prototype, SAN_DEVTOOL, hookAccessor);
     defineProperty(window.constructor.prototype, ns, hookAccessor);
 }
+
+/*eslint-enable*/
 

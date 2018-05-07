@@ -163,7 +163,9 @@ export function toVar(string) {
             if (!v) {
                 throw new Error();
             }
+            /*eslint-disable*/
             return eval(`(function(){return ${v}})()`);
+            /*eslint-enable*/
         }
         catch (ex) {
             return v;

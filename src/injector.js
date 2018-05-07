@@ -5,8 +5,12 @@
  * @file Inject the script to page context.
  */
 
+
+import {getDevtoolNS} from './utils';
+
+
 function generateCodeString(codeArg, thisArg, mountingKey) {
-    const ns = SAN_DEVTOOL;
+    const ns = getDevtoolNS();
     let code = '';
 
     if (mountingKey) {
@@ -18,7 +22,7 @@ function generateCodeString(codeArg, thisArg, mountingKey) {
         case 'string':
             code = /^function/i.test(codeArg)
                 ? `(${codeArg})(${thisArg})`
-                : `(function(){${codeArg}}).call(${thisArg})`; 
+                : `(function(){${codeArg}}).call(${thisArg})`;
             break;
         case 'function':
             code = `(${codeArg.toString()}).call(${thisArg})`;
