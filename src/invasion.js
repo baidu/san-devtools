@@ -21,28 +21,42 @@ import {parseUrl, getDevtoolNS, toStr, toVar} from './utils';
 const AUTO_HOOK = 'autohook';
 
 
+function install() {
+    switch (getContext()) {
+        case CONTEXT_TYPE.BROWSER:
+            installSanHook(window);
+            break;
+        case CONTEXT_TYPE.EXTENSION:
+            fromContentScript(installSanHook.toString(), 'window');
+            break;
+    }
+}
+
+
 export function initHook(config = defaultConfig) {
-    const ns = getDevtoolNS();
     if (config !== defaultConfig) {
         setConfig(config);
     }
     switch (getContext()) {
         case CONTEXT_TYPE.BROWSER:
-            installSanHook(window);
+            const ns = getDevtoolNS();
             if (ns) {
                 ns.initHook = initHook;
+                ns._config = getConfig();
             }
             addSanEventListeners();
             addStoreEventListeners();
             break;
         case CONTEXT_TYPE.EXTENSION:
-            fromContentScript(installSanHook.toString(), 'window');
             fromContentScript(toStr(getConfig()), 'window', '_config');
             fromExtensionUrlSync(chrome.runtime.getURL('host_entry.js'));
             break;
     }
 }
 
+
+// First, install __san_devtool__ object.
+install();
 
 // Auto hook
 let currentScript = document.currentScript;
