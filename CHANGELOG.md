@@ -1,6 +1,12 @@
 ChangeLog
 ========
 
+0.0.3
+-------
+ - [BUGFIX]
+   - Fix config error.
+
+
 0.0.2
 -------
  - [Add]

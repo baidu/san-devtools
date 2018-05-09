@@ -1,6 +1,6 @@
 {
-  "name": "san-devhook",
-  "version": "0.0.2",
+  "name": "@ecomfe/san-devhook",
+  "version": "0.0.3",
   "description": "Hook for san-devtool.",
   "keywords": [
     "san",

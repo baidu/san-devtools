@@ -49,7 +49,7 @@ export function tsConfig() {
     if (!ns) {
         return;
     }
-    if (typeof ns._config === 'object') {
+    if (ns._config && typeof ns._config === 'object') {
         ns._config = toVar(JSON.stringify(ns._config));
         setConfig(ns._config);
     }
