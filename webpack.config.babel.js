@@ -13,6 +13,8 @@ import path from 'path';
 
 const productionMode = process.env.NODE_ENV === 'production';
 
+process.noDeprecation = true;
+
 const productionConfig = {
     plugins: [
         new webpack.optimize.UglifyJsPlugin({
@@ -42,9 +44,9 @@ let baseConfig = {
         path: (env => {
             switch (env) {
                 case 'chrome_ext':
-                    return './dist/extensions/chrome';
+                    return path.resolve(__dirname, 'dist/extensions/chrome');
                 default:
-                    return './dist';
+                    return path.resolve(__dirname, 'dist');
             }
         })(process.env.NODE_ENV),
         libraryTarget: 'umd',

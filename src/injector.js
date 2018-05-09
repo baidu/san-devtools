@@ -81,7 +81,8 @@ function executeJavaScriptFromDevtool(codeString) {
     });
 }
 
-    // Must be run in content script context. 
+
+// Must be run in content script context. 
 export function fromContentScript(codeArg, thisArg, mountingKey) {
     inject(generateCodeString(codeArg, thisArg, mountingKey));
 }
@@ -99,7 +100,4 @@ export function fromDevtool(code, ...args) {
         code = `(${code.toString()}).apply(null, [${args.toString()}])`;
     }
     return executeJavaScriptFromDevtool(code);
-}
-
-export function fromBackground(code) {
 }

@@ -9,7 +9,7 @@
 import {SAN_EVENTS, STORE_EVENTS, COMP_ROUTE,
     __3_COMP__, __3_PATH__, __3_DATA__, __3_TREE_INDEX__, __3_INFO__}
         from './constants';
-import {isBrowser, isExtension} from './context';
+import {isExtension} from './context';
 import {getDevtoolNS} from './utils';
 import {serialize, getComponentPath, getComponentName, getHistoryInfo,
     getRouteInfo, getComponentTreeItemData} from './components';

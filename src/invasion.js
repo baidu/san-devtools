@@ -6,12 +6,12 @@
  */
 
 
-import {defaultConfig, setConfig, getConfig} from './config';
-import {getContext, CONTEXT_TYPE, isExtension} from './context';
+import {defaultConfig, setConfig, getConfig, tsConfig} from './config';
+import {getContext, CONTEXT_TYPE} from './context';
 import {installSanHook} from './hook';
 import {fromContentScript, fromExtensionUrlSync} from './injector';
 import {addSanEventListeners, addStoreEventListeners} from './listeners';
-import {parseUrl, getDevtoolNS, toStr, toVar} from './utils';
+import {parseUrl, toStr} from './utils';
 
 
 /* globals sanDevHook */
@@ -39,11 +39,7 @@ export function initHook(config = defaultConfig) {
     }
     switch (getContext()) {
         case CONTEXT_TYPE.BROWSER:
-            const ns = getDevtoolNS();
-            if (ns) {
-                ns.initHook = initHook;
-                ns._config = getConfig();
-            }
+            tsConfig();
             addSanEventListeners();
             addStoreEventListeners();
             break;

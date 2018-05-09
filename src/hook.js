@@ -5,6 +5,7 @@
  * @file Hook.
  */
 
+
 /*eslint-disable*/
 
 export function installSanHook(global) {
@@ -112,4 +113,3 @@ export function installSanHook(global) {
 }
 
 /*eslint-enable*/
-

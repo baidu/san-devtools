@@ -42,3 +42,18 @@ export function setConfig(c) {
     }
     config = Object.assign(config, c);
 }
+
+
+export function tsConfig() {
+    const ns = getDevtoolNS();
+    if (!ns) {
+        return;
+    }
+    if (typeof ns._config === 'object') {
+        ns._config = toVar(JSON.stringify(ns._config));
+        setConfig(ns._config);
+    }
+    else {
+        ns._config = getConfig();
+    }
+}
