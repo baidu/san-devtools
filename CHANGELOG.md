@@ -1,6 +1,13 @@
 ChangeLog
 ========
 
+0.0.2
+-------
+ - [Add]
+   - New entry.
+   - Config.
+
+
 0.0.1
 -------
  - [Add]
