@@ -8,7 +8,7 @@
 
 import {defaultConfig, setConfig, getConfig, tsConfig} from './config';
 import {getContext, CONTEXT_TYPE} from './context';
-import {installSanHook} from './hook';
+import {installSanHook, setInitHook} from './hook';
 import {fromContentScript, fromExtensionUrlSync} from './injector';
 import {addSanEventListeners, addStoreEventListeners} from './listeners';
 import {parseUrl, toStr} from './utils';
@@ -53,6 +53,7 @@ export function initHook(config = defaultConfig) {
 
 // First, install __san_devtool__ object.
 install();
+setInitHook(initHook);
 
 // Auto hook
 let currentScript = document.currentScript;

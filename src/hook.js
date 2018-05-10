@@ -6,7 +6,16 @@
  */
 
 
+import {getDevtoolNS} from './utils';
+
 /*eslint-disable*/
+
+export function setInitHook(func) {
+    const ns = getDevtoolNS();
+    if (ns) {
+        ns.initHook = func;
+    }
+}
 
 export function installSanHook(global) {
     const ns = SAN_DEVTOOL;
