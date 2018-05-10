@@ -8,15 +8,16 @@
 <body>
     <script src="../../dist/san_devhook.js"></script>
     <script>
-        window.__san_devtool__.initHook({
-            treeDataGenerator: (message, component, config) => {
-                component.el.dataset['san_id'] = component.id;
-                return {hello: 'world'};
-            }
-        });
+    window.__san_devtool__.initHook({
+        treeDataGenerator: (message, component, config) => {
+            component.el.dataset['san_id'] = component.id;
+            return {hello: 'world'};
+        }
+    });
     </script>
     <script src="../../node_modules/san/dist/san.dev.js"></script>
     <script>
+    /* globals san */
     var MyApp = san.defineComponent({
         template: '<p>Hello {{name}}!</p>',
         initData: function () {
