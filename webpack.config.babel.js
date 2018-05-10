@@ -31,14 +31,13 @@ const developConfig = {
 
 const extConfig = {
     entry: {
-        'invasion.js': './src/invasion.js',
         'host_entry.js': './src/host_entry.js'
     }
 }
 
 let baseConfig = {
     entry: {
-        'invasion.js': './src/invasion.js'
+        'san_devhook.js': './src/invasion.js'
     },
     output: {
         path: (env => {

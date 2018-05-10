@@ -25,7 +25,7 @@
     },
     "web_accessible_resources": [
         "host_entry.js",
-        "invasion.js",
+        "san_devhook.js",
         "devtool_background.html",
         "popup.html"
     ],
@@ -33,7 +33,7 @@
         "matches": ["<all_urls>"],
         "js": [
             "init.js",
-            "invasion.js"
+            "san_devhook.js"
         ],
         "run_at": "document_start"
     }],

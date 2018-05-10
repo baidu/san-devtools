@@ -15,7 +15,8 @@
   "scripts": {
     "test": "",
     "build": "cross-env NODE_ENV=production webpack --progress --hide-modules",
-    "chrome": "cross-env NODE_ENV=chrome_ext webpack --hide-modules --progress && node ./tests/run_chrome_ext.js"
+    "chrome": "cross-env NODE_ENV=chrome_ext webpack --hide-modules --progress && node ./tests/run_chrome_ext.js",
+    "browser": "cross-env NODE_ENV=production webpack --hide-modules --progress && node ./tests/browser.js"
   },
   "devDependencies": {
     "babel-core": "^6.13.2",
@@ -39,6 +40,8 @@
     "file-loader": "^0.9.0",
     "graceful-copy": "1.1.0",
     "html-webpack-plugin": "^2.26.0",
+    "san": "^3.5.5",
+    "san-store": "^1.1.0",
     "webpack": "^2.7.0",
     "webpack-dev-server": "^2.2.0",
     "webpack-merge": "^2.4.0"
