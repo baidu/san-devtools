@@ -1,6 +1,14 @@
 ChangeLog
 ========
 
+
+0.0.4
+-------
+ - [ADD]
+   - Export initHook function for `__san_devtool__`.
+   - A browser test.
+
+
 0.0.3
 -------
  - [BUGFIX]

@@ -45,6 +45,7 @@ initHook(config);
 
   - san: A San object including version info, Component class etc.
   - _config: User configuration. Please see the section above.
+  - initHook: initHook function. Please see the section above.
   - data: Whole component tree.
   - history: San event history.
   - store: Mutation records and stores for san-store.
@@ -57,8 +58,14 @@ initHook(config);
   - `__SAN_INFO__`: Basic component info.
   - `__SAN_PATH__`: Ancestor component ID list.
 
-## Run extension test
+## Tests
+### Run extension test
 ```
 $ npm run chrome
 ```
 And open a page using San.
+
+### Run browser test
+```
+$ npm run browser
+```
