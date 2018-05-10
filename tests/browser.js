@@ -24,7 +24,8 @@ function killChromeIfNeeded(argv, promise) {
 }
 
 var argv = {
-    directory: __dirname
+    directory: __dirname,
+    url: path.resolve(__dirname, '..', 'resources', 'browser', 'index.html')
 };
 
 var launcherOptions = {
@@ -32,13 +33,7 @@ var launcherOptions = {
     enableExtensions: true,
     handleSIGINT: argv.forceQuit,
     chromePath: argv.chromePath,
-    startingUrl: argv.url,
-    chromeFlags: [
-        '--load-extension='
-            + path.resolve(argv.directory, '../dist/extensions/chrome'),
-        argv.auto ? '--auto-open-devtools-for-tabs' : '',
-        '--force-fieldtrials=ExtensionDeveloperModeWarning/None/'
-    ]
+    startingUrl: argv.url
 }
 
 killChromeIfNeeded(argv, chromeLauncher.launch(launcherOptions))
