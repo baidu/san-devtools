@@ -8,7 +8,7 @@
 
 
 import {isSanComponent, getXPath} from './utils';
-import {__3_INFO__} from './constants';
+import {__3_INFO__, INVALID, COMP_CONSTRUCTOR_NAME} from './constants';
 
 
 export function serialize(component, includingParent, keepJSON) {
@@ -107,6 +107,65 @@ export function getComponentRouteExtraData(component) {
 }
 
 
+/**
+ * Get component's DOM index of the parent referring to DOM tree.
+ *
+ * @param {Object} component Component instance
+ * @return {number}
+ */
+export function getDOMIndexUnderParent(component) {
+    if (!component) {
+        return INVALID;
+    }
+
+    let childrenArray = [];
+
+    const parent = component.parentComponent;
+    if (!parent || (!parent.children && !parent.childs)) {
+        return INVALID;
+    }
+
+    function flattenChildren(children) {
+        if (!children || !Array.isArray(children)) {
+            return;
+        }
+        for (let i = 0; i < children.length; i++) {
+            if (children[i].constructor.name === COMP_CONSTRUCTOR_NAME) {
+                childrenArray.push(children[i]);
+            }
+            else {
+                flattenChildren(children[i].children || children[i].childs);
+            }
+        }
+    }
+
+    flattenChildren(parent.children || parent.childs);
+    return childrenArray.indexOf(component);
+}
+
+
+/**
+ * Get component's ancestor DOM index list.
+ *
+ * @param {Object} component Component instance
+ * @return {Array}
+ */
+export function getAncestorDOMIndexList(component) {
+    let list = [];
+    let comp = component;
+    while (comp) {
+        let index = getDOMIndexInParent(comp);
+        if (index === INVALID) {
+            break;
+        }
+        list.unshift(index);
+        comp = comp.parentComponent;
+    }
+    list.unshift(INVALID);
+    return list;
+}
+
+
 export function getComponentTreeItemData(component) {
     const name = getComponentName(component);
     const id = component.id;
@@ -123,6 +182,9 @@ export function getComponentTreeItemData(component) {
         secondaryText: id,
         identity: id,
         extras: [getComponentRouteExtraData(component)],
-        idPath: component.idPath
+        idPath: component.idPath,
+        ancestorDOMIndexList: getAncestorDOMIndexList(component),
+        domIndex: getDOMIndexInParent(component),
+        parentDOMIndex: getDOMIndexInParent(component.parentComponent)
     };
 }

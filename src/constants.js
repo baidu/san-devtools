@@ -56,3 +56,7 @@ export const __3_PATH__ = '__SAN_PATH__';
 export const __3_DATA__ = '__SAN_DATA__';
 export const __3_TREE_INDEX__ = '__SAN_TREE_INDEX__';
 export const __3_INFO__ = '__SAN_INFO__';
+
+export const INVALID = -1;
+
+export const COMP_CONSTRUCTOR_NAME = 'ComponentClass';
