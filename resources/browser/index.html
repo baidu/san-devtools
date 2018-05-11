@@ -6,28 +6,61 @@
 </head>
 
 <body>
-    <script src="../../dist/san_devhook.js"></script>
-    <script>
-    window.__san_devtool__.initHook({
-        treeDataGenerator: (message, component, config) => {
-            component.el.dataset['san_id'] = component.id;
-            return {hello: 'world'};
+<script src="../../dist/san_devhook.js"></script>
+<script>
+window.__san_devtool__.initHook({
+    treeDataGenerator: (message, component, config) => {
+        component.el.dataset['san_id'] = component.id;
+        return {hello: 'world'};
+    }
+});
+</script>
+<script src="../../node_modules/san/dist/san.dev.js"></script>
+<script>
+/* globals san */
+
+var MySub = san.defineComponent({
+    template: '<span><b>Sub {{name}}!</b>&nbsp;</span>'
+});
+
+var MyComp = san.defineComponent({
+    template: '<p>Hello {{name}} <my-sub s-for="n in list" name="{{n}}"></my-sub></p>',
+    components: {
+        'my-sub': MySub
+    },
+    initData: function () {
+        return {
+            list: ['a', 'b', 'c']
         }
-    });
-    </script>
-    <script src="../../node_modules/san/dist/san.dev.js"></script>
-    <script>
-    /* globals san */
-    var MyApp = san.defineComponent({
-        template: '<p>Hello {{name}}!</p>',
-        initData: function () {
-            return {
-                name: 'San'
-            };
+    }
+});
+
+var MyComp0 = san.defineComponent({
+    template: '<div><p>MyComp0_{{name}}</p><my-comp s-for="n in list" name="San_{{n}}"></my-comp></div>',
+    components: {
+        'my-comp': MyComp
+    },
+    initData: function () {
+        return {
+            list: [1, 2, 3, 4]
         }
-    });
-    var myApp = new MyApp();
-    myApp.attach(document.body);
-    </script>
+    }
+});
+
+var MyApp = san.defineComponent({
+    template: '<div class="app"><my-comp0 s-for="n in list" name="{{n}}"></my-comp0></div>',
+    components: {
+        'my-comp0': MyComp0,
+    },
+    initData: function () {
+        return {
+            list: [1, 2]
+        }
+    }
+});
+
+var myApp = new MyApp();
+myApp.attach(document.body);
+</script>
 </body>
 </html>
