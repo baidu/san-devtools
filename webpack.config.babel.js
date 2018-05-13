@@ -16,13 +16,6 @@ const productionMode = process.env.NODE_ENV === 'production';
 process.noDeprecation = true;
 
 const productionConfig = {
-    plugins: [
-        new webpack.optimize.UglifyJsPlugin({
-            compress: {
-                warnings: false
-            }
-        })
-    ]
 };
 
 const developConfig = {
