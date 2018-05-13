@@ -2,109 +2,13 @@
  * San DevHook
  * Copyright 2017 Baidu Inc. All rights reserved.
  *
- * @file 组件相关的公用工具集，可以运行于页面、content script 或者 devtool 上下文。
+ * @file Component common functions and CNode.
  * @author luyuan<luyuan.china@gmail.com>
  */
 
 
-import {isSanComponent, getXPath} from './utils';
-import {__3_INFO__, INVALID, COMP_CONSTRUCTOR_NAME} from './constants';
-
-
-export function serialize(component, includingParent, keepJSON) {
-    if (!component || !isSanComponent(component) || !component.el) {
-        return null;
-    }
-    const id = component.id;
-    return {
-        id,
-        classList: Array.prototype.slice.call(component.el.classList),
-        elId: component.el.id,
-        tagName: component.tagName,
-        xpath: getXPath(component.el),
-        subTag: component.subTag,
-        idPath: [id],
-        // FIXME:
-        data: keepJSON
-            ? component.data.raw
-            : JSON.stringify(component.data.raw),
-        parentComponent: includingParent
-            ? serialize(component.parentComponent)
-            : null,
-        parentComponentId: component.parentComponent
-            ? [component.parentComponent.id]
-            : [],
-        ownerComponentId: component.owner ? [component.owner.id] : [],
-        parentId: component.parent ? [component.parent.id] : [],
-        constructor: component.constructor.name/*,
-        // For TreeView
-        text: '<' + (component.subTag || component.constructor.name) + '>',
-        secondaryText: component.id,
-        identity: component.id*/
-    };
-}
-
-
-export function getComponentPath(component) {
-    let c = component;
-    let path = [c.id];
-    if (c.parentComponent && c.parentComponent.id) {
-        while (c) {
-            c = c.parentComponent;
-            if (c) {
-                path.unshift(c.id);
-            }
-        }
-    }
-    return path;
-}
-
-
-export function getComponentName(component) {
-    let name = component && (component.subTag || component.constructor.name);
-    if (!name || name.length === 1) {
-        name = component ? component.tagName : 'Component';
-    }
-    return name;
-}
-
-
-export function getHistoryInfo(component, message) {
-    return {
-        id: component.id,
-        idPath: component.idPath,
-        componentName: getComponentName(component),
-        timestamp: Date.now(),
-        compData: component.el[__3_INFO__],
-        message
-    };
-}
-
-
-export function getRouteInfo(component) {
-    return {
-        id: component.id,
-        timestamp: Date.now(),
-        routeData: component.data.get('route')
-            ? JSON.parse(JSON.stringify(component.data.get('route')))
-                : undefined
-    };
-}
-
-
-export function getComponentRouteData(component) {
-    const data = getRouteInfo(component);
-    return data.routeData ? 'Route:' + data.routeData.path : '';
-}
-
-
-export function getComponentRouteExtraData(component) {
-    const data = getRouteInfo(component);
-    return data.routeData ? {
-        icon: 'navigation',
-        text: getComponentRouteData(component)
-    } : null;
-}
+import {isSanComponent} from './utils';
+import {__3_INFO__, INVALID, COMP_CONSTRUCTOR_NAME, SUB_KEY} from './constants';
 
 
 /**
@@ -144,47 +48,155 @@ export function getDOMIndexUnderParent(component) {
 }
 
 
-/**
- * Get component's ancestor DOM index list.
- *
- * @param {Object} component Component instance
- * @return {Array}
- */
-export function getAncestorDOMIndexList(component) {
-    let list = [];
-    let comp = component;
-    while (comp) {
-        let index = getDOMIndexInParent(comp);
-        if (index === INVALID) {
-            break;
+export function getAncestorComponent(component) {
+    let c = component;
+    let ancestor = [c];
+    while (c) {
+        c = c.parentComponent;
+        if (c) {
+            ancestor.unshift(c);
         }
-        list.unshift(index);
-        comp = comp.parentComponent;
     }
-    list.unshift(INVALID);
-    return list;
+    return ancestor;
 }
 
 
-export function getComponentTreeItemData(component) {
-    const name = getComponentName(component);
-    const id = component.id;
-    return {
-        id,
-        text: '<' + name + '>',
-        component: {
-            name,
-            id,
-            data: component.data.raw || component.data.data,
-            class: component.el.className,
-            style: component.el.style.cssText
-        },
-        secondaryText: id,
-        identity: id,
-        extras: [getComponentRouteExtraData(component)],
-        idPath: component.idPath,
-        ancestorDOMIndexList: getAncestorDOMIndexList(component),
-        domIndex: getDOMIndexInParent(component),
-        parentDOMIndex: getDOMIndexInParent(component.parentComponent)
+export default class CNode {
+    constructor(component, {subKey = SUB_KEY, fake = {}} = {}) {
+        this._subKey = subKey;
+        if (!isSanComponent(component)) {
+            this.init(fake);
+            return;
+        }
+        if (!component.id) {
+            console.warn('Component is not initialized.')
+            return;
+        }
+        this._component = component;
+        this.init();
+        // Detech _component to avoid circular structure.
+        delete this._component;
+    }
+
+    init = fake => {
+        if (typeof fake === 'object') {
+            for (let k in fake) {
+                if (typeof fake[k] !== 'function') {
+                    this[k] = fake[k];
+                }
+            }
+            return;
+        }
+        this.id = this._component.id;
+        this.template = this._component.template;
+        this.name = this._getName();
+        this.data = this._getData();
+        this.ancestorPath = this._getAncestorPath();
+        this.ancestorDOMIndexList = this._getAncestorDOMIndexList();
+        this.history = this._getHistoryInfo();
+        this.route = this._getRouteInfo();
+    }
+
+    append = node => {
+        if (IsCNode(node)) {
+            this.createSubKey();
+            Append(this.getSubKey(), node);
+        }
+    }
+
+    update = (node, index) => {
+        if (IsCNode(node)) {
+            this.createSubKey();
+            Update(this.getSubKey(), node, index);
+        }
+    }
+
+    insertBefore = (node, before) => {
+        if (IsCNode(node)) {
+            this.createSubKey();
+            InsertBefore(this.getSubKey(), node, before);
+        }
+    }
+
+    removeAt = at => {
+        RemoveAt(this.getSubKey(), at);
+    }
+
+    createSubKey = () => {
+        if (!Array.isArray(this.getSubKey())) {
+            this.setSubKey([]);
+        }
     };
+
+    deleteSubKey = () => {
+        if (Array.isArray(this.getSubKey()) && this.getSubKey().length > 0) {
+            delete this[this._subKey];
+        }
+    }
+
+    merge = object => {
+        if (object) {
+            return Object.keys(object).forEach(k => (this[k] = object[k]));
+        }
+    }
+
+    getSubKey = () => this[this._subKey];
+
+    setSubKey = children => (this[this._subKey] = children);
+
+    _getName = () => (this._component.subTag || this._component.constructor.name);
+
+    _getData = () => (this._component.data
+        && (this._component.data.raw || this._component.data.data));
+
+    _getAncestorPath = () => getAncestorComponent(this._component).map(v => v.id);
+
+    /**
+     * Get current component's ancestor DOM index list.
+     *
+     * @return {Array}
+     */
+    _getAncestorDOMIndexList = () => getAncestorComponent(this._component)
+        .map(v => getDOMIndexUnderParent(v));
+ 
+    _getHistoryInfo = () => ({
+        id: this.id,
+        ancestorPath: this.ancestorPath,
+        name: this.name,
+        timestamp: Date.now(),
+        data: this.data
+    });
+
+    _getRouteInfo = () => ({
+        id: this.id,
+        timestamp: Date.now(),
+        routeData: this.data && this.data['route']
+    });
+
+    static IsCNode = node => (node instanceof CNode);
+
+    static Append = (root, node) => {
+        if (Array.isArray(root)) {
+            root.push(node);
+        }
+    }
+
+    static Update = (root, node, index) => {
+        if (Array.isArray(root)) {
+            root[index] = node;
+        }
+    }
+
+    static InsertBefore = (root, node, before) => {
+        if (Array.isArray(root)) {
+            root.splice(before, 0, node);
+        }
+    }
+
+    static RemoveAt = (root, at) => {
+        if (Array.isArray(root)) {
+            root.splice(at, 1);
+        }
+    }
+
 }

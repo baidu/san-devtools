@@ -7,12 +7,9 @@
  */
 
 
-import {COMP_ATTACHED, COMP_DETACHED, COMP_UPDATED} from './constants';
+import {COMP_ATTACHED, COMP_DETACHED, COMP_UPDATED, INVALID} from './constants';
+import CNode from './components';
 import {getConfig} from './config';
-
-
-const INVALID = -1;
-const EMPTY_ARRAY = [];
 
 
 export default class {
@@ -23,124 +20,152 @@ export default class {
             throw new Error('root is not an object.')
         }
         this._root = root;
-        this.SUB_KEY = getConfig().subKey;
     }
 
     getRoot() {
         return this._root;
     }
 
-    emit(event, data) {
-        if (!data || typeof data !== 'object' || !data.id) {
+    emit(event, node) {
+        if (!node || !(CNode.IsCNode(node)) || !node.id) {
+            return;
+        }
+
+        switch (event) {
+            case COMP_ATTACHED:
+            case COMP_UPDATED: {
+                this.appendNode(node);
+                break;
+            }
+            case COMP_DETACHED: {
+                this.removeNode(node);
+                break;
+            }
+            default:
+                break;
+        }
+    }
+
+    appendNode(node) {
+        let path = node.ancestorPath;
+        if (!this._isValidPath(path)) {
             return;
         }
 
         let root = this._root;
-        switch (event) {
-            case COMP_ATTACHED:
-            case COMP_UPDATED: {
-                this.appendOrUpdateNode(data);
-                break;
-            }
-            case COMP_DETACHED: {
-                this.removeNode(data);
-                break;
-            }
-        }
-    }
 
-    appendOrUpdateNode(data) {
-        let path = data.idPath;
-        if (!this._isValidPath(path)) {
-            return;
-        }
-        let node = this._root;
         path.forEach((id, i, p) => {
-            let index = this.getIdListByNode(node).indexOf(id);
+            let index = this.getIdListByNode(root).indexOf(id);
+            let next;
+
             if (index < 0) {
-                let newData = {...data, id};
+                // Create a fake CNode for unattached parent component.
+                let newNode = new CNode(null, {
+                    subkey: getConfig().subKey,
+                    fake: {...node, id}
+                });
+
                 if (i !== p.length - 1) {
-                    newData[this.SUB_KEY] = [];
+                    newNode.createSubKey();
                 }
-                node && node.push(newData);
-            }
-            else {
-                if (node[index] && node[index].id === data.id) {
-                    node[index] = {
-                        ...node[index],
-                        ...data
+
+                if (root) {
+                    let list = node.ancestorDOMIndexList;
+                    let domIndex = i === p.length - 1 ? list[list.length - 1] : list[i];
+                    if (domIndex > INVALID) {
+                        CNode.InsertBefore(root, newNode, domIndex);
+                    }
+                    else {
+                        CNode.Append(root, newNode);
+                    }
+                    if (i < p.length - 1) {
+                        next = newNode;
+                        root = newNode.getSubKey();
+                        return;
                     }
                 }
             }
-
-            let next = index < 0 ? node[node.length - 1] : node[index];
-            if (i < p.length - 1 && !next[this.SUB_KEY]) {
-                next[this.SUB_KEY] = [];
+            else {
+                if (root[index] && root[index].id === node.id) {
+                    node.setSubKey(root[index].getSubKey());
+                    CNode.Update(root, node, index);
+                }
             }
-            node = next[this.SUB_KEY];
+
+            if (!next) {
+                next = root[index];
+            }
+            if (!CNode.IsCNode(next)) {
+                return;
+            }
+
+            if (i < p.length - 1 && !next.getSubKey()) {
+                next.createSubKey();
+            }
+            root = next.getSubKey();
         });
     }
 
-    removeNode(data) {
-        let path = data.idPath;
+    removeNode(node) {
+        let path = node.ancestorPath;
         if (!this._isValidPath(path)) {
             return;
         }
-        let node = this._root;
+
+        let root = this._root;
         let prev;
+
         path.forEach((id, i, p) => {
-            let index = this.getIdListByNode(node).indexOf(id);
+            let index = this.getIdListByNode(root).indexOf(id);
+
             if (index < 0) {
                 return;
             }
+
             if (i === p.length - 1) {
-                node.splice(index, 1);
-                if (node.length === 0 && prev) {
-                    delete prev[this.SUB_KEY];
-                } 
+                CNode.RemoveAt(root, index);
+                if (root.length === 0 && prev) {
+                    prev.deleteSubKey();
+                }
             }
-            if (!node) {
+
+            if (!root) {
               return;
             }
-            if (node[index]) {
-                prev = node[index];
-                node = node[index][this.SUB_KEY] ? node[index][this.SUB_KEY] : null;
-            }
-        });
-    }
 
-    getIdList(path) {
-        if (_isValidPath(path)) {
-            this.getNode
-        }
-        else {
-            return this._data.filter(x => x.id).map(x => x.id);
-        }
+            prev = root[index];
+            if (!CNode.IsCNode(prev)) {
+                return;
+            }
+            
+            root = prev.getSubKey() ? prev.getSubKey() : null;
+        });
     }
 
     getIdListByNode(node) {
         if (!node || !Array.isArray(node)) {
-            return EMPTY_ARRAY;
+            return [];
         }
         return node.filter(x => x.id).map(x => x.id);
     }
 
     getIndexListByPath(path) {
         if (!path || !Array.isArray(path)) {
-            return EMPTY_ARRAY;
+            return [];
         }
-        let node = this._root;
-        let a = path.map((id, i, p) => {
-            let index = this.getIndexByNode(node, id);
+
+        let root = this._root;
+
+        return path.map((id, i, p) => {
+            let index = this.getIndexByNode(root, id);
             if (index < 0 && i !== p.length - 1) {
                 return;
             }
             if (i < p.length - 1) {
-                node = node[index][this.SUB_KEY];
+                root = root[index].getSubKey();
             }
             return index;
-        });
-        return a.filter(v => v);
+        }).filter(v => v);
     }
 
     getIndexByNode(node, id) {
