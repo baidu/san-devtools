@@ -85,11 +85,9 @@ export default class TreeBuilder {
                     }
                 }
             }
-            else {
-                if (root[index] && root[index].id === node.id) {
-                    node.setSubKey(root[index].getSubKey());
-                    CNode.updateInRoot(root, node, index);
-                }
+            else if (root[index] && root[index].id === node.id) {
+                node.setSubKey(root[index].getSubKey());
+                CNode.updateInRoot(root, node, index);
             }
 
             if (!next) {
@@ -159,7 +157,7 @@ export default class TreeBuilder {
         return path.map((id, i, p) => {
             let index = this.getIndexByNode(root, id);
             if (index < 0 && i !== p.length - 1) {
-                return;
+                return INVALID;
             }
             if (i < p.length - 1) {
                 root = root[index].getSubKey();

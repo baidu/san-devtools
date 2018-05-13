@@ -63,7 +63,7 @@ export function parseUrl(url) {
 
 
 export function normalizeVersionNumber(version) {
-    let reg = /^\d+(\.\d+)+(\-\b\w*\b)?$/;
+    let reg = /^\d+(\.\d+)+(-\b\w*\b)?$/;
     if (!version || typeof version !== 'string') {
         return null;
     }
