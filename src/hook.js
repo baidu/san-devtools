@@ -35,8 +35,7 @@ export function installSanHook(global) {
         san: null,
         // 与 devtool 保持同步的组件树。
         data: {
-            selectedComponentId: null,
-            treeData: []
+            selectedComponentId: null
         },
         // 记录 San devtool 事件触发列表。
         history: [],

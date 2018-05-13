@@ -56,4 +56,5 @@ export function tsConfig() {
     else {
         ns._config = getConfig();
     }
+    ns.data[ns._config.subKey] = [];
 }
