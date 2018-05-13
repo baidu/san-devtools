@@ -102,6 +102,16 @@ export function getSanIdElementCount() {
 }
 
 
+export function executeCallback(callback, context, ...args) {
+    if (typeof callback === 'function') {
+        if (typeof context !== 'object') {
+            context = null;
+        }
+        return callback.apply(context, args);
+    }
+}
+
+
 export function toStr(varient) {
     function toString(va) {
         if (va instanceof RegExp) {

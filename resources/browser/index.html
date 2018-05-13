@@ -9,6 +9,7 @@
 <script src="../../dist/san_devhook.js"></script>
 <script>
 window.__san_devtool__.initHook({
+    subKey: 'sub',
     treeDataGenerator: (message, component, config) => {
         component.el.dataset['san_id'] = component.id;
         return {hello: 'world'};

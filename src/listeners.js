@@ -1,21 +1,27 @@
 /**
- * San DevTool Hook
+ * San DevHook
  * Copyright 2017 Baidu Inc. All rights reserved.
  *
  * @file San and san-store listeners。
  */
 
 
-import {SAN_EVENTS, STORE_EVENTS, COMP_ROUTE,
-    __3_COMP__, __3_PATH__, __3_DATA__, __3_TREE_INDEX__, __3_INFO__}
-        from './constants';
+import {SAN_EVENTS, STORE_EVENTS, SAN_PROPERTIES} from './constants';
 import {isExtension} from './context';
-import {getDevtoolNS} from './utils';
-import {serialize, getComponentPath, getComponentName, getHistoryInfo,
-    getRouteInfo, getComponentTreeItemData} from './components';
+import {getDevtoolNS, executeCallback} from './utils';
+import CNode, {serialize, getHistoryInfo, getRouteInfo} from './components';
 import componentTreeBuilder from './tree_builder';
 import stores from './stores';
 import {getConfig} from './config';
+
+
+const [COMP_COMPILED, COMP_INITED, COMP_CREATED, COMP_ATTACHED, COMP_DETACHED,
+    COMP_DISPOSED, COMP_UPDATED, COMP_ROUTE] = SAN_EVENTS;
+const [STORE_DEFAULT_INITED, STORE_CONNECTED, STORE_COMP_INITED,
+    STORE_COMP_DISPOSED, STORE_LISTENED, STORE_UNLISTENED, STORE_DISPATCHED,
+    STORE_ACTION_ADDED] = STORE_EVENTS;
+const [__3_COMP__, __3_PATH__, __3_DATA__, __3_TREE_INDEX__, __3_INFO__,
+    __3_CNODE__] = SAN_PROPERTIES;
 
 
 if (isExtension()) {
@@ -47,11 +53,13 @@ window.addEventListener('message', e => {
 
 
 // 将所有事件信息存入 history 数组，以便后续使用。
-function buildHistory(component, root, message) {
+function buildHistory(cnode, root, message) {
     if (!root || !root['history']) {
         return null;
     }
-    const info = getHistoryInfo(component, message);
+
+    const info = {...cnode.history, message};//getHistoryInfo(component, message);
+
     root['history'].unshift(info);
     return info;
 }
@@ -79,8 +87,10 @@ function getStoreName(devtool, store) {
 }
 
 export function addStoreEventListeners(callback) {
-    const beforeFunc = getConfig().beforeStoreEventListener;
-    typeof beforeFunc === 'function' && beforeFunc.bind(this)(getConfig());
+    const config = getConfig();
+
+    executeCallback(config.beforeStoreEventListener, this, config);
+
     let sanDevtool = getDevtoolNS();
     if (!sanDevtool || typeof sanDevtool.store !== 'object') {
         return;
@@ -88,12 +98,10 @@ export function addStoreEventListeners(callback) {
 
     for (let message of STORE_EVENTS) {
         sanDevtool.on(message, (...args) => {
-            const onMessageFunc = getConfig().onStoreMessage;
-            if (typeof onMessageFunc === 'function') {
-                if (onMessageFunc.call(this, message, ...args)) {
-                    return;
-                }
+            if (executeCallback(config.onStoreMessage, this, message, ...args, config)) {
+                return;
             }
+
             switch (message) {
                 case 'store-connected': {
                     let {store, mapStates, mapActions} = args[0];
@@ -203,8 +211,8 @@ export function addStoreEventListeners(callback) {
             }
         });
     }
-    const afterFunc = getConfig().afterStoreEventListener;
-    typeof afterFunc === 'function' && afterFunc.bind(this)(getConfig());
+
+    executeCallback(config.afterStoreEventListener, this, config);
 }
 
 function listenRouteEvent(ns) {
@@ -216,27 +224,16 @@ function listenRouteEvent(ns) {
     });
 }
 
-function bindProperties(component, {idPath, compData, indexList}) {
+function bindProperties(component, {indexList, cnode}) {
     component.el[__3_COMP__] = component;
-    component.el[__3_PATH__] = idPath;
-    component.el[__3_DATA__] = compData;
+    component.el[__3_PATH__] = cnode.ancestorPath;
+    component.el[__3_DATA__] = cnode.data;
     component.el[__3_TREE_INDEX__] = indexList;
-
-    // 为提高效率在 get 的时候才生成数据。
-    if (!component.el.hasOwnProperty(__3_INFO__)) {
-        Object.defineProperty(component.el, __3_INFO__, {
-            get() {
-                return {
-                    ...serialize(component),
-                    idPath
-                };
-            }
-        });
-    }
+    component.el[__3_CNODE__] = cnode;
 }
 
 function postMessageToExtension(ns, {
-    message, id, idPath, oldIndexList, indexList, data
+    message, id, idPath, oldIndexList, indexList, cnode
 }) {
     if (ns.devtoolPanelCreated) {
         window.postMessage({
@@ -245,10 +242,10 @@ function postMessageToExtension(ns, {
             idPath,
             oldIndexList,
             indexList,
-            data,
+            cnode,
             timestamp: Date.now(),
-            componentName: getComponentName(component),
-            compData: JSON.parse(JSON.stringify(compData))
+            componentName: cnode.name,
+            compData: cnode.data
         }, '*');
     }
 }
@@ -257,28 +254,30 @@ function postMessageToExtension(ns, {
 // 必须在页面上下文中执行。
 // 必须在 window.__san_devtool__ 挂钩注册好后执行。
 export function addSanEventListeners() {
-    const beforeFunc = getConfig().beforeSanEventListener;
-    typeof beforeFunc === 'function' && beforeFunc.bind(this)(getConfig());
+    const config = getConfig();
+
+    executeCallback(config.beforeSanEventListener, this, getConfig());
+
     const sanDevtool = getDevtoolNS();
     if (!sanDevtool || typeof sanDevtool.data !== 'object') {
         return;
     }
 
-    const builder = new componentTreeBuilder({root: sanDevtool.data.treeData});
+    const builder = new componentTreeBuilder({
+        root: sanDevtool.data[config.subKey]
+    });
 
-    // 8 种事件。
+    // COMP_XXX events
     for (const message of SAN_EVENTS) {
         if (message === COMP_ROUTE) {
             return listenRouteEvent(sanDevtool);
         }
         sanDevtool.on(message, (...args) => {
-            const onMessageFunc = getConfig().onSanMessage;
-            if (typeof onMessageFunc === 'function') {
-                if (onMessageFunc.call(this, message, ...args, getConfig())) {
-                    return;
-                }
+            if (executeCallback(config.onSanMessage, this, message, ...args, config)) {
+                return;
             }
-            // 默认第一个参数均为 Component 实例。
+
+            // First argument is a San component.
             const component = args[0];
 
             if (!component || !component.id || !component.el) {
@@ -286,36 +285,36 @@ export function addSanEventListeners() {
             }
 
             const id = component.id;
-            const idPath = getComponentPath(component);
-            let data = getComponentTreeItemData(component);
-            const treeDataGeneratorFunc = getConfig().treeDataGenerator;
-            if (typeof treeDataGeneratorFunc === 'function') {
-                let res = treeDataGeneratorFunc.call(this, message, ...args, getConfig());
-                if (typeof res === 'object') {
-                    data = {
-                        ...data,
-                        ...res
-                    };
-                }
-            }
-            const oldIndexList = builder.getIndexListByPath(idPath);
-            component.idPath = data.idPath = idPath;
-            buildHistory(component, sanDevtool, message);
-            builder.emit(message, data);
-            const indexList = builder.getIndexListByPath(idPath);
-            const compData = component.data.raw || component.data.data;
 
-            bindProperties(component, {idPath, compData, indexList});
+            // Create a CNode from component instance.
+            const cnode = new CNode(component, {subKey: config.subKey});
 
+            const ancestorPath = cnode.ancestorPath;
+
+            cnode.merge(
+                executeCallback(
+                    config.treeDataGenerator, this, message, ...args, config));
+
+            const oldIndexList = builder.getIndexListByPath(ancestorPath);
+
+            // Emit to TreeBuilder to update component tree.
+            builder.emit(message, cnode);
+
+            const indexList = builder.getIndexListByPath(ancestorPath);
+
+            buildHistory(cnode, sanDevtool, message);
+            bindProperties(component, {indexList, cnode});
+
+            // For browser context.
             if (getConfig().hookOnly) {
                 return;
             }
 
-            // 只有当 devtool 面板创建之后才向 content script 发送组件信息。
+            // Only post message after devtool panel created.
             postMessageToExtension(sanDevtool,
-                {message, id, idPath, oldIndexList, indexList, data});
+                {message, id, ancestorPath, oldIndexList, indexList, cnode});
         });
     }
-    const afterFunc = getConfig().afterSanEventListener;
-    typeof afterFunc === 'function' && afterFunc.bind(this)(getConfig());
+
+    executeCallback(config.afterSanEventListener, this, config);
 }
