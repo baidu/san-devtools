@@ -98,36 +98,28 @@ export default class CNode {
     }
 
     append = node => {
-        /* eslint-disable fecs-camelcase */
-        if (CNode.IsCNode(node)) {
+        if (CNode.isCNode(node)) {
             this.createSubKey();
-            CNode.Append(this.getSubKey(), node);
+            CNode.appendInRoot(this.getSubKey(), node);
         }
-        /* eslint-enable fecs-camelcase */
     }
 
     update = (node, index) => {
-        /* eslint-disable fecs-camelcase */
-        if (CNode.IsCNode(node)) {
+        if (CNode.isCNode(node)) {
             this.createSubKey();
-            CNode.Update(this.getSubKey(), node, index);
+            CNode.updateInRoot(this.getSubKey(), node, index);
         }
-        /* eslint-enable fecs-camelcase */
     }
 
     insertBefore = (node, before) => {
-        /* eslint-disable fecs-camelcase */
-        if (CNode.IsCNode(node)) {
+        if (CNode.isCNode(node)) {
             this.createSubKey();
-            CNode.InsertBefore(this.getSubKey(), node, before);
+            CNode.insertBeforeInRoot(this.getSubKey(), node, before);
         }
-        /* eslint-enable fecs-camelcase */
     }
 
     removeAt = at => {
-        /* eslint-disable fecs-camelcase */
-        CNode.RemoveAt(this.getSubKey(), at);
-        /* eslint-enable fecs-camelcase */
+        CNode.removeAtInRoot(this.getSubKey(), at);
     }
 
     createSubKey = () => {
@@ -181,27 +173,27 @@ export default class CNode {
         routeData: this.data && this.data['route']
     });
 
-    static IsCNode = node => (node instanceof CNode);
+    static isCNode = node => (node instanceof CNode);
 
-    static Append = (root, node) => {
+    static appendInRoot = (root, node) => {
         if (Array.isArray(root)) {
             root.push(node);
         }
     }
 
-    static Update = (root, node, index) => {
+    static updateInRoot = (root, node, index) => {
         if (Array.isArray(root)) {
             root[index] = node;
         }
     }
 
-    static InsertBefore = (root, node, before) => {
+    static insertBeforeInRoot = (root, node, before) => {
         if (Array.isArray(root)) {
             root.splice(before, 0, node);
         }
     }
 
-    static RemoveAt = (root, at) => {
+    static removeAtInRoot = (root, at) => {
         if (Array.isArray(root)) {
             root.splice(at, 1);
         }

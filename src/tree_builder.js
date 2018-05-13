@@ -27,11 +27,9 @@ export default class TreeBuilder {
     }
 
     emit(event, node) {
-        /* eslint-disable fecs-camelcase */
-        if (!node || !(CNode.IsCNode(node)) || !node.id) {
+        if (!node || !(CNode.isCNode(node)) || !node.id) {
             return;
         }
-        /* eslint-enable fecs-camelcase */
 
         switch (event) {
             case COMP_ATTACHED:
@@ -74,14 +72,12 @@ export default class TreeBuilder {
                 if (root) {
                     let list = node.ancestorDOMIndexList;
                     let domIndex = i === p.length - 1 ? list[list.length - 1] : list[i];
-                    /* eslint-disable fecs-camelcase */
                     if (domIndex > INVALID) {
-                        CNode.InsertBefore(root, newNode, domIndex);
+                        CNode.insertBeforeInRoot(root, newNode, domIndex);
                     }
                     else {
-                        CNode.Append(root, newNode);
+                        CNode.appendInRoot(root, newNode);
                     }
-                    /* eslint-enable fecs-camelcase */
                     if (i < p.length - 1) {
                         next = newNode;
                         root = newNode.getSubKey();
@@ -91,21 +87,17 @@ export default class TreeBuilder {
             }
             else {
                 if (root[index] && root[index].id === node.id) {
-                    /* eslint-disable fecs-camelcase */
                     node.setSubKey(root[index].getSubKey());
-                    CNode.Update(root, node, index);
-                    /* eslint-enable fecs-camelcase */
+                    CNode.updateInRoot(root, node, index);
                 }
             }
 
             if (!next) {
                 next = root[index];
             }
-            /* eslint-disable fecs-camelcase */
-            if (!CNode.IsCNode(next)) {
+            if (!CNode.isCNode(next)) {
                 return;
             }
-            /* eslint-enable fecs-camelcase */
 
             if (i < p.length - 1 && !next.getSubKey()) {
                 next.createSubKey();
@@ -131,12 +123,10 @@ export default class TreeBuilder {
             }
 
             if (i === p.length - 1) {
-                /* eslint-disable fecs-camelcase */
-                CNode.RemoveAt(root, index);
+                CNode.removeAtInRoot(root, index);
                 if (root.length === 0 && prev) {
                     prev.deleteSubKey();
                 }
-                /* eslint-enable fecs-camelcase */
             }
 
             if (!root) {
@@ -144,11 +134,9 @@ export default class TreeBuilder {
             }
 
             prev = root[index];
-            /* eslint-disable fecs-camelcase */
-            if (!CNode.IsCNode(prev)) {
+            if (!CNode.isCNode(prev)) {
                 return;
             }
-            /* eslint-enable fecs-camelcase */
 
             root = prev.getSubKey() ? prev.getSubKey() : null;
         });
