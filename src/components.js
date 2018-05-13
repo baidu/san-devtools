@@ -61,7 +61,6 @@ export function getAncestorComponent(component) {
 }
 
 
-/* eslint-disable fecs-camelcase */
 export default class CNode {
     constructor(component, {subKey = SUB_KEY, fake = {}} = {}) {
         this._subKey = subKey;
@@ -99,28 +98,36 @@ export default class CNode {
     }
 
     append = node => {
+        /* eslint-disable fecs-camelcase */
         if (CNode.IsCNode(node)) {
             this.createSubKey();
             CNode.Append(this.getSubKey(), node);
         }
+        /* eslint-enable fecs-camelcase */
     }
 
     update = (node, index) => {
+        /* eslint-disable fecs-camelcase */
         if (CNode.IsCNode(node)) {
             this.createSubKey();
             CNode.Update(this.getSubKey(), node, index);
         }
+        /* eslint-enable fecs-camelcase */
     }
 
     insertBefore = (node, before) => {
+        /* eslint-disable fecs-camelcase */
         if (CNode.IsCNode(node)) {
             this.createSubKey();
             CNode.InsertBefore(this.getSubKey(), node, before);
         }
+        /* eslint-enable fecs-camelcase */
     }
 
     removeAt = at => {
+        /* eslint-disable fecs-camelcase */
         CNode.RemoveAt(this.getSubKey(), at);
+        /* eslint-enable fecs-camelcase */
     }
 
     createSubKey = () => {
@@ -159,7 +166,7 @@ export default class CNode {
      */
     _getAncestorDOMIndexList = () => getAncestorComponent(this._component)
         .map(v => getDOMIndexUnderParent(v));
- 
+
     _getHistoryInfo = () => ({
         id: this.id,
         ancestorPath: this.ancestorPath,
@@ -200,4 +207,3 @@ export default class CNode {
         }
     }
 }
-/* eslint-enable fecs-camelcase */
