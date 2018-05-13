@@ -2,6 +2,14 @@ ChangeLog
 ========
 
 
+0.0.6
+-------
+ - [ADD]
+   - CNode class for component tree in `__san_devtool__`.
+   - New San listener.
+   - Customized key for component tree.
+
+
 0.0.4
 -------
  - [ADD]

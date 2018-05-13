@@ -26,16 +26,18 @@ contains components and stores raw data.
 import {initHook} from '@ecomfe/san-devhook';
 
 const config = {
-    hookOnly: false,                     // Do not send any message to content script (Only for extension).
-    subKey: 'treeData',                  // Key for the array of sub component tree.
-    treeDataGenerator: () => {},         // Append customized data for generating component tree.
-    beforeSanEventListener: () => {},    // Do something before a San event.
-    onSanMessage: () => {},              // Do something when a San event triggering.
-    afterSanEventListener: () => {},     // Do something after a San event.
-    beforeStoreEventListener: () => {},  // Do something before a san-store event.
-    onStoreMessage: () => {},            // Do something when a san-store event triggering.
-    afterStoreEventListener: () => {}    // Do something after a san-store event.
+    hookOnly: false,                                // Do not send any message to content script (Only for extension).
+    subKey: 'treeData',                             // Key for the array of sub component tree.
+    treeDataGenerator: (message, component) => {},  // Append customized data for generating component tree.
+    beforeSanEventListener: () => {},               // Do something before a San event.
+    onSanMessage: (message, component) => {},       // Do something when a San event triggering.
+    afterSanEventListener: () => {},                // Do something after a San event.
+    beforeStoreEventListener: () => {},             // Do something before a san-store event.
+    onStoreMessage: () => {},                       // Do something when a san-store event triggering.
+    afterStoreEventListener: () => {}               // Do something after a san-store event.
 };
+
+// The last argument called *config* is the configuration of san-devhook in all listeners.
 
 initHook(config);
 ```
@@ -53,9 +55,9 @@ initHook(config);
 
 #### Objects binding on DOM
 
-  - `__SAN_COMPONENT__`: The component instance for current DOM.
+  - `__SAN_COMPONENT__`: The component instance of current DOM object.
   - `__SAN_DATA__`: The component data.
-  - `__SAN_INFO__`: Basic component info.
+  - `__SAN_CNODE__`: A CNode instance of component acts as a serializable object.
   - `__SAN_PATH__`: Ancestor component ID list.
 
 ## Tests
