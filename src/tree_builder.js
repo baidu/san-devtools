@@ -12,7 +12,8 @@ import CNode from './components';
 import {getConfig} from './config';
 
 
-export default class {
+/* eslint-disable fecs-camelcase */
+export default class TreeBuilder {
     constructor({
         root
     } = {}) {
@@ -137,7 +138,7 @@ export default class {
             if (!CNode.IsCNode(prev)) {
                 return;
             }
-            
+
             root = prev.getSubKey() ? prev.getSubKey() : null;
         });
     }
@@ -180,3 +181,5 @@ export default class {
         return Array.isArray(path) && !path.some(v => typeof v !== 'string');
     }
 }
+/* eslint-enable fecs-camelcase */
+

@@ -10,18 +10,39 @@ import {SAN_EVENTS, STORE_EVENTS, SAN_PROPERTIES} from './constants';
 import {isExtension} from './context';
 import {getDevtoolNS, executeCallback} from './utils';
 import CNode, {serialize, getHistoryInfo, getRouteInfo} from './components';
-import componentTreeBuilder from './tree_builder';
+import ComponentTreeBuilder from './tree_builder';
 import stores from './stores';
 import {getConfig} from './config';
 
 
-const [COMP_COMPILED, COMP_INITED, COMP_CREATED, COMP_ATTACHED, COMP_DETACHED,
-    COMP_DISPOSED, COMP_UPDATED, COMP_ROUTE] = SAN_EVENTS;
-const [STORE_DEFAULT_INITED, STORE_CONNECTED, STORE_COMP_INITED,
-    STORE_COMP_DISPOSED, STORE_LISTENED, STORE_UNLISTENED, STORE_DISPATCHED,
-    STORE_ACTION_ADDED] = STORE_EVENTS;
-const [__3_COMP__, __3_PATH__, __3_DATA__, __3_TREE_INDEX__, __3_INFO__,
-    __3_CNODE__] = SAN_PROPERTIES;
+const [
+    COMP_COMPILED,
+    COMP_INITED,
+    COMP_CREATED,
+    COMP_ATTACHED,
+    COMP_DETACHED,
+    COMP_DISPOSED,
+    COMP_UPDATED,
+    COMP_ROUTE
+] = SAN_EVENTS;
+const [
+    STORE_DEFAULT_INITED,
+    STORE_CONNECTED,
+    STORE_COMP_INITED,
+    STORE_COMP_DISPOSED,
+    STORE_LISTENED,
+    STORE_UNLISTENED,
+    STORE_DISPATCHED,
+    STORE_ACTION_ADDED
+] = STORE_EVENTS;
+const [
+    __3_COMP__,
+    __3_PATH__,
+    __3_DATA__,
+    __3_TREE_INDEX__,
+    __3_INFO__,
+    __3_CNODE__
+] = SAN_PROPERTIES;
 
 
 if (isExtension()) {
@@ -58,7 +79,7 @@ function buildHistory(cnode, root, message) {
         return null;
     }
 
-    const info = {...cnode.history, message};//getHistoryInfo(component, message);
+    const info = {...cnode.history, message};
 
     root['history'].unshift(info);
     return info;
@@ -232,18 +253,16 @@ function bindProperties(component, {indexList, cnode}) {
     component.el[__3_CNODE__] = cnode;
 }
 
-function postMessageToExtension(ns, {
-    message, id, idPath, oldIndexList, indexList, cnode
-}) {
+function postMessageToExtension(ns, {message, oldIndexList, indexList, cnode}) {
     if (ns.devtoolPanelCreated) {
         window.postMessage({
             message,
-            id,
-            idPath,
             oldIndexList,
             indexList,
             cnode,
             timestamp: Date.now(),
+            id: cnode.id,
+            ancestorPath: cnode.ancestorPath,
             componentName: cnode.name,
             compData: cnode.data
         }, '*');
@@ -263,7 +282,7 @@ export function addSanEventListeners() {
         return;
     }
 
-    const builder = new componentTreeBuilder({
+    const builder = new ComponentTreeBuilder({
         root: sanDevtool.data[config.subKey]
     });
 

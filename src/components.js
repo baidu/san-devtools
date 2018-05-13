@@ -61,6 +61,7 @@ export function getAncestorComponent(component) {
 }
 
 
+/* eslint-disable fecs-camelcase */
 export default class CNode {
     constructor(component, {subKey = SUB_KEY, fake = {}} = {}) {
         this._subKey = subKey;
@@ -69,7 +70,7 @@ export default class CNode {
             return;
         }
         if (!component.id) {
-            console.warn('Component is not initialized.')
+            console.warn('Component is not initialized.');
             return;
         }
         this._component = component;
@@ -98,28 +99,28 @@ export default class CNode {
     }
 
     append = node => {
-        if (IsCNode(node)) {
+        if (CNode.IsCNode(node)) {
             this.createSubKey();
-            Append(this.getSubKey(), node);
+            CNode.Append(this.getSubKey(), node);
         }
     }
 
     update = (node, index) => {
-        if (IsCNode(node)) {
+        if (CNode.IsCNode(node)) {
             this.createSubKey();
-            Update(this.getSubKey(), node, index);
+            CNode.Update(this.getSubKey(), node, index);
         }
     }
 
     insertBefore = (node, before) => {
-        if (IsCNode(node)) {
+        if (CNode.IsCNode(node)) {
             this.createSubKey();
-            InsertBefore(this.getSubKey(), node, before);
+            CNode.InsertBefore(this.getSubKey(), node, before);
         }
     }
 
     removeAt = at => {
-        RemoveAt(this.getSubKey(), at);
+        CNode.RemoveAt(this.getSubKey(), at);
     }
 
     createSubKey = () => {
@@ -198,5 +199,5 @@ export default class CNode {
             root.splice(at, 1);
         }
     }
-
 }
+/* eslint-enable fecs-camelcase */
