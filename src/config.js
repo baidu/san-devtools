@@ -8,7 +8,6 @@
 
 
 import {SUB_KEY, NOOP} from './constants';
-import {getDevtoolNS, toVar} from './utils';
 import {isExtension} from './context';
 
 
@@ -41,20 +40,4 @@ export function setConfig(c) {
         return;
     }
     config = Object.assign(config, c);
-}
-
-
-export function tsConfig() {
-    const ns = getDevtoolNS();
-    if (!ns) {
-        return;
-    }
-    if (ns._config && typeof ns._config === 'object') {
-        ns._config = toVar(JSON.stringify(ns._config));
-        setConfig(ns._config);
-    }
-    else {
-        ns._config = getConfig();
-    }
-    ns.data[ns._config.subKey] = [];
 }

@@ -9,8 +9,8 @@
 import {SAN_EVENTS, STORE_EVENTS, SAN_PROPERTIES} from './constants';
 import {isExtension} from './context';
 import {getDevtoolNS, executeCallback} from './utils';
-import CNode, {serialize, getHistoryInfo, getRouteInfo} from './components';
-import ComponentTreeBuilder from './tree_builder';
+import CNode from './component';
+import ComponentTreeBuilder from './component_tree_builder';
 import stores from './stores';
 import {getConfig} from './config';
 
@@ -73,7 +73,6 @@ window.addEventListener('message', e => {
 }, false);
 
 
-// 将所有事件信息存入 history 数组，以便后续使用。
 function buildHistory(cnode, root, message) {
     if (!root || !root['history']) {
         return null;
@@ -85,11 +84,11 @@ function buildHistory(cnode, root, message) {
     return info;
 }
 
-function buildRoutes(component, root) {
-    if (!root || !root['routes'] || !component || !component.data) {
+function buildRoutes(cnode, root) {
+    if (!root || !root['routes'] || !CNode.isCNode(cnode)) {
         return null;
     }
-    const info = getRouteInfo(component);
+    const info = cnode.route;
     root['routes'].unshift(info);
     return info;
 }
@@ -236,9 +235,10 @@ export function addStoreEventListeners(callback) {
     executeCallback(config.afterStoreEventListener, this, config);
 }
 
-function listenRouteEvent(ns) {
+function listenRouteEvent() {
+    const ns = getDevtoolNS();
     ns.on(COMP_ROUTE, (...args) => {
-        const data = buildRoutes(args[0], ns);
+        const data = buildRoutes(new CNode(args[0]), ns);
         if (ns.devtoolPanelCreated) {
             window.postMessage({...data, COMP_ROUTE}, '*');
         }
@@ -269,9 +269,9 @@ function postMessageToExtension(ns, {message, oldIndexList, indexList, cnode}) {
     }
 }
 
-// 注册所有 San 发送给 devtool 的 event listeners。
-// 必须在页面上下文中执行。
-// 必须在 window.__san_devtool__ 挂钩注册好后执行。
+// Listen all San events.
+// The function must be executed in page context and after
+// window.__san_devtool__ hooked.
 export function addSanEventListeners() {
     const config = getConfig();
 
@@ -289,7 +289,7 @@ export function addSanEventListeners() {
     // COMP_XXX events
     for (const message of SAN_EVENTS) {
         if (message === COMP_ROUTE) {
-            return listenRouteEvent(sanDevtool);
+            return listenRouteEvent();
         }
         sanDevtool.on(message, (...args) => {
             if (executeCallback(config.onSanMessage, this, message, ...args, config)) {

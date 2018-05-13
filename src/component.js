@@ -62,7 +62,7 @@ export function getAncestorComponent(component) {
 
 
 export default class CNode {
-    constructor(component, {subKey = SUB_KEY, fake = {}} = {}) {
+    constructor(component, {subKey = SUB_KEY, fake} = {}) {
         this._subKey = subKey;
         if (!isSanComponent(component)) {
             this.init(fake);

@@ -7,10 +7,11 @@
 
 
 import {addSanEventListeners, addStoreEventListeners} from './listeners';
-import {tsConfig} from './config';
+import {backupConfig, initComponentTreeDataRoot} from './hook';
 
 
-tsConfig();
+backupConfig();
+initComponentTreeDataRoot();
 
 addSanEventListeners();
 addStoreEventListeners();

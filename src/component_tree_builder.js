@@ -8,7 +8,7 @@
 
 
 import {COMP_ATTACHED, COMP_DETACHED, COMP_UPDATED, INVALID} from './constants';
-import CNode from './components';
+import CNode from './component';
 import {getConfig} from './config';
 
 

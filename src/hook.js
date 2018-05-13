@@ -6,15 +6,44 @@
  */
 
 
-import {getDevtoolNS} from './utils';
+import {getDevtoolNS, toVar} from './utils';
+import {setConfig, getConfig} from './config';
+
 
 /*eslint-disable*/
 
-export function setInitHook(func) {
+export function backupInitHook(func) {
     const ns = getDevtoolNS();
     if (ns) {
         ns.initHook = func;
     }
+}
+
+export function backupConfig() {
+    const ns = getDevtoolNS();
+    if (!ns) {
+        return;
+    }
+    if (ns._config && typeof ns._config === 'object') {
+        ns._config = toVar(JSON.stringify(ns._config));
+        setConfig(ns._config);
+    }
+    else {
+        ns._config = getConfig();
+    }
+}
+
+export function initComponentTreeDataRoot() {
+    const ns = getDevtoolNS();
+    if (ns) {
+        ns.data[getConfig().subKey] = [];
+    }
+}
+
+export function tsConfig() {
+    const ns = getDevtoolNS();
+    
+    ns.data[ns._config.subKey] = [];
 }
 
 export function installSanHook(global) {

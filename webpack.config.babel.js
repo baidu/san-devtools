@@ -24,6 +24,7 @@ const developConfig = {
 
 const extConfig = {
     entry: {
+        'san_devhook.js': './src/invasion.cs.js',
         'host_entry.js': './src/host_entry.js'
     }
 }
