@@ -45,6 +45,15 @@ const [
 const blackSanEvent = [COMP_COMPILED, COMP_INITED, COMP_CREATED, COMP_DISPOSED];
 
 
+/**
+ * Build the history list and return the latest info.
+ * @inner
+ *
+ * @param {CNode} cnode     The CNode instance.
+ * @param {Array} root      The __san_devtool__ namespace.
+ * @param {string} message  The event name.
+ * @return {Object}
+ */
 function buildHistory(cnode, root, message) {
     if (!root || !root['history']) {
         return null;
@@ -56,6 +65,15 @@ function buildHistory(cnode, root, message) {
     return info;
 }
 
+
+/**
+ * Build the route list and return the latest info.
+ * @inner
+ *
+ * @param {CNode} cnode     The CNode instance.
+ * @param {Array} root      The __san_devtool__ namespace.
+ * @return {Object}
+ */
 function buildRoutes(cnode, root) {
     if (!root || !root['routes'] || !CNode.isCNode(cnode)) {
         return null;
@@ -207,6 +225,11 @@ export function addStoreEventListeners(callback) {
     executeCallback(config.afterStoreEventListener, this, config);
 }
 
+
+/**
+ * Listen the San route event.
+ * @inner
+ */
 function listenRouteEvent() {
     const ns = getDevtoolNS();
     ns.on(COMP_ROUTE, (...args) => {
@@ -217,6 +240,13 @@ function listenRouteEvent() {
     });
 }
 
+/**
+ * Bind some DOM properties for user's debugging.
+ * @inner
+ *
+ * @param {CNode} cnode           The CNode instance.
+ * @param {Component} component   The San Component instance.
+ */
 function bindProperties(cnode, component) {
     component.el[__3_COMP__] = component;
     component.el[__3_PATH__] = cnode.ancestorPath;
@@ -225,25 +255,11 @@ function bindProperties(cnode, component) {
     component.el[__3_CNODE__] = cnode;
 }
 
-function postMessageToExtension(ns, {message, cnode}) {
-    if (ns.devtoolPanelCreated) {
-        let {id, data, name, ancestorPath, ancestorIndexList} = cnode;
-        window.postMessage({
-            message,
-            cnode,
-            id,
-            data,
-            name,
-            ancestorPath,
-            ancestorIndexList,
-            timestamp: Date.now(),
-        }, '*');
-    }
-}
 
-// Listen all San events.
-// The function must be executed in page context and after
-// window.__san_devtool__ hooked.
+/**
+ * Listen all San events.
+ * @inner
+ */
 export function addSanEventListeners() {
     const config = getConfig();
 

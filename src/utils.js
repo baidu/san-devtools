@@ -6,6 +6,11 @@
  */
 
 
+/**
+ * Retrieve __san_devtool__ namespace if has.
+ *
+ * @return {Object}
+ */
 export function getDevtoolNS() {
     if (typeof window[SAN_DEVTOOL] !== 'object') {
         return null;
@@ -14,6 +19,12 @@ export function getDevtoolNS() {
 }
 
 
+/**
+ * Determine if the specified object is a San component.
+ *
+ * @param {Component} component  A Component instance.
+ * @return {boolean}
+ */
 export function isSanComponent(component) {
     let ns = getDevtoolNS();
     if (!ns || !ns.san) {
@@ -23,6 +34,12 @@ export function isSanComponent(component) {
 }
 
 
+/**
+ * Get XPath string for the specified DOM element.
+ *
+ * @param {HTMLElement} element  A DOM element.
+ * @return {boolean}
+ */
 export function getXPath(element) {
     if (!element) {
         return '';
@@ -49,6 +66,12 @@ export function getXPath(element) {
 }
 
 
+/**
+ * Parse a URL string to an object.
+ *
+ * @param {string} url  A URL.
+ * @return {Object}
+ */
 export function parseUrl(url) {
     let params = {};
     for (let s of url.slice(url.indexOf('?') + 1).split('&')) {
@@ -59,46 +82,15 @@ export function parseUrl(url) {
 }
 
 
-export function normalizeVersionNumber(version) {
-    let reg = /^\d+(\.\d+)+(-\b\w*\b)?$/;
-    if (!version || typeof version !== 'string') {
-        return null;
-    }
-    if (!reg.test(version)) {
-        return '';
-    }
-    return version;
-}
-
-
-export function toLocaleDatetime(timestamp) {
-    return new Date(+timestamp).toLocaleString(
-        navigator.language,
-        {
-            hour12: false,
-            month: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            day: '2-digit',
-            year: '2-digit',
-            weekday: 'short'
-        }
-    );
-}
-
-
-export function isContentScript() {
-    return typeof chrome === 'object' && chrome.extension;
-}
-
-
-export function getSanIdElementCount() {
-    return document.evaluate('//*[contains(@id,"_san_")]', document, null,
-        XPathResult.ORDERED_NODE_SNAPSHOT_TYPE).snapshotLength;
-}
-
-
+/**
+ * Execute the callback with context of the user's configuration.
+ *
+ * @param {Function} callback  A callback.
+ * @param {Object} context  The execution context.
+ * @param {Object?} args  The Arguments.
+ * @param {Function} callback  A callback.
+ * @return {*}
+ */
 export function executeCallback(callback, context, ...args) {
     if (typeof callback === 'function') {
         if (typeof context !== 'object') {
@@ -108,82 +100,3 @@ export function executeCallback(callback, context, ...args) {
     }
 }
 
-
-export function toStr(varient) {
-    function toString(va) {
-        if (va instanceof RegExp) {
-            return va.toString();
-        }
-        switch (typeof va) {
-            case 'function':
-                return va.toString();
-            case 'object': {
-                if (Array.isArray(va)) {
-                    let v = Object.assign([], va);
-                    v.forEach((e, i) => {
-                        v[i] = toString(v[i]);
-                    });
-                    return v;
-                }
-                else {
-                    let v = Object.assign({}, va);
-                    for (let k in v) {
-                        v[k] = toString(v[k]);
-                    }
-                    return v;
-                }
-            }
-            case 'number':
-            case 'string':
-            case 'boolean':
-            default:
-                return va + '';
-        }
-    }
-
-    let s = toString(varient);
-    return typeof s === 'object' ? JSON.stringify(s) : s;
-}
-
-
-export function toVar(string) {
-    if (typeof string !== 'string') {
-        return string;
-    }
-    function toVarient(v) {
-        if (typeof v === 'object') {
-            if (Array.isArray(v)) {
-                v.forEach((e, i) => {
-                    v[i] = toVarient(v[i]);
-                });
-                return v;
-            }
-            else {
-                for (let k in v) {
-                    v[k] = toVarient(v[k]);
-                }
-                return v;
-            }
-        }
-        try {
-            if (!v) {
-                throw new Error();
-            }
-            /*eslint-disable*/
-            return eval(`(function(){return ${v}})()`);
-            /*eslint-enable*/
-        }
-        catch (ex) {
-            return v;
-        }
-    }
-
-    let va;
-    try {
-        va = JSON.parse(string);
-    }
-    catch (ex) {
-        va = string;
-    }
-    return toVarient(va);
-}

@@ -18,7 +18,11 @@ import {parseUrl} from './utils';
 
 const AUTO_HOOK = 'autohook';
 
-
+/**
+ * Initialize the hook, add all listeners.
+ *
+ * @param {Object?} config  User's configuration.
+ */
 export function initHook(config = defaultConfig) {
     if (config !== defaultConfig) {
         setConfig(config);

@@ -1,5 +1,14 @@
 ChangeLog
-========
+=========
+
+
+0.0.6
+-------
+ - [ADD]
+   - Props in CNode.
+ - [REMOVE]
+   - All extension code.
+   - `__SAN_INFO__` property.
 
 
 0.0.6

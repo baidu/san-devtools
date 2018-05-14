@@ -10,6 +10,9 @@ import {getDevtoolNS} from './utils';
 import {getConfig} from './config';
 
 
+/**
+ * Backup initHook function for __san_devtool__.
+ */
 export function backupInitHook(func) {
     const ns = getDevtoolNS();
     if (ns) {
@@ -18,6 +21,9 @@ export function backupInitHook(func) {
 }
 
 
+/**
+ * Backup user's configuration for __san_devtool__._config.
+ */
 export function backupConfig() {
     const ns = getDevtoolNS();
     if (!ns) {
@@ -27,6 +33,9 @@ export function backupConfig() {
 }
 
 
+/**
+ * Intialize component tree's root key for __san_devtool__.data.
+ */
 export function initComponentTreeDataRoot() {
     const ns = getDevtoolNS();
     if (ns) {
@@ -36,6 +45,11 @@ export function initComponentTreeDataRoot() {
 
 
 /*eslint-disable*/
+/**
+ * Install __san_devtool__ namespace in global window.
+ *
+ * @param {Object} global   The global window.
+ */
 export function installSanHook(global) {
     const ns = SAN_DEVTOOL;
     if (global[ns]) {

@@ -25,11 +25,21 @@ export const defaultConfig = {
 let config = {...defaultConfig};
 
 
+/**
+ * Retrieve user's configuration object.
+ *
+ * @return {Object}
+ */
 export function getConfig() {
     return config;
 }
 
 
+/**
+ * Save the user's configuration.
+ *
+ * @param {Object} c  Customized configuration.
+ */
 export function setConfig(c) {
     if (!c || typeof c !== 'object') {
         return;
