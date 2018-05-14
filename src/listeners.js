@@ -257,6 +257,25 @@ function bindProperties(cnode, component) {
 
 
 /**
+ * Post CNode with message to content script.
+ * @inner
+ *
+ * @param {Object} ns                The __san_devtool__ namespace.
+ * @param {string} options.message   The San event name.
+ * @param {CNode}  options.cnode     The CNode instance.
+ */
+function postMessageToExtension(ns, {message, cnode}) {
+    if (ns.devtoolPanelCreated) {
+        window.postMessage({
+            message,
+            cnode,
+            timestamp: Date.now(),
+        }, '*');
+    }
+}
+
+
+/**
  * Listen all San events.
  * @inner
  */
