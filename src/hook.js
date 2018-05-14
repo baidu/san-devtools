@@ -12,6 +12,8 @@ import {getConfig} from './config';
 
 /**
  * Backup initHook function for __san_devtool__.
+ *
+ * @param {Function} func   The initHook function.
  */
 export function backupInitHook(func) {
     const ns = getDevtoolNS();

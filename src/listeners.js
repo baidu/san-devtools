@@ -278,6 +278,8 @@ function postMessageToExtension(ns, {message, cnode}) {
 /**
  * Listen all San events.
  * @inner
+ *
+ * @return
  */
 export function addSanEventListeners() {
     const config = getConfig();

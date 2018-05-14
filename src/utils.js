@@ -87,9 +87,8 @@ export function parseUrl(url) {
  *
  * @param {Function} callback  A callback.
  * @param {Object} context  The execution context.
- * @param {Object?} args  The Arguments.
- * @param {Function} callback  A callback.
- * @return {*}
+ * @param {?Object} args  The Arguments.
+ * @return
  */
 export function executeCallback(callback, context, ...args) {
     if (typeof callback === 'function') {
