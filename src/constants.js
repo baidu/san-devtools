@@ -54,16 +54,14 @@ export const NOOP = () => {};
 export const __3_COMP__ = '__SAN_COMPONENT__';
 export const __3_PATH__ = '__SAN_PATH__';
 export const __3_DATA__ = '__SAN_DATA__';
-export const __3_TREE_INDEX__ = '__SAN_TREE_INDEX__';
-export const __3_INFO__ = '__SAN_INFO__';
+export const __3_INDEX_LIST__ = '__SAN_INDEX_LIST__';
 export const __3_CNODE__ = '__SAN_CNODE__';
 
 export const SAN_PROPERTIES = [
     __3_COMP__,
     __3_PATH__,
     __3_DATA__,
-    __3_TREE_INDEX__,
-    __3_INFO__,
+    __3_INDEX_LIST__,
     __3_CNODE__
 ];
 

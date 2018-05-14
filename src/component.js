@@ -201,7 +201,7 @@ export default class CNode {
         if (!Array.isArray(this.getSubKey())) {
             this.setSubKey([]);
         }
-    };
+    }
 
     /**
      * Delete the children collection if empty.
@@ -236,7 +236,9 @@ export default class CNode {
      * @param {Array} children   The specified children collection.
      */
     setSubKey(children) {
-        return this[this._subKey] = children;
+        if (Array.isArray(children)) {
+            this[this._subKey] = children;
+        }
     }
 
     /**
@@ -256,7 +258,8 @@ export default class CNode {
      * @return {Object}
      */
     _getData() {
-        return this._component.data && (this._component.data.raw || this._component.data.data);
+        return this._component.data
+            && (this._component.data.raw || this._component.data.data);
     }
 
     /**
@@ -276,7 +279,8 @@ export default class CNode {
      * @return {Array}
      */
     _getAncestorIndexList() {
-        return getAncestorComponent(this._component).map(v => getIndexInParent(v));
+        return getAncestorComponent(this._component)
+            .map(v => getIndexInParent(v));
     }
 
     /**
