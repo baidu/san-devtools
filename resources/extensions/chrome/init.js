@@ -2,7 +2,7 @@
  * San DevHook
  * Copyright 2017 Baidu Inc. All rights reserved.
  *
- * @file Init hook.
+ * @file Init hook config.
  */
 
 
@@ -11,8 +11,8 @@ window.sanDevHook = {
     config: {
         subKey: 'sub',
         hookOnly: false,
-        treeDataGenerator: (message, component, config) => {
-            component.el.dataset['san_id'] = component.id;
+        treeDataGenerator: (message, cnode, component, config) => {
+            component.el.dataset['san_id'] = cnode.id;
             return {hello: 'world'};
         }
     }

@@ -10,14 +10,13 @@ import {getDevtoolNS, toVar} from './utils';
 import {setConfig, getConfig} from './config';
 
 
-/*eslint-disable*/
-
 export function backupInitHook(func) {
     const ns = getDevtoolNS();
     if (ns) {
         ns.initHook = func;
     }
 }
+
 
 export function backupConfig() {
     const ns = getDevtoolNS();
@@ -33,6 +32,7 @@ export function backupConfig() {
     }
 }
 
+
 export function initComponentTreeDataRoot() {
     const ns = getDevtoolNS();
     if (ns) {
@@ -40,12 +40,8 @@ export function initComponentTreeDataRoot() {
     }
 }
 
-export function tsConfig() {
-    const ns = getDevtoolNS();
-    
-    ns.data[ns._config.subKey] = [];
-}
 
+/*eslint-disable*/
 export function installSanHook(global) {
     const ns = SAN_DEVTOOL;
     if (global[ns]) {

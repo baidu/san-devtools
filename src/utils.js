@@ -6,14 +6,11 @@
  */
 
 
-import {isBrowser} from './context';
-
 export function getDevtoolNS() {
-    let global = isBrowser() ? window : global;
-    if (!global || typeof global[SAN_DEVTOOL] !== 'object') {
+    if (typeof window[SAN_DEVTOOL] !== 'object') {
         return null;
     }
-    return global[SAN_DEVTOOL];
+    return window[SAN_DEVTOOL];
 }
 
 

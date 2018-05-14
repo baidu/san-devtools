@@ -4,15 +4,6 @@ Hook for San-DevTool. Append a `__san_devtool__` namespace on global context whi
 contains components and stores raw data.
 
 
-## Entries
-
- * Browser context
-   - External script
-   - Module
- * Extension context
-   - For San-DevTool
-
-
 ## Usage
 
 ### Automatically
@@ -26,18 +17,18 @@ contains components and stores raw data.
 import {initHook} from '@ecomfe/san-devhook';
 
 const config = {
-    hookOnly: false,                                // Do not send any message to content script (Only for extension).
-    subKey: 'treeData',                             // Key for the array of sub component tree.
-    treeDataGenerator: (message, component) => {},  // Append customized data for generating component tree.
-    beforeSanEventListener: () => {},               // Do something before a San event.
-    onSanMessage: (message, component) => {},       // Do something when a San event triggering.
-    afterSanEventListener: () => {},                // Do something after a San event.
-    beforeStoreEventListener: () => {},             // Do something before a san-store event.
-    onStoreMessage: () => {},                       // Do something when a san-store event triggering.
-    afterStoreEventListener: () => {}               // Do something after a san-store event.
+    hookOnly: false,                                      // Do not send any message to content script (Only for extension).
+    subKey: 'treeData',                                   // Key for the array of sub component tree.
+    treeDataGenerator: (message, cnode, component) => {}, // Append customized data for generating component tree.
+    beforeSanEventListener: () => {},                     // Do something before a San event.
+    onSanMessage: (message, cnode, component) => {},      // Do something when a San event triggering.
+    afterSanEventListener: () => {},                      // Do something after a San event.
+    beforeStoreEventListener: () => {},                   // Do something before a san-store event.
+    onStoreMessage: () => {},                             // Do something when a san-store event triggering.
+    afterStoreEventListener: () => {}                     // Do something after a san-store event.
 };
 
-// The last argument called *config* is the configuration of san-devhook in all listeners.
+// The last argument called *config* is the configuration of san-devhook in all callbacks.
 
 initHook(config);
 ```

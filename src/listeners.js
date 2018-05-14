@@ -7,7 +7,6 @@
 
 
 import {SAN_EVENTS, STORE_EVENTS, SAN_PROPERTIES} from './constants';
-import {isExtension} from './context';
 import {getDevtoolNS, executeCallback} from './utils';
 import CNode from './component';
 import ComponentTreeBuilder from './component_tree_builder';
@@ -39,38 +38,11 @@ const [
     __3_COMP__,
     __3_PATH__,
     __3_DATA__,
-    __3_TREE_INDEX__,
-    __3_INFO__,
+    __3_INDEX_LIST__,
     __3_CNODE__
 ] = SAN_PROPERTIES;
 
-
-if (isExtension()) {
-    chrome.runtime.onMessage.addListener((message, sender, send) => {
-        if (message.message === 'get_version') {
-            window.postMessage({
-                host: HOST,
-                message: 'get_version'
-            }, '*');
-        }
-    });
-}
-
-window.addEventListener('message', e => {
-    if (e.data.host === HOST) {
-        switch (e.data.message) {
-            case 'version': {
-                if (isExtension()) {
-                    chrome.runtime.sendMessage({
-                        message: 'version',
-                        data: e.data.version
-                    });
-                }
-                break;
-            }
-        }
-    }
-}, false);
+const blackSanEvent = [COMP_COMPILED, COMP_INITED, COMP_CREATED, COMP_DISPOSED];
 
 
 function buildHistory(cnode, root, message) {
@@ -245,26 +217,26 @@ function listenRouteEvent() {
     });
 }
 
-function bindProperties(component, {indexList, cnode}) {
+function bindProperties(cnode, component) {
     component.el[__3_COMP__] = component;
     component.el[__3_PATH__] = cnode.ancestorPath;
     component.el[__3_DATA__] = cnode.data;
-    component.el[__3_TREE_INDEX__] = indexList;
+    component.el[__3_INDEX_LIST__] = cnode.ancestorIndexList;
     component.el[__3_CNODE__] = cnode;
 }
 
-function postMessageToExtension(ns, {message, oldIndexList, indexList, cnode}) {
+function postMessageToExtension(ns, {message, cnode}) {
     if (ns.devtoolPanelCreated) {
+        let {id, data, name, ancestorPath, ancestorIndexList} = cnode;
         window.postMessage({
             message,
-            oldIndexList,
-            indexList,
             cnode,
+            id,
+            data,
+            name,
+            ancestorPath,
+            ancestorIndexList,
             timestamp: Date.now(),
-            id: cnode.id,
-            ancestorPath: cnode.ancestorPath,
-            componentName: cnode.name,
-            compData: cnode.data
         }, '*');
     }
 }
@@ -292,10 +264,6 @@ export function addSanEventListeners() {
             return listenRouteEvent();
         }
         sanDevtool.on(message, (...args) => {
-            if (executeCallback(config.onSanMessage, this, message, ...args, config)) {
-                return;
-            }
-
             // First argument is a San component.
             const component = args[0];
 
@@ -308,21 +276,25 @@ export function addSanEventListeners() {
             // Create a CNode from component instance.
             const cnode = new CNode(component, {subKey: config.subKey});
 
-            const ancestorPath = cnode.ancestorPath;
+            if (executeCallback(config.onSanMessage, this, message, cnode, ...args, config)) {
+                return;
+            }
+
+            buildHistory(cnode, sanDevtool, message);
+            if (blackSanEvent.includes(message)) {
+                return;
+            }
+
+            cnode.seekAncestor();
 
             cnode.merge(
                 executeCallback(
-                    config.treeDataGenerator, this, message, ...args, config));
-
-            const oldIndexList = builder.getIndexListByPath(ancestorPath);
+                    config.treeDataGenerator, this, message, cnode, ...args, config));
 
             // Emit to TreeBuilder to update component tree.
             builder.emit(message, cnode);
 
-            const indexList = builder.getIndexListByPath(ancestorPath);
-
-            buildHistory(cnode, sanDevtool, message);
-            bindProperties(component, {indexList, cnode});
+            bindProperties(cnode, component);
 
             // For browser context.
             if (getConfig().hookOnly) {
@@ -330,8 +302,7 @@ export function addSanEventListeners() {
             }
 
             // Only post message after devtool panel created.
-            postMessageToExtension(sanDevtool,
-                {message, id, ancestorPath, oldIndexList, indexList, cnode});
+            postMessageToExtension(sanDevtool, {message, cnode});
         });
     }
 

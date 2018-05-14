@@ -6,7 +6,7 @@
  */
 
 
-import {defaultConfig, setConfig, getConfig, tsConfig} from './config';
+import {defaultConfig, setConfig, getConfig} from './config';
 import {installSanHook, backupInitHook, backupConfig, initComponentTreeDataRoot} from './hook';
 import {addSanEventListeners, addStoreEventListeners} from './listeners';
 import {parseUrl} from './utils';
