@@ -238,13 +238,14 @@ export default class CNode {
         }
         const props = binds.raw || binds;
         props.forEach(e => {
-            const {name, raw} = e;
-            this.props.push({key: name, value: raw});
+            this.props.push({key: e.name, value: e.raw});
         });
     }
 
     /**
      * Retrieve children CNode collection.
+     *
+     * @return {Array}
      */
     getSubKey() {
         return this[this._subKey];
