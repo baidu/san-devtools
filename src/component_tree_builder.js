@@ -12,7 +12,17 @@ import CNode from './component';
 import {getConfig} from './config';
 
 
+/**
+ * A TreeBuilder represents a builder to build whole component tree with CNode.
+ *
+ * @class
+ */
 export default class TreeBuilder {
+    /**
+     * TreeBuilder consturctor
+     *
+     * @param {Array} root  The root children collection.
+     */
     constructor({
         root
     } = {}) {
@@ -22,10 +32,21 @@ export default class TreeBuilder {
         this._root = root;
     }
 
+    /**
+     * Retrieve the root.
+     *
+     * @return {Array}
+     */
     getRoot() {
         return this._root;
     }
 
+    /**
+     * Emit to append, update or remove a CNode.
+     *
+     * @param {string} event  The San event.
+     * @param {CNode}  node   A CNode instance.
+     */
     emit(event, node) {
         if (!node || !(CNode.isCNode(node)) || !node.id) {
             return;
@@ -46,6 +67,11 @@ export default class TreeBuilder {
         }
     }
 
+    /**
+     * Append a CNode in root refer to ancestor path.
+     *
+     * @param {CNode} node   A CNode instance.
+     */
     appendNode(node) {
         let path = node.ancestorPath;
         if (!this._isValidPath(path)) {
@@ -70,10 +96,11 @@ export default class TreeBuilder {
                 }
 
                 if (root) {
-                    let list = node.ancestorDOMIndexList;
-                    let domIndex = i === p.length - 1 ? list[list.length - 1] : list[i];
-                    if (domIndex > INVALID) {
-                        CNode.insertBeforeInRoot(root, newNode, domIndex);
+                    let list = node.ancestorIndexList;
+                    let ancestorIndex = i === p.length - 1
+                        ? list[list.length - 1] : list[i];
+                    if (ancestorIndex > INVALID) {
+                        CNode.insertBeforeInRoot(root, newNode, ancestorIndex);
                     }
                     else {
                         CNode.appendInRoot(root, newNode);
@@ -104,6 +131,11 @@ export default class TreeBuilder {
         });
     }
 
+    /**
+     * Remove a CNode from root refer to ancestor path.
+     *
+     * @param {CNode} node   A CNode instance.
+     */
     removeNode(node) {
         let path = node.ancestorPath;
         if (!this._isValidPath(path)) {
@@ -140,6 +172,11 @@ export default class TreeBuilder {
         });
     }
 
+    /**
+     * Retrieve the ID list of the CNode.
+     *
+     * @param {CNode} node   A CNode instance.
+     */
     getIdListByNode(node) {
         if (!node || !Array.isArray(node)) {
             return [];
@@ -147,33 +184,13 @@ export default class TreeBuilder {
         return node.filter(x => x.id).map(x => x.id);
     }
 
-    getIndexListByPath(path) {
-        if (!path || !Array.isArray(path)) {
-            return [];
-        }
-
-        let root = this._root;
-
-        return path.map((id, i, p) => {
-            let index = this.getIndexByNode(root, id);
-            if (index < 0 && i !== p.length - 1) {
-                return INVALID;
-            }
-            if (i < p.length - 1) {
-                root = root[index].getSubKey();
-            }
-            return index;
-        }).filter(v => v);
-    }
-
-    getIndexByNode(node, id) {
-        if (!id || !node || !Array.isArray(node)) {
-            return INVALID;
-        }
-        return node.map((data, index) => data && id === data.id ? index : null)
-            .filter(v => v)[0] || INVALID;
-    }
-
+    /**
+     * Determine if the ancestor path is valid.
+     *
+     * @private
+     * @param {Array} path   An ancestor path.
+     * @return {boolean}
+     */
     _isValidPath(path) {
         return Array.isArray(path) && !path.some(v => typeof v !== 'string');
     }
