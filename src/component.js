@@ -113,10 +113,12 @@ export default class CNode {
         this.parentTemplate = this._component.parentComponent
             ? this._component.parentComponent.template
             : null;
+
         this.name = this._getName();
         this.data = this._getData();
         this.history = this._getHistoryInfo();
         this.route = this._getRouteInfo();
+        this.props = [];
     }
 
     /**
@@ -224,6 +226,24 @@ export default class CNode {
     }
 
     /**
+     * Parse ANode of component for more details.
+     */
+    parseANode() {
+        if (!this._component) {
+            return;
+        }
+        const binds = this._component.binds;
+        if (!binds) {
+            return;
+        }
+        const props = binds.raw || binds;
+        props.forEach(e => {
+            const {name, raw} = e;
+            this.props.push({key: name, value: raw});
+        });
+    }
+
+    /**
      * Retrieve children CNode collection.
      */
     getSubKey() {
@@ -248,6 +268,9 @@ export default class CNode {
      * @return {string}
      */
     _getName() {
+        if (!this._component) {
+            return null;
+        }
         return this._component.subTag || this._component.constructor.name;
     }
 
@@ -258,6 +281,9 @@ export default class CNode {
      * @return {Object}
      */
     _getData() {
+        if (!this._component) {
+            return null;
+        }
         return this._component.data
             && (this._component.data.raw || this._component.data.data);
     }
@@ -269,6 +295,9 @@ export default class CNode {
      * @return {Array}
      */
     _getAncestorPath() {
+        if (!this._component) {
+            return null;
+        }
         return getAncestorComponent(this._component).map(v => v.id);
     }
 
@@ -279,6 +308,9 @@ export default class CNode {
      * @return {Array}
      */
     _getAncestorIndexList() {
+        if (!this._component) {
+            return null;
+        }
         return getAncestorComponent(this._component)
             .map(v => getIndexInParent(v));
     }

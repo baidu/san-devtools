@@ -6,8 +6,8 @@
  */
 
 
-import {getDevtoolNS, toVar} from './utils';
-import {setConfig, getConfig} from './config';
+import {getDevtoolNS} from './utils';
+import {getConfig} from './config';
 
 
 export function backupInitHook(func) {
@@ -23,13 +23,7 @@ export function backupConfig() {
     if (!ns) {
         return;
     }
-    if (ns._config && typeof ns._config === 'object') {
-        ns._config = toVar(JSON.stringify(ns._config));
-        setConfig(ns._config);
-    }
-    else {
-        ns._config = getConfig();
-    }
+    ns._config = getConfig();
 }
 
 

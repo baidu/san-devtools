@@ -285,6 +285,7 @@ export function addSanEventListeners() {
                 return;
             }
 
+            cnode.parseANode();
             cnode.seekAncestor();
 
             cnode.merge(
