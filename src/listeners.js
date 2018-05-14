@@ -296,7 +296,7 @@ export function addSanEventListeners() {
     // COMP_XXX events
     for (const message of SAN_EVENTS) {
         if (message === COMP_ROUTE) {
-            listenRouteEvent()
+            listenRouteEvent();
             return;
         }
         sanDevtool.on(message, (...args) => {
