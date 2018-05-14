@@ -278,8 +278,6 @@ function postMessageToExtension(ns, {message, cnode}) {
 /**
  * Listen all San events.
  * @inner
- *
- * @return
  */
 export function addSanEventListeners() {
     const config = getConfig();
@@ -298,7 +296,8 @@ export function addSanEventListeners() {
     // COMP_XXX events
     for (const message of SAN_EVENTS) {
         if (message === COMP_ROUTE) {
-            return listenRouteEvent();
+            listenRouteEvent()
+            return;
         }
         sanDevtool.on(message, (...args) => {
             // First argument is a San component.
