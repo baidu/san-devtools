@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <style>
+            body {
+                font-size: 14px;
+                min-width: 300px;
+                min-height: 50px;
+            }
+            img {
+                float: left;
+                margin-right: 10px;
+                height: 54px;
+            }
+            img.null {
+                filter: grayscale(100%);
+            }
+            #version {
+                overflow: hidden;
+                height: 60px;
+            }
+            .options {
+                user-select: none;
+            }
+        </style>
+        <script src="popup.js"></script>
+    </head>
+    <body>
+        <a href="https://github.com/baidu/san-devtool-hook" target="_blank">
+            <img class="null" src="../../icons/logo128.png" />
+        </a>
+        <p id="version">
+            San not detected
+        </p>
+    </body>
+</html>
