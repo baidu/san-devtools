@@ -1,7 +1,7 @@
 {
   "name": "@ecomfe/san-devhook",
   "version": "0.0.7",
-  "description": "Hook for san-devtool.",
+  "description": "Hook debug events to build components, stores, routes, history information for San.",
   "keywords": [
     "san",
     "devtool",
@@ -47,7 +47,7 @@
   "main": "dist/san_devhook.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/baidu/san-devhook.git"
+    "url": "https://github.com/baidu/san-devtool/tree/master/hook"
   },
   "author": "BAIDU",
   "license": "MIT"
