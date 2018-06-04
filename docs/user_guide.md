@@ -26,7 +26,7 @@ San-devtool 为 **San** 基于浏览器扩展的开发者工具。目前暂时�
 ## 下载
 目前支持以下的下载途径：
 
- - GitHub Releases：https://github.com/ecomfe/san-devtool/releases，zip 格式。
+ - GitHub Releases：https://github.com/ecomfe/san-devtool/releases zip 格式。
  - Source code：`$ git clone https://github.com/ecomfe/san-devtool.git`
 
 ## 安装
