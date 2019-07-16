@@ -69,8 +69,7 @@ export default {
                 'subTag',
                 'idPath',
                 'parentComponentId',
-                'ownerComponentId',
-                'parentId'
+                'ownerComponentId'
             ],
             infoList: [
                 {key: 'No data', value: 'Please choose a component.'}
@@ -82,7 +81,7 @@ export default {
         this.pageEval = chrome.devtools.inspectedWindow.eval;
     },
 
-    attached() {window.bi=this;
+    attached() {
         this.watch('cid', value => {
             this.generateInfoList(value);
         });
@@ -90,7 +89,7 @@ export default {
 
     generateInfoList(id) {
         this.pageEval(
-            'document.getElementById("' + id + '").__san_info__',
+            `window.${SAN_DEVTOOL}._map["${id}"].el.__san_info__`,
             (res, ex) => {
                 if (!res || typeof res !== 'object') {
                     return;

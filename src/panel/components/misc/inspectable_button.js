@@ -40,12 +40,12 @@ export default class InspectableButton extends Component {
     };
 
     static dataTypes = {
-        cid: DataTypes.string,
+        cid: DataTypes.oneOfType([DataTypes.string, DataTypes.number]),
         variants: DataTypes.string,
         hasIcon: DataTypes.bool,
         iconName: DataTypes.string,
         spacing: DataTypes.string,
-        text: DataTypes.string
+        text: DataTypes.oneOfType([DataTypes.string, DataTypes.number])
     };
 
     initData() {
@@ -69,8 +69,8 @@ export default class InspectableButton extends Component {
     }
 
     inspectId() {
-        this.pageEval('inspect(document.getElementById("'
-            + this.data.get('cid') + '"))|0');
+        const cid = this.data.get('cid');
+        this.pageEval(`inspect(window.${SAN_DEVTOOL}._map["${cid}"].el)`);
     }
 
     highlight() {

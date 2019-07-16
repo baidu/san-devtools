@@ -23,7 +23,7 @@ let getComponentTreeItemData = component => ({
         class: component.el.className,
         style: component.el.style.cssText
     },
-    secondaryText: component.id,
+    secondaryText: component.id + '',
     identity: component.id,
     extras: [getComponentRouteExtraData(component)],
     idPath: component.idPath
@@ -288,6 +288,8 @@ function addSanEventListeners() {
             component.el['__san_path__'] = idPath;
             component.el['__san_data__'] = compData;
             component.el['__san_tree_index__'] = indexList;
+            sanDevtool._map[id] = component;
+
 
             // 为提高效率在 get 的时候才生成数据。
             if (!component.el.hasOwnProperty('__san_info__')) {

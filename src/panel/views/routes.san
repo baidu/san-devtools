@@ -140,7 +140,7 @@ export default {
     },
 
     inspectId(id) {
-        pageEval('inspect(document.getElementById("' + id + '"))|0');
+        pageEval(`inspect(window.${SAN_DEVTOOL}._map["${id}"].el)`);
     },
 
     highlight(id) {

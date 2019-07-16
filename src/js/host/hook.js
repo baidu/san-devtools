@@ -18,6 +18,7 @@ export function installSanHook(global) {
         // 判定此挂钩的运行上下文。
         _this: null,
         // 由 San 传入的 san 对象。
+        _map: {},
         san: null,
         // 与 devtool 保持同步的组件树。
         data: {

@@ -9,7 +9,7 @@
                         variants="info raised"
                         class="logo"
                         slot="left"
-                        href="https://github.com/ecomfe/san/releases/tag/{{sanVersion}}"
+                        href="https://github.com/baidu/san/releases/tag/{{sanVersion}}"
                         target="_blank"
                     >
                         <san-avatar

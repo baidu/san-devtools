@@ -23,14 +23,13 @@ import prettyFast from 'pretty-fast';
 let getComputed = cid => ({
     computed: (() => {
         let computedFuncStr = {};
-        let computedFunc = document.getElementById(
-            cid).__san_component__.computed;
+        let computedFunc = window[SAN_DEVTOOL]._map[cid].el.__san_component__.computed;
         for (let c in computedFunc) {
             computedFuncStr[c] = computedFunc[c].toString();
         }
         return computedFuncStr;
     })(),
-    computedDeps: document.getElementById(cid).__san_component__.computedDeps
+    computedDeps: window[SAN_DEVTOOL]._map[cid].el.__san_component__.computedDeps
 });
 
 function generateComputedInfo(data) {

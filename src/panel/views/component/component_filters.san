@@ -17,8 +17,7 @@ import prettyFast from 'pretty-fast';
 let getFilters = cid => ({
     filters: (() => {
         let filtersFuncStr = {};
-        let filtersFunc = document.getElementById(
-            cid).__san_component__.filters;
+        let filtersFunc = window[SAN_DEVTOOL]._map[cid].el.__san_component__.filters;
         for (let f in filtersFunc) {
             filtersFuncStr[f] = filtersFunc[f].toString();
         }

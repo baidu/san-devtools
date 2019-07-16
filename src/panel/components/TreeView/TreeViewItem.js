@@ -118,7 +118,7 @@ export default san.defineComponent({
         filterText: DataTypes.string,
         filtered: DataTypes.bool,
         primaryText: DataTypes.string,
-        secondaryText: DataTypes.string,
+        secondaryText: DataTypes.oneOfType([DataTypes.string, DataTypes.number]),
         extras: DataTypes.arrayOf(DataTypes.objectOf(DataTypes.string))
     },
 
@@ -316,7 +316,7 @@ export default san.defineComponent({
             this.data.get('treeData') && this.data.set('primaryText', value);
         });
         this.watch('treeData.secondaryText', value => {
-            this.data.get('treeData') && this.data.set('secondaryText', value);
+            this.data.get('treeData') && this.data.set('secondaryText', value + '');
         });
         this.watch('treeData.extras', value => {
             this.data.get('treeData') && this.data.set('extras', value);
@@ -404,9 +404,7 @@ export default san.defineComponent({
 
         const defaultSelectedIdentity = this.data.get('defaultSelectedIdentity');
         const identity = this.data.get('identity');
-        console.log(defaultSelectedIdentity, identity);
         if (defaultSelectedIdentity && identity && defaultSelectedIdentity === identity) {
-            console.log('bingo!!!');
             let evt = document.createEvent('MouseEvent');
             this.toggleTreeView(evt, 'FORCE');
         }
@@ -753,7 +751,7 @@ export default san.defineComponent({
         }
         this.data.set('toggleNested', !!data.treeData);
         this.data.set('primaryText', data.text);
-        this.data.set('secondaryText', data.secondaryText);
+        this.data.set('secondaryText', data.secondaryText + '');
         this.data.set('extras', data.extras);
         this.data.set('open', data.treeData && data.treeData.length > 0);
         let checked = data.checked;

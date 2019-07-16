@@ -60,11 +60,11 @@ export default {
             return element.tagName;
         }
 
-        let c = 0;
+        let ix = 0;
         let siblings = element.parentNode.childNodes;
         for (let i of siblings) {
             if (i === element) {
-                return getXPath(element.parentNode) + '/' + element.tagName
+                return this.getXPath(element.parentNode) + '/' + element.tagName
                     + '[' + (ix + 1) + ']';
             }
             if (i.nodeType === Node.ELEMENT_NODE

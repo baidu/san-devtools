@@ -17,8 +17,7 @@ import prettyFast from 'pretty-fast';
 let getMessages = cid => ({
     messages: (() => {
         let messagesFuncStr = {};
-        let messagesFunc = document.getElementById(
-            cid).__san_component__.messages;
+        let messagesFunc = window[SAN_DEVTOOL]._map[cid].el.__san_component__.messages;
         for (let m in messagesFunc) {
             messagesFuncStr[m] = messagesFunc[m].toString();
         }

@@ -207,7 +207,7 @@ export default {
     },
 
     inspectId(id) {
-        this.pageEval('inspect(document.getElementById("' + id + '"))|0');
+        this.pageEval(`inspect(window.${SAN_DEVTOOL}._map["${id}"].el)`);
     },
 
     highlight(id) {

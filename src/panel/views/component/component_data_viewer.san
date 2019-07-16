@@ -50,9 +50,8 @@ export default {
         this.pageEval = chrome.devtools.inspectedWindow.eval;
 
         this.watch('cid', value => {
-            //this.hookSetter([value]);
             this.pageEval(
-                'document.getElementById("' + value + '").__san_data__',
+                `window.${SAN_DEVTOOL}._map["${value}"].el.__san_data__`,
                 (res, ex) => {
                     if (!res || typeof res !== 'object') {
                         this.owner.data.set('panelVisibility.dv', false);
@@ -74,7 +73,7 @@ export default {
                 var cid = args[0];
                 var key = args[1];
                 var event = args[4];
-                let data = document.getElementById(cid).__san_component__.data;
+                let data = window[SAN_DEVTOOL]._map[cid].el.__san_component__.data;
                 switch (event) {
                     case 'change':
                         if (data.get(key) === args[2] && data.get(key) !== args[3]) {

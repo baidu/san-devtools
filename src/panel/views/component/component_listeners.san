@@ -23,17 +23,15 @@ import prettyFast from 'pretty-fast';
 
 let getListeners = cid => ({
     listeners: (() => {
-        let listeners = document.getElementById(
-            cid).__san_component__.listeners;
+        let listeners = window[SAN_DEVTOOL]._map[cid].el.__san_component__.listeners;
         for (let l in listeners) {
             for (let i = 0; i < listeners[l].length; i++) {
                 let n = listeners[l][i].declaration.expr.name;
                 listeners[l][i].func = (() => {
                     let path
-                        = document.getElementById(cid).__san_path__.reverse();
+                        = window[SAN_DEVTOOL]._map[cid].el.__san_path__.reverse();
                     for (let p = 0; p < path.length; p++) {
-                        let f = document.getElementById(
-                            path[p]).__san_component__[n];
+                        let f = window[SAN_DEVTOOL]._map[path[p]].el.__san_component__[n];
                         if (f) {
                             return {
                                 str: f.toString(),
