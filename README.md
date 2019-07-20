@@ -1,9 +1,3 @@
-<p>
-    <a href="https://ecomfe.github.io/san/">
-        <img align="right" src="https://baidu.github.io/san-devtool/san_devtool_logo_clipped.svg" alt="Logo" height="250">
-    </a>
-</p>
-
 # &lt;San-DevTool /&gt;
 
 Browser developer tools extension for debugging San.
