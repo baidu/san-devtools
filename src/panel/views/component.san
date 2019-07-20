@@ -243,7 +243,7 @@ export default {
                 font-size 3vw
         .guide
             font-weight bold
-            text-shadow #ccc .15vw .15vw
+            text-shadow #ccc .15vw .15vw .1vw
             font-size 2vw
             margin-top 5vw
     .sd-detail-wrapper

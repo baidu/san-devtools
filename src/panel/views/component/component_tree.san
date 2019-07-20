@@ -422,6 +422,7 @@ export default {
 .sm-tree-view-wrapper
     width 100%
     height 100%
+    user-select none
     .sm-tree-view
         height: 100%
         .sm-tree-view-filter-bar

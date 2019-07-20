@@ -48,7 +48,9 @@ export default class JsonTreeView extends Component {
 
     bind(event) {
         this.view.on(event, (...args) => {
-            this.fire.call(this, event, args);
+            if (!this.data.get('readonly')) {
+                this.fire.call(this, event, args);
+            }
         });
     }
 
@@ -71,6 +73,7 @@ export default class JsonTreeView extends Component {
         this.watch('data', value => {
             this.view.value = value;
             this.view.refresh();
+            this.view.readonly = this.data.get('readonly');
         });
 
         let rootName = this.data.get('rootName');

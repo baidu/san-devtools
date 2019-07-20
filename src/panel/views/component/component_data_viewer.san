@@ -69,14 +69,22 @@ export default {
     setData(args) {
         return this.data.get('dataReadonly')
             ? () => {}
+            // Execute in page context.
             : injector.fromDevtool('(' + (args => {
+                // Like a['b'][0]
+                var squareBracketify = key => key.map((v, i) => typeof v === 'number'
+                    ? '[' + v + ']'
+                    : (i === 0 ? v : '["' + v + '"]')).join('');
                 var cid = args[0];
-                var key = args[1];
+                if (args[1] && args[1][0] === null) {
+                    return;
+                }
+                var key = squareBracketify(args[1]);
                 var event = args[4];
-                let data = window[SAN_DEVTOOL]._map[cid].el.__san_component__.data;
+                var data = window[SAN_DEVTOOL]._map[cid].el.__san_component__.data;
                 switch (event) {
                     case 'change':
-                        if (data.get(key) === args[2] && data.get(key) !== args[3]) {
+                        if (typeof data.get(key) !== 'undefined') {
                             data.set(key, args[3]);
                         }
                         break;
@@ -85,19 +93,20 @@ export default {
                             break;
                         }
                         args[2] === 'value'
-                            ? data.push(key.replace(/^(.*)\[\d+\]$/,'$1'), args[3])
-                                : data.set(key, args[3]);
+                            ? data.push(key, args[3])
+                                : data.set(key, null);
                         break;
                     case 'rename':
-                        var oldKey = key.replace(/(^|(?!\.))\w+$/, args[2]);
+                        var oldKey = squareBracketify(args[1].map((v, i) => i === args[1].length - 1 ? args[2] : v));
                         var value = data.get(oldKey);
                         data.set(oldKey, undefined);
                         data.set(key, value);
                         break;
                     case 'delete':
-                        var m = key.match(/^(.*)\[(\d+)\]$/);
+                        var k = squareBracketify(args[1].slice(0, args[1].length - 1));
+                        var index = args[1][args[1].length - 1];
                         if (args[3] === 'array') {
-                            data.splice(m[1], [m[2], 1]);
+                            data.splice(k, [index, 1]);
                         } else {
                             data.set(key, undefined);
                         }
