@@ -1,6 +1,13 @@
 ChangeLog
 ========
 
+1.1.3
+ - [Bugfix]
+   - Opaque background for dark theme devtools.
+   - Compatible with the latest San version (3.1.5 ~ latest).
+   - Fix data updater in component data viewer.
+
+
 1.1.0
 -------
  - [Add]
@@ -16,11 +23,11 @@ ChangeLog
    - Data viewer can update the data of the component.
    - Welcome page and title bar for component panel.
    - A filter for component panel, can filter keyword in component data (key or value), messages, computed, etc.
- - [BUGFIX]
+ - [Bugfix]
    - Fix window.postMessage data error when navigating.
- - [UPDATE]
+ - [Update]
    - Enhance component tree's filter.
- - [REMOVE]
+ - [Remove]
    - Highlight of component tree filter.
    - Unnessessary lines in base information.
 
