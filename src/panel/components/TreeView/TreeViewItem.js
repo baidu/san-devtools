@@ -17,6 +17,7 @@ export default san.defineComponent({
         <div class="sm-tree-view-item {{itemClass}} {{selectedClass}}
                     {{hasSecondaryTextClass}} {{checkedClass}}"
             on-click="toggleTreeView($event)"
+            on-dblclick="toggleTreeView($event, 'DBL_CLICK')"
             on-mouseover="handleContainerMouseover($event)"
             on-mouseout="handleContainerMouseout($event)"
             style="{{itemStyle}}"
@@ -516,6 +517,7 @@ export default san.defineComponent({
         if (driver === 'EXPAND' || forceSelected) {
             this.toggleRipple();
         }
+
         if (driver !== 'EXPAND' && !forceOpen
                 && !this.data.get('primaryTogglesNestedTreeView')
                 || (evt && evt.target && (evt.target.tagName === 'INPUT'
@@ -523,11 +525,12 @@ export default san.defineComponent({
             return;
         }
 
-        let open = this.data.get('open');
-        this.data.set('open', forceOpen ? true : !open);
-
-        this.fire('nestedTreeViewToggle', open);
-        this.dispatch('UI:nested-item-toggle', this);
+        if (driver === 'EXPAND' || driver === 'DBL_CLICK') {
+            let open = this.data.get('open');
+            this.data.set('open', forceOpen ? true : !open);
+            this.fire('nestedTreeViewToggle', open);
+            this.dispatch('UI:nested-item-toggle', this);
+        }
     },
 
     checkboxChanged(evt) {
