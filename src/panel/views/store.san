@@ -121,6 +121,9 @@ export default {
         let connector = this.messenger.initConnection('options_updated', res => {
             this.data.set('payloadReadonly', !!+res['readonly_for_store']);
         });
+        connector.sendMessage('background:options', {}).then(res => {
+            this.data.set('payloadReadonly', !!+res['readonly_for_store']);
+        });
     },
 
     created() {
