@@ -7,9 +7,10 @@
 
 
 import {defaultConfig, setConfig, getConfig} from './config';
-import {installSanHook, backupInitHook, backupConfig, initComponentTreeDataRoot} from './hook';
+import {installSanHook, backupInitHook, backupConfig, initDataRoot, emitSan} from './hook';
 import {addSanEventListeners, addStoreEventListeners} from './listeners';
 import {parseUrl} from './utils';
+import {registerConditions} from './conditions';
 
 
 /* globals sanDevHook */
@@ -27,7 +28,9 @@ export function initHook(config = defaultConfig) {
     if (config !== defaultConfig) {
         setConfig(config);
     }
-    initComponentTreeDataRoot();
+    emitSan('initHook');
+    initDataRoot();
+    registerConditions(getConfig());
     addSanEventListeners();
     addStoreEventListeners();
 }
@@ -40,12 +43,12 @@ backupConfig();
 
 // Auto hook
 let currentScript = document.currentScript;
-if (typeof location === 'object' && AUTO_HOOK in parseUrl(location.href)) {
+if (typeof sanDevHook === 'object' && sanDevHook.autohook) {
+    initHook(sanDevHook.config);
+}
+else if (typeof location === 'object' && AUTO_HOOK in parseUrl(location.href)) {
     initHook();
 }
 else if (currentScript && AUTO_HOOK in parseUrl(currentScript.src)) {
     initHook();
-}
-else if (typeof sanDevHook === 'object' && sanDevHook.autohook) {
-    initHook(sanDevHook.config);
 }

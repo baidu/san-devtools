@@ -11,9 +11,12 @@ window.sanDevHook = {
     config: {
         subKey: 'sub',
         hookOnly: false,
-        treeDataGenerator: (message, cnode, component, config) => {
+        onAfterGenerateData: (message, cnode, parentId, component, config) => {
             component.el.dataset['san_id'] = cnode.id;
             return {hello: 'world'};
+        },
+        onSan: san => {
+            const version = san && san.version;
         }
     }
 };

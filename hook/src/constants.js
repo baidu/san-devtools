@@ -48,12 +48,14 @@ export const STORE_EVENTS = [
 ];
 
 export const SUB_KEY = 'treeData';
+export const DOM_CHILDREN_KEY = 'domChildren';
 
 export const NOOP = () => {};
 
 export const __3_COMP__ = '__SAN_COMPONENT__';
 export const __3_PATH__ = '__SAN_PATH__';
 export const __3_DATA__ = '__SAN_DATA__';
+export const __3_PROPS__ = '__SAN_PROPS__';
 export const __3_INDEX_LIST__ = '__SAN_INDEX_LIST__';
 export const __3_CNODE__ = '__SAN_CNODE__';
 
@@ -61,10 +63,55 @@ export const SAN_PROPERTIES = [
     __3_COMP__,
     __3_PATH__,
     __3_DATA__,
+    __3_PROPS__,
     __3_INDEX_LIST__,
     __3_CNODE__
 ];
 
 export const INVALID = -1;
 
-export const COMP_CONSTRUCTOR_NAME = 'ComponentClass';
+export const TREE_DETAIL_TYPE = {
+    NONE: 0,
+    DOM: 1,
+    DATA: 2,
+    COMPONENT: 4,
+    FUNCTION_LIST: 8
+};
+
+export const TREE_MODE = {
+    NORMAL: 'NORMAL',
+    GROUP: 'GROUP'
+};
+
+export const getConstants = () => ({
+    SAN_EVENTS: {
+        COMP_COMPILED,
+        COMP_INITED,
+        COMP_CREATED,
+        COMP_ATTACHED,
+        COMP_DETACHED,
+        COMP_DISPOSED,
+        COMP_UPDATED,
+        COMP_ROUTE
+    },
+    STORE_EVENTS: {
+        STORE_DEFAULT_INITED,
+        STORE_CONNECTED,
+        STORE_COMP_INITED,
+        STORE_COMP_DISPOSED,
+        STORE_LISTENED,
+        STORE_UNLISTENED,
+        STORE_DISPATCHED,
+        STORE_ACTION_ADDED
+    },
+    SAN_PROPERTIES: {
+        __3_COMP__,
+        __3_PATH__,
+        __3_DATA__,
+        __3_PROPS__,
+        __3_INDEX_LIST__,
+        __3_CNODE__
+    },
+    TREE_DETAIL_TYPE,
+    TREE_MODE
+});

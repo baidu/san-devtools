@@ -7,11 +7,12 @@
 
 
 import {SAN_EVENTS, STORE_EVENTS, SAN_PROPERTIES} from './constants';
-import {getDevtoolNS, executeCallback} from './utils';
+import {getDevtoolNS, executeCallback, tryToRetrieveRoot} from './utils';
 import CNode from './component';
 import ComponentTreeBuilder from './component_tree_builder';
 import stores from './stores';
 import {getConfig} from './config';
+import {getFunctionList, showTree, DEFAULT_CONSOLE_OPTIONS} from './console';
 
 
 const [
@@ -38,6 +39,7 @@ const [
     __3_COMP__,
     __3_PATH__,
     __3_DATA__,
+    __3_PROPS__,
     __3_INDEX_LIST__,
     __3_CNODE__
 ] = SAN_PROPERTIES;
@@ -79,6 +81,7 @@ function buildRoutes(cnode, root) {
         return null;
     }
     const info = cnode.route;
+    info.relatived = cnode;
     root['routes'].unshift(info);
     return info;
 }
@@ -99,7 +102,7 @@ function getStoreName(devtool, store) {
 export function addStoreEventListeners(callback) {
     const config = getConfig();
 
-    executeCallback(config.beforeStoreEventListener, this, config);
+    executeCallback('onBeforeListenStore', this, config);
 
     let sanDevtool = getDevtoolNS();
     if (!sanDevtool || typeof sanDevtool.store !== 'object') {
@@ -108,7 +111,8 @@ export function addStoreEventListeners(callback) {
 
     for (let message of STORE_EVENTS) {
         sanDevtool.on(message, (...args) => {
-            if (executeCallback(config.onStoreMessage, this, message, ...args, config)) {
+            if (executeCallback('onStoreMessage', this, message, ...args,
+                    config)) {
                 return;
             }
 
@@ -222,7 +226,7 @@ export function addStoreEventListeners(callback) {
         });
     }
 
-    executeCallback(config.afterStoreEventListener, this, config);
+    executeCallback('onAfterListenStore', this, config);
 }
 
 
@@ -244,15 +248,42 @@ function listenRouteEvent() {
  * Bind some DOM properties for user's debugging.
  * @inner
  *
- * @param {CNode} cnode           The CNode instance.
+ * @param {CNode} node           The CNode instance.
  * @param {Component} component   The San Component instance.
  */
-function bindProperties(cnode, component) {
-    component.el[__3_COMP__] = component;
-    component.el[__3_PATH__] = cnode.ancestorPath;
-    component.el[__3_DATA__] = cnode.data;
-    component.el[__3_INDEX_LIST__] = cnode.ancestorIndexList;
-    component.el[__3_CNODE__] = cnode;
+function bindProperties(node, component, config) {
+    const el = component.el;
+
+    el[__3_COMP__] = component;
+    el[__3_PATH__] = node.ancestorPath;
+    el[__3_DATA__] = node.data;
+    el[__3_PROPS__] = node.props;
+    el[__3_INDEX_LIST__] = node.ancestorIndexList;
+    el[__3_CNODE__] = node;
+
+    node.showTree = el['showTree'] = () => showTree(Object.assign({}, DEFAULT_CONSOLE_OPTIONS, {node}));
+    el['functionList'] = getFunctionList(node);
+
+    if (config.prefixForBindingData) {
+        Object.keys(node.data).forEach(k => {
+            try {
+                el.dataset[`${config.prefixForBindingData}${k}`]
+                    = JSON.stringify(node.data[k]);
+            } catch (ex) {
+                let prefix = config.prefixForBindingData.replace(/-/g, '');
+                el.dataset[`${prefix}${k}`] = JSON.stringify(node.data[k]);
+            }
+        });
+        node.props.forEach(({key, value}) => {
+            try {
+                el.dataset[`props_${config.prefixForBindingData}${key}`]
+                    = JSON.stringify(value);
+            } catch (ex) {
+                let prefix = config.prefixForBindingData.replace(/-/g, '');
+                el.dataset[`props_${prefix}${key}`] = JSON.stringify(value);
+            }
+        });
+    }
 }
 
 
@@ -282,7 +313,7 @@ function postMessageToExtension(ns, {message, cnode}) {
 export function addSanEventListeners() {
     const config = getConfig();
 
-    executeCallback(config.beforeSanEventListener, this, getConfig());
+    executeCallback('onBeforeListenSan', this, getConfig());
 
     const sanDevtool = getDevtoolNS();
     if (!sanDevtool || typeof sanDevtool.data !== 'object') {
@@ -299,25 +330,30 @@ export function addSanEventListeners() {
             listenRouteEvent();
             return;
         }
-        sanDevtool.on(message, (...args) => {
-            // First argument is a San component.
-            const component = args[0];
-
+        sanDevtool.on(message, component => {
             if (!component || !component.id || !component.el) {
                 return;
             }
 
-            const id = component.id;
-
             // Create a CNode from component instance.
-            const cnode = new CNode(component, {subKey: config.subKey});
+            let cnode = new CNode(component, {
+                subKey: config.subKey,
+                root: sanDevtool.data[config.subKey],
+                message
+            });
 
-            if (executeCallback(config.onSanMessage, this, message, cnode, ...args, config)) {
+            if (executeCallback('onSanMessage', this, message,
+                    cnode.serialize(), cnode.parentId, component, true, config)) {
                 return;
             }
 
+            if (message === COMP_CREATED) {
+                component.el.dataset['san_id'] = component.id;
+            }
+
             buildHistory(cnode, sanDevtool, message);
-            if (blackSanEvent.includes(message)) {
+
+            if (blackSanEvent.indexOf(message) >= 0) {
                 return;
             }
 
@@ -326,22 +362,30 @@ export function addSanEventListeners() {
 
             cnode.merge(
                 executeCallback(
-                    config.treeDataGenerator, this, message, cnode, ...args, config));
+                    'onGenerateData', this, message, cnode.serialize(),
+                        cnode.parentId, component, config));
+
+            cnode.simplify();
+
+            bindProperties(cnode, component, config);
 
             // Emit to TreeBuilder to update component tree.
             builder.emit(message, cnode);
 
-            bindProperties(cnode, component);
+            executeCallback('onAfterGenerateData', this, message,
+                cnode.serialize(), cnode.parentId, component, config);
 
-            // For browser context.
-            if (getConfig().hookOnly) {
-                return;
+            if (message === COMP_ATTACHED) {
+                tryToRetrieveRoot(cnode, component, config);
             }
 
-            // Only post message after devtool panel created.
-            postMessageToExtension(sanDevtool, {message, cnode});
+            if (!getConfig().hookOnly) {
+                // Only post message after devtool panel created.
+                postMessageToExtension(sanDevtool, {message, cnode});
+            }
+
         });
     }
 
-    executeCallback(config.afterSanEventListener, this, config);
+    executeCallback('onAfterListenSan', this, config);
 }

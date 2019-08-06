@@ -24,7 +24,8 @@ function killChromeIfNeeded(argv, promise) {
 }
 
 var argv = {
-    directory: __dirname
+    directory: __dirname,
+    auto: true
 };
 
 var launcherOptions = {

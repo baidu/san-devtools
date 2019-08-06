@@ -8,11 +8,14 @@
 
 
 import {isSanComponent} from './utils';
-import {__3_INFO__, INVALID, COMP_CONSTRUCTOR_NAME, SUB_KEY} from './constants';
+import {__3_CNODE__, INVALID, SUB_KEY, DOM_CHILDREN_KEY} from './constants';
+import {getConfig} from './config';
+
+/* globals Node */
 
 
 /**
- * Get component's index of the parent referring to DOM tree.
+ * Get component's index of the parent component referring to DOM tree.
  *
  * @param {Object} component Component instance
  * @return {number}
@@ -22,11 +25,25 @@ export function getIndexInParent(component) {
         return INVALID;
     }
 
-    let childrenArray = [];
-
-    const parent = component.parentComponent;
-    if (!parent || (!parent.children && !parent.childs)) {
+    const childrenList = getChildrenComponentList(component.parentComponent);
+    if (childrenList.length <= 0) {
         return INVALID;
+    }
+
+    return childrenList.indexOf(component);
+}
+
+
+/**
+ * Get children component instances of specified component referring to DOM tree.
+ *
+ * @param {Object} component Component instance
+ * @return {Array}
+ */
+export function getChildrenComponentList(component) {
+    let childrenList = [];
+    if (!component || (!component.children && !component.childs)) {
+        return childrenList;
     }
 
     function flattenChildren(children) {
@@ -34,17 +51,43 @@ export function getIndexInParent(component) {
             return;
         }
         for (let i = 0; i < children.length; i++) {
-            if (children[i].constructor.name === COMP_CONSTRUCTOR_NAME) {
-                childrenArray.push(children[i]);
+            if (isSanComponent(children[i])) {
+                childrenList.push(children[i]);
             }
-            else {
+            else if (children[i]) {
                 flattenChildren(children[i].children || children[i].childs);
             }
         }
     }
 
-    flattenChildren(parent.children || parent.childs);
-    return childrenArray.indexOf(component);
+    flattenChildren(component.children || component.childs);
+    return childrenList;
+}
+
+
+/**
+ * Get the index of specified DOM element in its siblings.
+ *
+ * @param {Object} el       DOM element to compare.
+ * @param {Array} siblings  Other sibling elements.
+ * @return {number}
+ */
+export function getSiblingComparePosition(el, siblings) {
+    if (!el || !Array.isArray(siblings)) {
+        return INVALID;
+    }
+    let index = 0;
+    siblings.forEach(item => {
+        let pos = el.compareDocumentPosition(item);
+        if (pos & Node.DOCUMENT_POSITION_CONTAINS
+            || pos & Node.DOCUMENT_POSITION_CONTAINED_BY) {
+            return;
+        }
+        if (pos & Node.DOCUMENT_POSITION_PRECEDING) {
+            index++;
+        }
+    });
+    return Math.min(index, siblings.length);
 }
 
 
@@ -81,8 +124,20 @@ export default class CNode {
      * @param {Object?} options.subKey Key for children
      * @param {Object?} options.fake   Initial with fake parameters
      */
-    constructor(component, {subKey = SUB_KEY, fake} = {}) {
+    constructor(component, {
+        subKey = SUB_KEY,
+        domChildrenKey = DOM_CHILDREN_KEY,
+        message,
+        fake,
+        root
+    } = {}) {
         this._subKey = subKey;
+        this._domChildrenKey = domChildrenKey;
+        this._lastMessage = message;
+
+        // Save root
+        this._rootCollection = () => root;
+
         if (!isSanComponent(component)) {
             this.init(fake);
             return;
@@ -90,14 +145,21 @@ export default class CNode {
         if (!component.id) {
             return;
         }
-        this.attach(component);
+
+        // Save component
+        this._getComponent = () => component;
+        this._getParentComponent = () => component.parentComponent;
+        this._getChildrenComponent = () => getChildrenComponentList(component);
+
+        component[__3_CNODE__] = this;
+
         this.init();
     }
 
     /**
      * Initialize a CNode.
      *
-     * @param {Object?} fake   Initial with fake parameters
+     * @param {Object?} fake  Initial with fake parameters if component is null.
      */
     init(fake = null) {
         if (fake && typeof fake === 'object') {
@@ -106,47 +168,155 @@ export default class CNode {
                     this[k] = fake[k];
                 }
             }
-            return;
+            this.fake = true;
         }
-        this.id = this._component.id;
-        this.template = this._component.template;
-        this.parentTemplate = this._component.parentComponent
-            ? this._component.parentComponent.template
-            : null;
+        else {
+            const comp = this._getComponent();
+            this.id = comp.id;
+            this.template = comp.template;
+            this.parentTemplate = comp.parentComponent
+                ? comp.parentComponent.template
+                : null;
 
-        this.name = this._getName();
-        this.data = this._getData();
-        this.history = this._getHistoryInfo();
-        this.route = this._getRouteInfo();
-        this.props = [];
+            this.name = this._getName();
+            this.data = this._getData();
+            this.history = this._getHistoryInfo();
+            this.route = this._getRouteInfo();
+            this.callbacks = this._getCallbackInfo();
+            this.props = [];
+            this.parentId = this.hasParentComponent()
+                ? this._getParentComponent().id
+                : null;
+            this.fake = false;
+        }
     }
 
     /**
-     * Attach to a San component.
+     * Get the root CNode of current.
      *
-     * @param {Component} component  A San component instance
+     * @return {CNode}
      */
-    attach(component) {
-        this._component = component;
+    getRoot() {
+        return this.hasParentComponent()
+            ? getAncestorComponent(this._getComponent())[0][__3_CNODE__] : null;
     }
 
     /**
-     * Detach from the San component.
-     */
-    detach() {
-        delete this._component;
-    }
-
-    /**
-     * Detach from the San component.
+     * Get the parent CNode of current.
      *
-     * @param {boolean?} autoDeteched  Determine if detaching automatically.
+     * @return {CNode}
      */
-    seekAncestor(autoDeteched = true) {
-        this.ancestorPath = this._getAncestorPath();
-        this.ancestorIndexList = this._getAncestorIndexList();
-        // Detech _component to avoid circular structure.
-        autoDeteched && this.detach();
+    getParent() {
+        return this.hasParentComponent()
+            ? this._getParentComponent()[__3_CNODE__] : null;
+    }
+
+    /**
+     * Get previous sibling CNode.
+     *
+     * @return {Array}
+     */
+    getPrevious() {
+        return this.getPreviousSiblingComponent()
+            ? this.getPreviousSiblingComponent()[__3_CNODE__] : null;
+    }
+
+    /**
+     * Get next sibling CNode.
+     *
+     * @return {Array}
+     */
+    getNext() {
+        return this.getNextSiblingComponent()
+            ? this.getNextSiblingComponent()[__3_CNODE__] : null;
+    }
+
+    /**
+     * Determine if current CNode has a binding component instance.
+     *
+     * @return {boolean}
+     */
+    hasComponent() {
+        return typeof this._getComponent === 'function'
+            && !!this._getComponent();
+    }
+
+    /**
+     * Determine if current CNode's binding component has a parent component.
+     *
+     * @return {boolean}
+     */
+    hasParentComponent() {
+        return this.hasComponent() && !!this._getParentComponent();
+    }
+
+    /**
+     * Get the previous sibing component instance in parent.
+     *
+     * @return {CNode}
+     */
+    getPreviousSiblingComponent() {
+        if (!this.hasParentComponent() || !this.ancestorIndexList) {
+            return null;
+        }
+        const index = this.ancestorIndexList[this.ancestorIndexList.length - 1];
+        const list = getChildrenComponentList(this._getParentComponent());
+        return index > 0 ? list[index - 1] : null;
+    }
+
+    /**
+     * Get the next sibing component instance in parent.
+     *
+     * @return {CNode}
+     */
+    getNextSiblingComponent() {
+        if (!this.hasParentComponent() || !this.ancestorIndexList) {
+            return null;
+        }
+        const index = this.ancestorIndexList[this.ancestorIndexList.length - 1];
+        const list = getChildrenComponentList(this._getParentComponent());
+        return index < list.length - 1 ? list[index + 1] : null;
+    }
+
+    /**
+     * Return a serialized CNode.
+     *
+     * @return {CNode?}
+     */
+    serialize() {
+        let serialized = Object.assign({}, this);
+        serialized.getParent = this.getParent.bind(this);
+        serialized.getPrevious = this.getPrevious.bind(this);
+        serialized.getNext = this.getNext.bind(this);
+
+        return serialized;
+    }
+
+    /**
+     * Simplify properties.
+     */
+    simplify() {
+        if (getConfig().simplifiedCNode) {
+            Object.keys(this).forEach(k => {
+                if (k.startsWith('_') && typeof this[k] !== 'function') {
+                    delete this[k];
+                }
+                delete this.fake;
+                delete this.history;
+                delete this.route;
+                delete this.template;
+                delete this.parentTemplate;
+            });
+        }
+    }
+
+    /**
+     * Generate ancestor's information.
+     */
+    seekAncestor() {
+        const {path, indexList} = this._getAncestorInfo();
+        this.ancestorPath = path;
+        this.ancestorIndexList = indexList;
     }
 
     /**
@@ -154,10 +324,23 @@ export default class CNode {
      *
      * @param {CNode} node  The CNode instance to be appended.
      */
-    append(node) {
+    appendChild(node) {
         if (CNode.isCNode(node)) {
             this.createSubKey();
-            CNode.appendInRoot(this.getSubKey(), node);
+            this.getSubKey().push(node);
+        }
+    }
+
+    /**
+     * Append current CNode instance to specified root.
+     *
+     * @static
+     * @param {Array} root   The root collection.
+     * @param {CNode} node   A CNode to be appended.
+     */
+    appendTo(root) {
+        if (Array.isArray(root)) {
+            root.push(this);
         }
     }
 
@@ -167,10 +350,23 @@ export default class CNode {
      * @param {CNode} node   The CNode instance to be updated.
      * @param {index} index  The index of the CNode to be updated.
      */
-    update(node, index) {
+    updateChild(node, index) {
         if (CNode.isCNode(node)) {
             this.createSubKey();
-            CNode.updateInRoot(this.getSubKey(), node, index);
+            this.getSubKey()[index] = node;
+        }
+    }
+
+    /**
+     * Update current CNode instance at specified index in specified root.
+     *
+     * @static
+     * @param {Array} root   The root collection.
+     * @param {number} index The index of the CNode to be updated.
+     */
+    updateAt(root, index) {
+        if (Array.isArray(root)) {
+            root[index] = this;
         }
     }
 
@@ -180,10 +376,24 @@ export default class CNode {
      * @param {CNode} node    The CNode instance to be inserted.
      * @param {before} index  The index of the CNode to be inserted.
      */
-    insertBefore(node, before) {
+    insertChild(node, before) {
         if (CNode.isCNode(node)) {
             this.createSubKey();
-            CNode.insertBeforeInRoot(this.getSubKey(), node, before);
+            this.getSubKey().splice(before, 0, node);
+            this._getAncestorIndexList();
+        }
+    }
+
+    /**
+     * Insert current CNode instance before specified index in specified root.
+     *
+     * @static
+     * @param {Array} root     The root collection.
+     * @param {number} before  The index of the CNode to be inserted.
+     */
+    insertBefore(root, before) {
+        if (Array.isArray(root)) {
+            root.splice(before, 0, this);
         }
     }
 
@@ -192,8 +402,42 @@ export default class CNode {
      *
      * @param {number} at    The index of the CNode to be removed.
      */
-    removeAt(at) {
-        CNode.removeAtInRoot(this.getSubKey(), at);
+    removeChild(at) {
+        this.getSubKey().splice(at, 1);
+        this._getAncestorIndexList();
+    }
+
+    /**
+     * Remove current CNode instance at specified index in specified root.
+     *
+     * @static
+     * @param {Array} root    The root collection.
+     * @param {number} at.    The index of the CNode to be removed.
+     */
+    removeAt(root, at) {
+        if (Array.isArray(root)) {
+            root.splice(at, 1);
+        }
+    }
+
+    /**
+     * Get children CNode collection.
+     *
+     * @return {Array}
+     */
+    getSubKey() {
+        return this[this._subKey || getConfig().subKey];
+    }
+
+    /**
+     * Replace the children collection with specified.
+     *
+     * @param {Array} children   The specified children collection.
+     */
+    setSubKey(children) {
+        if (Array.isArray(children)) {
+            this[this._subKey || getConfig().subKey] = children;
+        }
     }
 
     /**
@@ -209,9 +453,76 @@ export default class CNode {
      * Delete the children collection if empty.
      */
     deleteSubKey() {
-        if (Array.isArray(this.getSubKey()) && this.getSubKey().length > 0) {
-            delete this[this._subKey];
+        if (Array.isArray(this.getSubKey()) && this.getSubKey().length === 0) {
+            delete this[this._subKey || getConfig().subKey];
         }
+    }
+
+    /**
+     * Get the root nodes attaching to current node in DOM.
+     *
+     * @return {Array}
+     */
+    getDOMChildren() {
+        return this[this._domChildrenKey || getConfig().domChildrenKey];
+    }
+
+    /**
+     * Replace the root nodes attaching to current node in DOM with specified.
+     *
+     * @param {Array} children   The specified children collection.
+     */
+    setDOMChildren(children) {
+        if (Array.isArray(children)) {
+            this[this._domChildrenKey || getConfig().domChildrenKey] = children;
+        }
+    }
+
+    /**
+     * Create an empty DOM children collection if do not exist.
+     */
+    createDOMChildren() {
+        if (!Array.isArray(this.getDOMChildren())) {
+            this.setDOMChildren([]);
+        }
+    }
+
+    /**
+     * Delete the DOM children collection if empty.
+     *
+     * @param {boolean} force   Delete if not empty.
+     */
+    deleteDOMChildren(force = false) {
+        if (Array.isArray(this.getDOMChildren())) {
+            if (force || this.getDOMChildren().length === 0) {
+                delete this[this._domChildrenKey || getConfig().domChildrenKey];
+            }
+        }
+    }
+
+    /**
+     * Insert a root node attaching to current node to DOM children collection.
+     *
+     * @param {CNode}   node     The root node to attach.
+     * @param {number?} before   The index to insert.
+     */
+    insertDOMChild(node, before = -1) {
+        if (CNode.isCNode(node)) {
+            this.createDOMChildren();
+            before === -1
+                ? this.getDOMChildren().push(node)
+                : this.getDOMChildren().splice(before, 0, node);
+            this._getAncestorIndexList();
+        }
+    }
+
+    /**
+     * Remove the specified root node deteching from current node.
+     *
+     * @param {number} at   The index to insert.
+     */
+    removeDOMChild(at) {
+        this.getDOMChildren().splice(at, 1);
     }
 
     /**
@@ -220,19 +531,31 @@ export default class CNode {
      * @param {Object} object   The object need to be merged.
      */
     merge(object) {
-        if (typeof object === 'object') {
-            return Object.keys(object).forEach(k => (this[k] = object[k]));
+        try {
+            if (object && typeof object === 'object') {
+                Object.keys(object).forEach(k => {
+                    this[k] = object[k];
+                });
+                Object.keys(this).forEach(k => {
+                    if (!object[k]) {
+                        delete this[k];
+                    }
+                });
+            }
+        } catch (ex) {
+            return null;
         }
+        return this;
     }
 
     /**
      * Parse ANode of component for more details.
      */
     parseANode() {
-        if (!this._component) {
+        if (!this._getComponent()) {
             return;
         }
-        const binds = this._component.binds;
+        const binds = this._getComponent().binds;
         if (!binds) {
             return;
         }
@@ -243,23 +566,15 @@ export default class CNode {
     }
 
     /**
-     * Retrieve children CNode collection.
+     * Determine if specifial node is a root CNode instance.
+     * @inner
      *
-     * @return {Array}
+     * @param {CNode} node   A CNode.
+     * @return {boolean}
      */
-    getSubKey() {
-        return this[this._subKey];
-    }
-
-    /**
-     * Replace the children collection with specified.
-     *
-     * @param {Array} children   The specified children collection.
-     */
-    setSubKey(children) {
-        if (Array.isArray(children)) {
-            this[this._subKey] = children;
-        }
+    isRootNode() {
+        return !!(this._getComponent && this._getComponent()
+            && !this._getComponent().parentComponent);
     }
 
     /**
@@ -269,10 +584,11 @@ export default class CNode {
      * @return {string}
      */
     _getName() {
-        if (!this._component) {
+        if (!this._getComponent()) {
             return null;
         }
-        return this._component.subTag || this._component.constructor.name;
+        return this._getComponent().subTag
+            || this._getComponent().constructor.name;
     }
 
     /**
@@ -282,11 +598,11 @@ export default class CNode {
      * @return {Object}
      */
     _getData() {
-        if (!this._component) {
+        if (!this._getComponent()) {
             return null;
         }
-        return this._component.data
-            && (this._component.data.raw || this._component.data.data);
+        return this._getComponent().data && (this._getComponent().data.raw
+            || this._getComponent().data.data);
     }
 
     /**
@@ -296,10 +612,7 @@ export default class CNode {
      * @return {Array}
      */
     _getAncestorPath() {
-        if (!this._component) {
-            return null;
-        }
-        return getAncestorComponent(this._component).map(v => v.id);
+        return getAncestorComponent(this._getComponent()).map(v => v.id + '');
     }
 
     /**
@@ -309,11 +622,25 @@ export default class CNode {
      * @return {Array}
      */
     _getAncestorIndexList() {
-        if (!this._component) {
-            return null;
-        }
-        return getAncestorComponent(this._component)
+        return getAncestorComponent(this._getComponent())
             .map(v => getIndexInParent(v));
+    }
+
+    /**
+     * Retrieve component's ancestor info including path and index list.
+     *
+     * @private
+     * @return {Object}
+     */
+    _getAncestorInfo() {
+        const info = getAncestorComponent(this._getComponent()).map(v => ({
+            path: v.id + '',
+            indexList: getIndexInParent(v)
+        }));
+        return {
+            path: info.map(i => i.path),
+            indexList: info.map(i => i.indexList)
+        };
     }
 
     /**
@@ -323,9 +650,13 @@ export default class CNode {
      * @return {Object}
      */
     _getHistoryInfo() {
+        if (this.fake || !this.hasComponent()) {
+            return null;
+        }
         return {
             id: this.id,
             ancestorPath: this._getAncestorPath(),
+            message: this._lastMessage,
             name: this.name,
             timestamp: Date.now(),
             data: this.data
@@ -339,11 +670,29 @@ export default class CNode {
      * @return {Object}
      */
     _getRouteInfo() {
+        if (this.fake  || !this.hasComponent() ||  !this.data || !this.data['route']) {
+            return null;
+        }
         return {
             id: this.id,
             timestamp: Date.now(),
-            routeData: this.data && this.data['route']
+            routeData: this.data['route']
         };
+    }
+
+    /**
+     * Retrieve component's computed, computedDeps, filters, listeners and
+     * messages callback instances.
+     *
+     * @private
+     * @return {Object}
+     */
+    _getCallbackInfo() {
+        if (this.fake || !this.hasComponent()) {
+            return null;
+        }
+        const {computed, computedDeps, filters, listeners, messages} = this._getComponent();
+        return {computed, computedDeps, filters, listeners, messages};
     }
 
     /**
@@ -355,56 +704,21 @@ export default class CNode {
     static isCNode = node => (node instanceof CNode);
 
     /**
-     * Append a child CNode instance in specified root.
+     * Update descendant's ancestorIndexList when siblings inserted or removed.
      *
-     * @static
-     * @param {Array} root   The root collection.
-     * @param {CNode} node   A CNode to be appended.
+     * @param {Array} children   Children CNode array.
+     * @param {number} level     Path level.
+     * @param {number} newIndex  New index need to be updated.
+     * @param {boolean?} isRoot  Determine if this is root CNode for updating.
      */
-    static appendInRoot = (root, node) => {
-        if (Array.isArray(root)) {
-            root.push(node);
+    static updateChildren = (children, level, newIndex, isRoot = true) => {
+        if (Array.isArray(children)) {
+            children.forEach((e, i) => {
+                let value = isRoot ? i : newIndex;
+                e.ancestorIndexList[level] = value;
+                CNode.updateChildren(e.getSubKey(), level, value, false);
+            });
         }
-    }
+    };
 
-    /**
-     * Update a child CNode instance at specified index in specified root.
-     *
-     * @static
-     * @param {Array} root   The root collection.
-     * @param {CNode} node   A CNode to be updated.
-     * @param {number} index The index of the CNode to be updated.
-     */
-    static updateInRoot = (root, node, index) => {
-        if (Array.isArray(root)) {
-            root[index] = node;
-        }
-    }
-
-    /**
-     * Insert a child CNode instance before specified index in specified root.
-     *
-     * @static
-     * @param {Array} root     The root collection.
-     * @param {CNode} node     A CNode to be inserted.
-     * @param {number} before  The index of the CNode to be inserted.
-     */
-    static insertBeforeInRoot = (root, node, before) => {
-        if (Array.isArray(root)) {
-            root.splice(before, 0, node);
-        }
-    }
-
-    /**
-     * Remove a child CNode instance at specified index in specified root.
-     *
-     * @static
-     * @param {Array} root    The root collection.
-     * @param {number} at.    The index of the CNode to be removed.
-     */
-    static removeAtInRoot = (root, at) => {
-        if (Array.isArray(root)) {
-            root.splice(at, 1);
-        }
-    }
 }

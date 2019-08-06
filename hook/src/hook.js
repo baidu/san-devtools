@@ -7,8 +7,23 @@
 
 
 import {getDevtoolNS} from './utils';
-import {getConfig} from './config';
+import {getConfig, defaultConfig} from './config';
+import {getConstants, NOOP} from './constants';
+import {generateListenerTriggered} from './conditions';
+import {showTree, DEFAULT_CONSOLE_OPTIONS} from './console';
 
+
+function hookAttach(ns) {
+    if (!ns || !ns.san) {
+        return;
+    }
+    const attach = ns.san.Component.prototype.attach;
+    ns.san.Component.prototype.attach = function (...args) {
+        this._attachedParentElement = args[0];
+        this._attachedBeforeElement = args[1];
+        attach.bind(this)(...args);
+    };
+}
 
 /**
  * Backup initHook function for __san_devtool__.
@@ -38,7 +53,7 @@ export function backupConfig() {
 /**
  * Intialize component tree's root key for __san_devtool__.data.
  */
-export function initComponentTreeDataRoot() {
+export function initDataRoot() {
     const ns = getDevtoolNS();
     if (ns) {
         ns.data[getConfig().subKey] = [];
@@ -46,7 +61,22 @@ export function initComponentTreeDataRoot() {
 }
 
 
-/*eslint-disable*/
+/**
+ * Trigger 'onSan' message to send 'san' object.
+ *
+ * @param {string} sender   'san' or 'initHook.
+ */
+export function emitSan(sender) {
+    const config = getConfig();
+    const ns = getDevtoolNS();
+    if (!config || !ns || !ns.san || ns._sanEmitted || config.onSan === NOOP) {
+        return;
+    }
+    config.onSan(ns.san, sender);
+    ns._sanEmitted = true;
+}
+
+
 /**
  * Install __san_devtool__ namespace in global window.
  *
@@ -59,33 +89,73 @@ export function installSanHook(global) {
     }
     const sanHook = {
         _config: null,
+        _constants: getConstants(),
         _listeners: {},
-        /* // 是否为第一次触发。
-        _initialEmitting: false, */
-        // 判断 devtool 面板是否打开。
         _devtoolPanelCreated: false,
-        // 判定此挂钩的运行上下文。
+        _sanEmitted: false,
         _this: null,
-        // 由 San 传入的 san 对象。
         san: null,
-        // 与 devtool 保持同步的组件树。
         data: {
-            selectedComponentId: null
+            id: 'root',
+            getSubKey() {
+                return sanHook._config && this[sanHook._config.subKey];
+            }
         },
-        // 记录 San devtool 事件触发列表。
         history: [],
         historyIndexBeforeDevtoolPanelCreated: 0,
         routes: [],
-        // Stores 对象及相关信息，与 devtool 保持同步的 mutation list。
         store: {
             stores: {},
             mutations: [],
             actions: [],
             treeData: []
         },
-        sub: (event, func) => {
-            sanHook.on(event, func);
-            return () => sanHook.off(event, func);
+        listenersTriggered: generateListenerTriggered(defaultConfig, true),
+        showTree: (options = DEFAULT_CONSOLE_OPTIONS) => showTree(
+            Object.assign({}, DEFAULT_CONSOLE_OPTIONS, {node: sanHook.data}, options)),
+        retrieveData: (...args) => {
+            const config = getConfig();
+            const callback = config.onRetrieveData;
+            if (typeof callback !== 'function') {
+                return;
+            }
+
+            let tree = Object.assign([], sanHook.data);
+            let indexList;
+            if (args.length < 1) {
+                callback(tree[config.subKey]);
+                return;
+            }
+            if (typeof args[0] === 'number') {
+                indexList = args.map(e => e | 0);
+            }
+            else if (Array.isArray(args[0])) {
+                indexList = args[0]
+            }
+            else {
+                return;
+            }
+
+            try {
+                const cnode = indexList.reduce((a, v) => typeof a === 'object'
+                    ? a[config.subKey][v]
+                        : tree[config.subKey][a][config.subKey][v])
+                callback(cnode);
+            }
+            catch (ex) {
+                callback();
+            }
+        },
+        getData: () => Object.assign([], sanHook.data[getConfig().subKey]),
+
+        once: (event, func) => {
+            const onFunc = (...args) => {
+                sanHook.off(event, onFunc);
+                if (typeof func === 'function') {
+                    func.apply(sanHook, args);
+                }
+            }
+            sanHook.on(event, onFunc);
         },
         on: (event, func) => {
             if (!sanHook._listeners[event]) {
@@ -106,43 +176,20 @@ export function installSanHook(global) {
             }
         },
         emit: (event, data) => {
-            /* // 兼容 San 3.1.3 以前的版本。在 3.1.3 之后仅挂在到 window 对象上。
-            if (!sanHook._initialEmitting && event === 'san') {
-                if (sanHook._this === window) {
-                    delete Object.prototype[SAN_DEVTOOL];
-                }
-                sanHook._initialEmitting = true;
-            }*/
             if (sanHook._listeners[event]) {
                 sanHook._listeners[event].map(func => func(data));
             }
         }
     };
 
-    function sendVersion(version) {
-        window.postMessage({
-            host: HOST,
-            message: 'version',
-            version
-        }, '*');
-    }
-
     sanHook.on('san', san => {
         if (!sanHook.san && san) {
             sanHook.san = san;
-        };
-        sendVersion(san.version);
-        window.addEventListener('message', e => {
-            if (e.data.host === HOST) {
-                if (e.data.message === 'get_version') {
-                    sendVersion(san.version);
-                }
-            }
-        });
+            hookAttach(sanHook);
+        }
+        emitSan('san');
     });
 
-    // FIXME
-    const defineProperty = ({}).constructor.defineProperty;
     const hookAccessor = {
         configurable: true,
         get() {
@@ -150,9 +197,5 @@ export function installSanHook(global) {
             return sanHook;
         }
     };
-    // Stop supporting older San.
-    // defineProperty(Object.prototype, SAN_DEVTOOL, hookAccessor);
-    defineProperty(window.constructor.prototype, ns, hookAccessor);
+    Object.defineProperty(window.constructor.prototype, ns, hookAccessor);
 }
-
-/*eslint-enable*/

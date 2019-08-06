@@ -7,18 +7,26 @@
  */
 
 
-import {SUB_KEY, NOOP} from './constants';
+import {SUB_KEY, DOM_CHILDREN_KEY, NOOP} from './constants';
 
 export const defaultConfig = {
-    hookOnly: false,
+    hookOnly: true,
     subKey: SUB_KEY,
-    treeDataGenerator: NOOP,
-    beforeSanEventListener: NOOP,
+    domChildrenKey: DOM_CHILDREN_KEY,
+    simplifiedCNode: false,
+    prefixForBindingData: '',
+    conditions: [],
+    onBeforeListenSan: NOOP,
+    onAfterListenSan: NOOP,
     onSanMessage: NOOP,
-    afterSanEventListener: NOOP,
-    beforeStoreEventListener: NOOP,
+    onGenerateData: NOOP,
+    onAfterGenerateData: NOOP,
+    onBeforeListenStore: NOOP,
+    onAfterListenStore: NOOP,
     onStoreMessage: NOOP,
-    afterStoreEventListener: NOOP
+    onRetrieveData: NOOP,
+    onRootReady: NOOP,
+    onSan: NOOP
 };
 
 
@@ -44,5 +52,5 @@ export function setConfig(c) {
     if (!c || typeof c !== 'object') {
         return;
     }
-    config = Object.assign(config, c);
+    Object.assign(config, c);
 }

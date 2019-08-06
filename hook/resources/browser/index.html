@@ -6,19 +6,80 @@
 </head>
 
 <body>
+<p></p>
 <script src="../../dist/san_devhook.js"></script>
 <script>
 window.__san_devtool__.initHook({
     subKey: 'sub',
-    treeDataGenerator: (message, cnode, component, config) => {
+    onSan: (san, sender) => {
+        // console.log('san', san.version, sender);
+    },
+    onAfterGenerateData: (message, cnode, parentId, component, config) => {
         component.el.dataset['san_id'] = component.id;
+        // console.log('onAfterGenerateData', message, cnode.id, parentId);
         return {hello: 'world'};
+    },
+    onSanMessage: (message, cnode) => {
+        // console.log('onSanMessage', message, cnode)
+    },
+    conditions: [
+        {
+            event: 'root',
+            target: window,
+            listeners: [
+                'onRootReady',
+                'onAfterGenerateData',
+                e => {
+                    // console.log('custom', e);
+                    window.__san_devtool__.retrieveData();
+                },
+                e => {
+                    // console.log('custom 2', e);
+                },
+                'onSanMessage'
+            ]
+        }
+    ],
+    onRetrieveData: cnode => {
+        // console.log('onRetrieveRoot', cnode);
+    },
+    onRootReady: (root, component) => {
+        // console.log('root ready', root, component);
     }
 });
+
+const raf = () => {
+    window.dispatchEvent(new MessageEvent('root'));
+};
+window.requestAnimationFrame(raf);
 </script>
 <script src="../../node_modules/san/dist/san.dev.js"></script>
 <script>
 /* globals san */
+
+/*
+var MySub5 = san.defineComponent({
+    template: '<span><b>Sub {{name}}!</b>&nbsp;</span>',
+    initData: function () {
+        return {
+            name: 'MMM'
+        };
+    }
+});
+var MySub4 = san.defineComponent({
+    template: '<span><b>Sub {{name}}!</b>&nbsp;<sub5 name="MM@"></sub5></span>',
+    components: {
+        'sub5': MySub5
+    },
+    initData: function () {
+        return {
+            name: 'kkkk'
+        };
+    }
+});
+var sub4 = new MySub4()
+sub4.attach($0);
+*/
 
 var MySub = san.defineComponent({
     template: '<span><b>Sub {{name}}!</b>&nbsp;</span>'
@@ -62,6 +123,11 @@ var MyApp = san.defineComponent({
 
 var myApp = new MyApp();
 myApp.attach(document.body);
+
+document.body.appendChild(document.createElement('p'));
+
+var myApp2 = new MyApp();
+myApp2.attach(document.body);
 </script>
 </body>
 </html>

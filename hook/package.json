@@ -1,7 +1,7 @@
 {
   "name": "@ecomfe/san-devhook",
-  "version": "0.0.7",
-  "description": "Hook debug events to build components, stores, routes, history information for San.",
+  "version": "0.1.17",
+  "description": "Hook for san-devtool.",
   "keywords": [
     "san",
     "devtool",
@@ -20,7 +20,7 @@
     "browser": "cross-env NODE_ENV=develop webpack --hide-modules --progress && node ./tests/browser.js"
   },
   "devDependencies": {
-    "babel-core": "^6.13.2",
+    "babel-core": "^6.26.3",
     "babel-loader": "^6.2.10",
     "babel-plugin-external-helpers": "^6.22.0",
     "babel-plugin-external-helpers-insert-require": "^1.0.2",
@@ -35,19 +35,19 @@
     "clean-webpack-plugin": "^0.1.15",
     "copy-webpack-plugin": "^4.0.1",
     "cross-env": "^3.1.4",
-    "eslint": "^4.18.2",
+    "eslint": "^3.2.2",
     "extract-text-webpack-plugin": "^1.0.1",
     "html-webpack-plugin": "^2.26.0",
-    "san": "3.1.0",
+    "san": "^3.5.10",
     "san-store": "^1.1.0",
     "webpack": "^2.7.0",
-    "webpack-dev-server": "^3.1.11",
+    "webpack-dev-server": "^2.2.0",
     "webpack-merge": "^2.4.0"
   },
   "main": "dist/san_devhook.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/baidu/san-devtool/tree/master/hook"
+    "url": "https://github.com/baidu/san-devtool.git"
   },
   "author": "BAIDU",
   "license": "MIT"

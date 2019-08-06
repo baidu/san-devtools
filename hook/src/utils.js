@@ -87,15 +87,29 @@ export function parseUrl(url) {
  *
  * @param {Function} callback  A callback.
  * @param {Object} context  The execution context.
- * @param {...*} args  The Arguments.
+ * @param {...*} args  The Arguments. The last argument must be configuration.
  * @return {*}
  */
-export function executeCallback(callback, context, ...args) {
+export function executeCallback(callbackName, context, ...args) {
+    const config = args[args.length - 1];
+    if (!config) {
+        return null;
+    }
+    const callback = config[callbackName];
     if (typeof callback === 'function') {
-        if (typeof context !== 'object') {
-            context = null;
+        if (config && typeof config === 'object') {
+            const ns = getDevtoolNS();
+            return ns && ns.listenersTriggered[callbackName]
+                ? callback.apply(context, args)
+                : null;
         }
         return callback.apply(context, args);
     }
+}
+
+
+export function tryToRetrieveRoot(rootNode, component, config) {
+    rootNode.isRootNode() && executeCallback('onRootReady', null,
+        rootNode.serialize(), component, config);
 }
 

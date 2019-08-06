@@ -50,10 +50,8 @@ let baseConfig = {
                 test: /\.js?$/,
                 loader: 'babel-loader',
                 query: {
-                    plugins: ['transform-runtime'],
                     presets: [
                         ['es2015'],
-                        'es2015-script',
                         'stage-1'
                     ]
                 },
@@ -88,8 +86,7 @@ let baseConfig = {
     },
     plugins: [
         new webpack.DefinePlugin({
-            'SAN_DEVTOOL': JSON.stringify('__san_devtool__'),
-            'HOST': JSON.stringify('sanDevHook')
+            'SAN_DEVTOOL': JSON.stringify('__san_devtool__')
         }),
         new CleanWebpackPlugin([
             'dist'
