@@ -197,5 +197,5 @@ export function installSanHook(global) {
             return sanHook;
         }
     };
-    Object.defineProperty(window.constructor.prototype, ns, hookAccessor);
+    Object.defineProperty(window, ns, hookAccessor);
 }

@@ -12,7 +12,7 @@
  * @return {Object}
  */
 export function getDevtoolNS() {
-    if (typeof window[SAN_DEVTOOL] !== 'object') {
+    if (typeof window !== 'object') {
         return null;
     }
     return window[SAN_DEVTOOL];
