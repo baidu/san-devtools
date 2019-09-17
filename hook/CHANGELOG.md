@@ -2,6 +2,12 @@ ChangeLog
 =========
 
 
+0.1.18
+-------
+ - [BUGFIX]
+   - Do not install __san_devtool__ on window's __proto__.
+
+
 0.1.17
 -------
  - [BUGFIX]
