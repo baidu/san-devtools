@@ -5,8 +5,6 @@
  * @file San 事件注册。
  */
 
-import _ from 'lodash';
-
 import constants from '../common/constants';
 import utils from '../common/utils';
 import components from './components';
@@ -96,7 +94,7 @@ function getDevtoolNS() {
         return;
     }
     let global = window;
-    if (!global || !_.isObject(global[SAN_DEVTOOL])) {
+    if (!global || typeof global[SAN_DEVTOOL] !== 'object') {
         return null;
     }
     return global[SAN_DEVTOOL];
@@ -116,13 +114,13 @@ function getStoreName(devtool, store) {
 
 function addStoreEventListeners() {
     let sanDevtool = getDevtoolNS();
-    if (!sanDevtool || !_.isObject(sanDevtool.store)) {
+    if (!sanDevtool || typeof sanDevtool.store !== 'object') {
         return;
     }
 
-    if (!_.isArray(sanDevtool.store.actions)
-        || !_.isArray(sanDevtool.store.mutations)
-        || !_.isObject(sanDevtool.store.stores)) {
+    if (!Array.isArray(sanDevtool.store.actions)
+        || !Array.isArray(sanDevtool.store.mutations)
+        || typeof sanDevtool.store.stores !== 'object') {
         return;
     }
 
@@ -244,7 +242,7 @@ function addStoreEventListeners() {
 // 必须在 window.__san_devtool__ 挂钩注册好后执行。
 function addSanEventListeners() {
     let sanDevtool = getDevtoolNS();
-    if (!sanDevtool || !_.isObject(sanDevtool.store)) {
+    if (!sanDevtool || typeof sanDevtool.store !== 'object') {
         return;
     }
 

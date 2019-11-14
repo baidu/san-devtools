@@ -65,7 +65,6 @@
 
 <script>
 import san, {DataTypes} from 'san';
-import _ from 'lodash';
 import Messenger from 'chrome-ext-messenger';
 import utils from '../../js/common/utils';
 import injector from '../../js/host/injector';
@@ -165,7 +164,7 @@ export default {
             this.data.set('sanVersion', ver);
         });
         injector.fromDevtool(getRoutesAndStore).then(res => {
-            if (!res || !_.isObject(res)) {
+            if (!res || typeof res !== 'object') {
                 return;
             }
             let {routes, stores} = res;

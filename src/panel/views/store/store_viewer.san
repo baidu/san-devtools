@@ -67,7 +67,6 @@
 
 <script>
 import san, {DataTypes} from 'san';
-import _ from 'lodash';
 import JSONView from 'json-tree-view';
 import Messenger from 'chrome-ext-messenger';
 import hljs from 'highlight.js';

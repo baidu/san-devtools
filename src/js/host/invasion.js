@@ -9,7 +9,6 @@ import injector from './injector';
 import {installSanHook} from './hook';
 import interchange from './interchange';
 import version from './version';
-import highlighter from './highlighter';
 
 // 将 hook 对象挂在到 window.__san_devtool__ 上。此代码应该尽早的执行。
 injector.fromContentScript(installSanHook.toString(), 'window');

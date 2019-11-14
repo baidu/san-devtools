@@ -6,11 +6,10 @@
  * @author luyuan<luyuan.china@gmail.com>
  */
 
-import _ from 'lodash';
 import utils from '../../js/common/utils';
 
 function getMutationItemData(storeData) {
-    if (!storeData || !_.isObject(storeData)) {
+    if (!storeData || typeof storeData !== 'object') {
         return null;
     }
     let extras = [{
@@ -30,10 +29,10 @@ function getMutationItemData(storeData) {
 }
 
 function updateMutationList(rootData, data) {
-    if (!rootData || !_.isObject(rootData) || !_.isArray(rootData.treeData)) {
+    if (!rootData || typeof rootData !== 'object' || !Array.isArray(rootData.treeData)) {
         return;
     }
-    if (!data || !_.isObject(data)) {
+    if (!data || typeof data !== 'object') {
         return;
     }
     rootData.treeData.unshift(getMutationItemData(data));
@@ -44,8 +43,8 @@ function processMutationData(data) {
         let {oldValue, newValue, target} = e;
         e.oValue = e.oValue || {};
         e.nValue = e.nValue || {};
-        e.oValue[target[target.length - 1]] = _.clone(oldValue, true);
-        e.nValue[target[target.length - 1]] = _.clone(newValue, true);
+        e.oValue[target[target.length - 1]] = {...oldValue};
+        e.nValue[target[target.length - 1]] = {...newValue};
     });
     return data;
 }

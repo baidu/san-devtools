@@ -4,7 +4,6 @@
  */
 
 import san, {DataTypes} from 'san';
-import _ from 'lodash';
 import {TouchRipple, CenterRipple} from 'san-mui/lib/Ripple';
 import Icon from 'san-mui/lib/Icon';
 import Chip from 'san-mui/lib/Chip';

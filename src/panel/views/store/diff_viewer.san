@@ -51,7 +51,6 @@
 
 <script>
 import san, {DataTypes} from 'san';
-import _ from 'lodash';
 import JSONView from 'json-tree-view';
 import 'json-tree-view/devtools.css';
 import Messenger from 'chrome-ext-messenger';
@@ -109,7 +108,7 @@ export default {
             this.data.set('diffData', []);
             injector.fromDevtool(requestDiffData(value)).then(data => {
                 this.data.set('diffData', data);
-                if (!data || !_.isArray(data)) {
+                if (!data || !Array.isArray(data)) {
                     return;
                 }
                 this.data.set('diffState', Array(data.length).fill('ON'));

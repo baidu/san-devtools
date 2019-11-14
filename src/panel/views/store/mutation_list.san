@@ -27,7 +27,6 @@
 
 <script>
 import san, {DataTypes} from 'san';
-import _ from 'lodash';
 import Messenger from 'chrome-ext-messenger';
 
 import injector from '../../../js/host/injector';
@@ -97,7 +96,7 @@ export default {
         this.mutationConnection = this.messenger.initConnection(
             'store_mutation',
             (message, from, sender, sendResponse) => {
-                if (!message || !_.isObject(message)) {
+                if (!message || typeof message !== 'object') {
                     return;
                 }
                 this.data.unshift('treeData', message);

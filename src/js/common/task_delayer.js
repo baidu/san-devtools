@@ -99,7 +99,6 @@ export default class TaskDelayer {
                 break;
             default:
                 throw new Error('Operator property must be "or" or "and"');
-                break;
         }
         return canShip;
     }

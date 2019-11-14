@@ -88,8 +88,7 @@ export function installSanHook(global) {
             return sanHook;
         }
     };
-    defineProperty(Object.prototype, SAN_DEVTOOL, hookAccessor);
-    defineProperty(window.constructor.prototype, SAN_DEVTOOL, hookAccessor);
+    defineProperty(window, SAN_DEVTOOL, hookAccessor);
 
     let devtoolPanelCreatedAccessor = {
         configurable: true,
