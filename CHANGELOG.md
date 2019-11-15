@@ -1,7 +1,17 @@
 ChangeLog
 ========
 
+
+1.1.4
+-------
+ - [Bugfix]
+  - Fix conflict with Lodash between host page and injected scripts.
+ - [Add]
+  - Show error messages when the component tree has building errors.
+
+
 1.1.3
+-------
  - [Bugfix]
    - Opaque background for dark theme devtools.
    - Compatible with the latest San version (3.1.5 ~ latest).
