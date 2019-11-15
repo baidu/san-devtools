@@ -5,9 +5,9 @@ ChangeLog
 1.1.4
 -------
  - [Bugfix]
-  - Fix conflict with Lodash between host page and injected scripts.
+    - Fix conflict with Lodash between host page and injected scripts.
  - [Add]
-  - Show error messages when the component tree has building errors.
+    - Show error messages when the component tree has building errors.
 
 
 1.1.3
