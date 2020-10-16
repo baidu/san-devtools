@@ -41,23 +41,23 @@ sand # short for san-devtools
 san-devtools
 ```
 
-![](//raw.githubusercontent.com/baidu/san-devtools/master/docs/images/sand-command.png)
+![](https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/sand-command.png)
 
-![](//raw.githubusercontent.com/baidu/san-devtools/master/docs/images/inspector.png)
+![](https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/inspector.png)
 
 **Second:** Add `ws-backend.js` to the top of the debugging page（before san.js).
 
 **Third:** Open the debugging page, and inspector page will auto connected.
 
-![](//raw.githubusercontent.com/baidu/san-devtools/master/docs/images/inspector-connected.png)
+![](https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/inspector-connected.png)
 
 ### chrome extension
 
 Open the debugging page and san-devtools plugin will show the San version, then open the chrome devtool and will see the San tab.
 
-![](//raw.githubusercontent.com/baidu/san-devtools/master/docs/images/san-detected.png)
+![](https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/san-detected.png)
 
-![](//raw.githubusercontent.com/baidu/san-devtools/master/docs/images/san-panel.png)
+![](https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/san-panel.png)
 
 #### sand options
 
