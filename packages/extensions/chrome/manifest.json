@@ -1,0 +1,34 @@
+{
+    "manifest_version": 2,
+    "name": "San Devtool",
+    "short_name": "san-devtool",
+    "description": "Browser developer tool extension for debugging San.",
+    "icons": {
+        "16": "icons/logo16.png",
+        "48": "icons/logo48.png",
+        "128": "icons/logo128.png"
+    },
+    "browser_action": {
+        "default_icon": {
+            "16": "icons/logo_disabled16.png",
+            "48": "icons/logo_disabled48.png",
+            "128": "icons/logo_disabled128.png"
+        },
+        "default_popup": "popup.html"
+    },
+    "devtools_page": "devtools_page.html",
+    "background": {
+        "scripts": ["js/background.js"],
+        "persistent": false
+    },
+    "web_accessible_resources": ["devtools_page.html", "js/*"],
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "js": ["js/content_script.js"],
+            "run_at": "document_start"
+        }
+    ],
+    "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
+    "permissions": ["<all_urls>", "tabs", "contextMenus"]
+}

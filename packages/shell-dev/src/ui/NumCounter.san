@@ -1,0 +1,30 @@
+<template>
+    <div>
+        <span>count: {{ obj.count }} /</span>
+        <input type="text" value="{= obj.count =}"/>
+        <button on-click="increment"> +1 </button>
+        <button on-click="decrement"> -1 </button>
+    </div>
+</template>
+
+<script>
+export default {
+    initData() {
+        return {
+            obj: {
+                count: 0
+            }
+        }
+    },
+    increment () {
+        let obj = this.data.get('obj');
+        obj.count++;
+        this.data.set('obj', obj, {force: true});
+    },
+    decrement (index) {
+        let obj = this.data.get('obj');
+        obj.count--;
+        this.data.set('obj', obj);
+    }
+}
+</script>

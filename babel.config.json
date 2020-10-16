@@ -1,0 +1,35 @@
+{
+    "babelrcRoots": [
+        ".",
+        "packages/*"
+    ],
+    "presets": [
+        [
+            "@babel/preset-env",
+            {
+                "targets": {"esmodules": true},
+                "modules": false
+            }
+        ]
+    ],
+    "plugins": [
+        "san-hot-loader/lib/babel-plugin",
+        [
+            "import",
+            {
+                "libraryName": "santd",
+                "libraryDirectory": "es",
+                "style": true
+            }
+        ],
+        "@babel/plugin-proposal-export-default-from",
+        "@babel/plugin-transform-modules-commonjs",
+        "@babel/plugin-proposal-optional-chaining",
+        [
+            "@babel/plugin-proposal-class-properties",
+            {
+                "loose": true
+            }
+        ]
+    ]
+}

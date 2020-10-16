@@ -1,0 +1,246 @@
+<template>
+    <div class="ex-panel-panel">
+        <div class="ex-panel-wrapper" s-if="infoList.length>0">
+            <san-collapse defaultActiveKey="{{['1']}}">
+                <san-collapse-panel header="Basic Information" key='1'>
+                    <div s-for="info in infoList">
+                        <san-row align="middle">
+                            <san-col span="12">{{info.key}}</san-col>
+                            <san-col span="12" s-if="info.isArray">
+                                <span
+                                    class="arr-item"
+                                    s-for="item in info.value"
+                                >
+                                    {{item}}
+                                </span>
+                            </san-col>
+                            <san-col span="12" s-else>
+                                {{info.value}}
+                            </san-col>
+                        </san-row>
+                    </div>
+                    <div class="payload-wrapper">
+                        <div class="payload">
+                            <div class="payload-header">
+                                payload
+                                <san-button
+                                    type="primary"
+                                    on-click="dispatchHandler"
+                                >
+                                    dispatch
+                                </san-button>
+                            </div>
+                            <san-json-tree-view
+                                s-ref="payload"
+                                alwaysShowRoot="{{!0}}"
+                                data="{{selectedMutationInfo.payload}}"
+                                filterText="{{filterText}}"
+                                rootName="payload"
+                                readonly="{{readonly}}"
+                            >
+                            </san-json-tree-view>
+                        </div>
+                    </div>
+                </san-collapse-panel>
+            </san-collapse>
+        </div>
+        <div class="ex-panel-wrapper">
+            <san-collapse defaultActiveKey="{{['1']}}">
+                <san-collapse-panel header="Diff" key='1' s-if="diffData.length>0">
+                    <template slot="extra">
+                        <san-tooltip
+                            title="当 oldData 以及 newData 出现 '~payload' 字符串的时候，表示是引用了 payload 中的数据"
+                            arrowPointAtCenter="{{true}}"
+                        >
+                            <san-icon type="info-circle"/>
+                        </san-tooltip>
+                    </template>
+                    <div class="diff" s-for="diff, index in diffData">
+                        <san-divider s-if="index > 0" />
+                        <san-sub-header
+                            backIcon="{{false}}"
+                            title="Type: {{diff.$change}}"
+                            subTitle=""
+                        >
+                        </san-sub-header>
+                        <san-row class="switch-wrapper">
+                            <san-col
+                                span="6"
+                                class="old {{diffState[index] ? '' : 'current'}}"
+                            >
+                                Old value
+                            </san-col>
+                            <san-col span="12" class="switch">
+                                <san-switch
+                                    checked="{=diffState[index]=}"
+                                ></san-switch>
+                            </san-col>
+                            <san-col
+                                span="6"
+                                class="new {{diffState[index] ? 'current' : ''}}"
+                            >
+                                New value
+                            </san-col>
+                        </san-row>
+                        <san-row class="path">
+                                <span>Target: </span>
+                                <span class="target">
+                                    {{diff.target | formateTarget}}
+                                </span>
+                        </san-row>
+                        <san-row class="json">
+                            <san-col span="24">
+                                <san-json-tree-view
+                                    alwaysShowRoot="{{!0}}"
+                                    data="{{diffState[index] ? diff.newValue : diff.oldValue}}"
+                                    filterText="{{filterText}}"
+                                    rootName="data"
+                                    readonly="{{true}}"
+                                >
+                                </san-json-tree-view>
+                            </san-col>
+                        </san-row>
+                    </div>
+                </san-collapse-panel>
+                <san-collapse-panel header="Diff" key='1' s-else>
+                    <div>may be your actions dispatched but not return "build().set(...)"</div>
+                </san-collapse-panel>
+            </san-collapse>
+        </div>
+        <san-divider s-if="infoList.length>0 || diffData.length>0">{{ storeName }}</san-divider>
+    </div>
+</template>
+
+<script>
+import san, {DataTypes} from 'san';
+import {connectStore, store} from '@san-devtools/store/index';
+import JSONView from 'json-tree-view';
+import 'json-tree-view/devtools.css';
+
+import pageheader from 'santd/es/pageheader';
+import {Switch, Grid, Divider, Icon, Button, Collapse, Tooltip} from 'santd';
+
+import JsonTreeView from '@san-devtools/components/misc/jsonTreeView.san';
+
+export default connectStore({
+    selectedMutationInfo: 'selectedMutationInfo',
+    storeName: 'selectedMutationInfo.storeName',
+    diffData: 'selectedMutationInfo.diff',
+    bridge: 'bridge',
+    readonly: 'settings.storeReadOnly'
+})(
+    {
+        filters: {
+            formateTarget(value) {
+                return value.join('.');
+            }
+        },
+
+        computed: {
+            infoList() {
+                let filterText = this.data.get('filterText');
+                let selectedMutationInfo = this.data.get('selectedMutationInfo') || [];
+                let infoList = Object.entries(selectedMutationInfo).map(([key, value]) => {
+                    if(key !== 'diff' && key !== 'payload' && JSON.stringify([key, value]).indexOf(filterText) > -1) {
+                        return {
+                            key,
+                            value
+                        }
+                    }
+                });
+                return infoList;
+            }
+        },
+
+        dispatchHandler() {
+            let bridge = this.data.get('bridge');
+            let storeName = this.data.get('storeName');
+            let actionName = this.data.get('selectedMutationInfo.actionName');
+            let payload = this.ref('payload').viewer().value;
+            let message = {
+                storeName,
+                actionName,
+                payload
+            }
+            bridge.send('Store.dispatchAction', message);
+        },
+        components: {
+            'san-divider': Divider,
+            'san-sub-header': pageheader,
+            'san-switch': Switch,
+            'san-divider': Divider,
+            'san-icon': Icon,
+            'san-row': Grid.Row,
+            'san-col': Grid.Col,
+            'san-button': Button,
+            'san-json-tree-view': JsonTreeView,
+            'san-collapse': Collapse,
+            'san-collapse-panel': Collapse.Panel,
+            'san-tooltip': Tooltip,
+        },
+
+        initData() {
+            return {
+                diffState: [true],
+                filterText: ''
+            };
+        },
+
+        dataTypes: {
+            diffState: DataTypes.arrayOf(DataTypes.bool),
+            filterText: DataTypes.string
+        }
+    }
+)
+
+</script>
+
+<style lang="less">
+.payload-wrapper {
+    .payload {
+        margin: 3px 0;
+        .payload-header {
+            .santd-btn {
+                margin: 4px 0;
+                height: 30px;
+            }
+            .santd-btn-primary {
+                background-color: #3898b9;
+            }
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #3898b9;
+            font-size: 120%;
+            border-bottom: 2px solid #3898b9;
+            margin-bottom: 5px;
+        }
+    }
+}
+.switch-wrapper {
+    margin: 5px 0;
+    .new {
+        text-align: end;
+    }
+    .switch {
+        > span {
+            width: 100%;
+            height: 16px;
+        }
+    }
+    .santd-switch-checked:after {
+        top: 50%;
+        left: 100%;
+        transform: translate(-100%, -50%);
+    }
+}
+.santd-switch .santd-switch-handler, .santd-switch:after {
+    top: 50% !important;
+    transform: translateY(-50%);
+}
+.target {
+    padding: 0 3px;
+    border-radius: 5px;
+    background-color: rgba(255, 163, 24, 0.5);
+}
+</style>

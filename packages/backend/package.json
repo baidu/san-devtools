@@ -1,0 +1,11 @@
+{
+    "private": true,
+    "name": "backend",
+    "version": "0.0.0",
+    "dependencies": {
+        "shared":"^0.0.0"
+    },
+    "repository": "ssh://git@icode.baidu.com:8235/baidu/hulk/san-devtools",
+    "author": "wangyongqing01 <wangyongqing01@baidu.com>",
+    "license": "MIT"
+}

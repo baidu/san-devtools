@@ -1,0 +1,106 @@
+<template>
+<div class="ui-layer ui-calendar-layer" style="left: {{left}}px; top: {{top}}px">
+    <div class="ui-calendar-func">
+        <i class="fa fa-angle-left" on-click="prevMonth"></i>
+        <b>{{ viewYear }}-{{ viewMonth + 1 }}</b>
+        <i class="fa fa-angle-right" on-click="nextMonth"></i>
+    </div>
+    <ol class="date-head">
+        <li>一</li>
+        <li>二</li>
+        <li>三</li>
+        <li>四</li>
+        <li>五</li>
+        <li>六</li>
+        <li>日</li>
+    </ol>
+    <ol>
+        <li s-for="item in dates" on-click="select(item)"
+            class="{{ item | selectedClass(value)}}">{{item}}</li>
+    </ol>
+</div>
+</template>
+
+<script>
+
+export default {
+
+    filters: {
+        selectedClass(date, value) {
+            return date === value.getDate()
+                && this.data.get('viewMonth') === value.getMonth()
+                && this.data.get('viewYear') === value.getFullYear()
+                ? 'selected'
+                : '';
+        }
+    },
+
+    updateViewState() {
+        let viewYear = this.data.get('viewYear');
+        let viewMonth = this.data.get('viewMonth');
+
+        let viewDate = new Date(viewYear, viewMonth, 1);
+        viewYear = viewDate.getFullYear();
+        viewMonth = viewDate.getMonth();
+        this.data.set('viewYear', viewYear);
+        this.data.set('viewMonth', viewMonth);
+
+        let dates = [];
+        let day = viewDate.getDay() - 1;
+
+        for (; day % 7; day--) {
+            dates.push('');
+        }
+        let nextMonth = new Date(viewYear, viewMonth + 1, 1);
+        let days = (nextMonth - viewDate) / 24 / 60 / 60 / 1000;
+        for (let i = 1; i <= days; i++) {
+            dates.push(i);
+        }
+        this.data.set('dates', dates);
+    },
+
+    hide() {
+        this.data.set('left', -1000);
+    },
+
+    show(pos) {
+        this.data.set('left', pos.left);
+        this.data.set('top', pos.top);
+
+        let value = this.data.get('value');
+        this.data.set('viewYear', value.getFullYear());
+        this.data.set('viewMonth', value.getMonth());
+
+        this.updateViewState();
+    },
+
+    isHide() {
+        return this.data.get('left') < 0;
+    },
+
+    prevMonth() {
+        let viewMonth = this.data.get('viewMonth');
+        this.data.set('viewMonth', viewMonth - 1);
+        this.updateViewState();
+    },
+
+    nextMonth() {
+        let viewMonth = this.data.get('viewMonth');
+        this.data.set('viewMonth', viewMonth + 1);
+        this.updateViewState();
+    },
+
+    select(date) {
+        let newDate = new Date(
+            this.data.get('viewYear'),
+            this.data.get('viewMonth'),
+            date
+        );
+        this.data.set('value', newDate);
+        this.fire('select', newDate);
+
+        this.hide();
+    }
+}
+</script>
+

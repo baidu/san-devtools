@@ -1,0 +1,88 @@
+<template>
+    <div class="messages-wrapper" style="{{displayStyle}}">
+        <input type="hidden" value="{{selectedComponentId}}" />
+        <div class="messages {{hidden[index] ? 'hidden' : ''}}" s-for="item, index in data">
+            <div class="func-name">{{item.name}}</div>
+            <san-pretty-code fnStr="{{item.fn}}"></san-pretty-code>
+        </div>
+    </div>
+</template>
+
+<script>
+import san, {DataTypes} from 'san';
+import PrettyCode from '@san-devtools/components/prettyCode/prettyCode.san';
+
+export default {
+    components: {
+        'san-pretty-code': PrettyCode
+    },
+
+
+    initData() {
+        return {
+            selectedComponentId: '',
+            shown: true,
+            hidden: [],
+            filterText: ''
+        }
+    },
+
+    dataTypes: {
+        selectedComponentId: DataTypes.string,
+        shown: DataTypes.bool,
+        data: DataTypes.arrayOf(DataTypes.object),
+        hidden: DataTypes.arrayOf(DataTypes.bool),
+        filterText: DataTypes.string
+    },
+
+    attached() {
+        this.filter(this.data.get('filterText'));
+        this.watch('filterText', value => {
+            this.filter(value);
+        });
+    },
+
+    filter(value) {
+        let text = value.trim();
+        for (let j = 0; j < this.data.get('hidden').length; j++) {
+            this.data.set('hidden[' + j + ']', false);
+        }
+        if (!text) {
+            return;
+        }
+        let messages = this.el.querySelectorAll('.messages');
+        messages.forEach((e, i) => {
+            if (!e.innerText.match(new RegExp(text, 'i'))) {
+                this.data.set('hidden[' + i + ']', true);
+            }
+        });
+    },
+
+    computed: {
+        displayStyle() {
+            return {
+                display: this.data.get('shown') ? 'block' : 'none'
+            };
+        }
+    }
+
+};
+</script>
+
+<style lang="less">
+.messages-wrapper {
+    .messages {
+        margin: 3px 0;
+        .func-name {
+            color: #3898b9;
+            font-size: 120%;
+            border-bottom: 2px solid #3898b9;
+            margin-bottom: 5px;
+        }
+    }
+}
+.hidden {
+    display: none;
+}
+
+</style>

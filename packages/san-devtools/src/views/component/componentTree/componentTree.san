@@ -1,0 +1,107 @@
+<template>
+    <div class="sm-tree-view-wrapper custom">
+        <san-tree-view
+            totalNums="{{totalCompNums}}"
+            defaultSelectedIdPath="{{defaultSelectedIdPath}}"
+            s-ref="tv"
+            ref="tv"
+            treeData="{=treeData=}"
+            compact="{{!0}}"
+            wholeLineSelected="{{!0}}"
+            keepingSelected="{{!0}}"
+            filterBar="{{!0}}"
+            filterIcon="search"
+            filterPlaceholder="Find component"
+            filterText="{=filterText=}"
+            initiallyOpen="{{!0}}"
+            primaryTogglesNestedTreeView="{{!0}}"
+            dataSource="JSON"
+            loadingToast="{{loadingToast}} {{processingComponentInfo}}"
+            loading="{=loading=}"
+            loadingToastContentFromColor="#3898b9"
+            loadingToastContentToColor="#000"
+            progress="{=progress=}"
+            type="component"
+        >
+        </san-tree-view>
+    </div>
+</template>
+
+<script>
+import san, {DataTypes} from 'san';
+import {connectStore, store} from '@san-devtools/store/index';
+import TreeView from '@san-devtools/components/treeView/treeView.san';
+
+import '@san-devtools/components/treeView/custom.less';
+
+export default connectStore({
+    treeData: 'treeData',
+    totalCompNums: 'totalCompNums',
+    bridge: 'bridge',
+    defaultSelectedIdPath: 'inspectedIdPathStr'
+})( {
+    messages: {
+        'UI:tree-view-item-click'({value}) {
+            this.getComponentInfo(value);
+            this.setSelectedComponentBaseInfo(value);
+            this.highlightNativeNode(value);
+            this.setInspectedId(value);
+        }
+    },
+    components: {
+        'san-tree-view': TreeView,
+    },
+
+    setInspectedId({idPath}) {
+        store.dispatch('setInspectId', idPath);
+    },
+
+    setSelectedComponentBaseInfo(treeData) {
+        let info = {
+            id: treeData.id + '',
+            parentId: treeData.parentId + '',
+            ownerId: treeData.ownerId + '',
+            tagName: treeData.tagName,
+            displayName: treeData.displayName,
+            idPath: treeData.idPath,
+        }
+        treeData.storeName && (info.storeName = treeData.storeName);
+        treeData.mapStates && (info.mapStates = treeData.mapStates);
+        treeData.mapActionsKeys && (info.mapActionsKeys = treeData.mapActionsKeys);
+        store.dispatch('setSelectedComponentBaseInfo', info);
+    },
+
+    getComponentInfo({id: componentId}) {
+        this.data.get('bridge') && this.data.get('bridge').send('Component.getComponentInfo', componentId);
+    },
+
+    highlightNativeNode({id: componentId}) {
+        this.data.get('bridge') && this.data.get('bridge').send('Inspect.highlight', componentId);
+    },
+
+    initData() {
+        return {
+            // 默认不对执行代码进行合并处理
+            maxLengthOfExecutionCodeQueue: 10,
+            loadingToast: 'Building component tree... ',
+            loading: true,
+            processingComponentInfo: ''
+        };
+    },
+
+    dataTypes: {
+        maxLengthOfExecutionCodeQueue: DataTypes.number,
+        loadingToast: DataTypes.string,
+        loading: DataTypes.bool,
+        processingComponentInfo: DataTypes.string
+    },
+})
+</script>
+
+<style lang="less">
+.sm-tree-view-wrapper {
+    width: 100%;
+    height: 100%;
+    user-select: none;
+}
+</style>

@@ -1,0 +1,188 @@
+<template>
+    <div>
+        <san-devtools-table
+            data="{{data}}"
+            readonly="{{true}}"
+            columns="{{columns}}"
+            bridgeOptions="{{bridgeOptions}}"
+            on-clear="clearHandler"
+            on-filter="doFilter"
+            on-loadBefore="loadBefore"
+            filterPlaceholder="eg: A.attached"
+            searchTip="Use '.' as separator for search, like: [componentName].[lifecycle]"
+            beforeLoaded="{{true}}"
+        >
+        </san-devtools-table>
+        <div class="sm-tree-view-loading-toast {{loading ? 'show' : 'hide'}}">
+            <div class="sm-tree-view-loading-toast-content" style="{{loadingToastContentStyle}}">
+                {{loadingToast}}
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+import san, {DataTypes} from 'san';
+import {connectStore, store} from '@san-devtools/store/index';
+import DevtoolsTable from '@san-devtools/components/misc/devtoolsTable.san';
+
+function filterData(filterText, data) {
+    filterText = filterText.trim();
+    if (!filterText) {
+        return data;
+    }
+    let filterKeys = filterText.split('.');
+    let newData = data.filter(item => {
+        let {component = {}, event} = item;
+        let testStr = `${component.componentName}.${event}`;
+        let match = false;
+        return filterKeys.every(str => testStr.includes(str));
+    });
+    return newData;
+}
+
+export default connectStore({
+    bridge: 'bridge',
+    historyRecordings: 'historyRecordings',
+    historyLengthBeforeDevtoolCreated: 'historyLengthBeforeDevtoolCreated'
+})(
+    {
+        components: {
+            'san-devtools-table': DevtoolsTable
+        },
+        clearHandler() {
+            store.dispatch('clearHistory');
+        },
+        doFilter(filterText) {
+            this.data.set('filterText', filterText);
+            let data = this.data.get('historyRecordings');
+            let newData = filterData(filterText, data);
+            this.data.set('data', newData);
+        },
+        computed: {
+            data() {
+                let beforeLoaded = this.data.get('beforeLoaded');
+                let historyRecordings = this.data.get('historyRecordings') || [];
+                let historyLengthBeforeDevtoolCreated = this.data.get('historyLengthBeforeDevtoolCreated');
+                let newData;
+                if (beforeLoaded) {
+                    // 展示数据
+                    if (historyLengthBeforeDevtoolCreated) {
+                        newData = historyRecordings;
+                    } else {
+                        this.data.get('bridge').send('History.historyRecording', {recording: this.data.get('recording'), loadBefore: true});
+                    }
+                } else {
+                    // 隐藏
+                    newData = historyRecordings.slice(historyLengthBeforeDevtoolCreated);
+                }
+                let filterText = this.data.get('filterText');
+                return filterData(filterText, newData);
+            },
+            loadingToastContentStyle() {
+                let fromColor = '#3898b9';
+                let toColor = '#000';
+                let progress = this.data.get('progress');
+                let leftBound = Math.max(0, progress - 3);
+                let rightBound = Math.min(100, progress + 3);
+                return {
+                    'background-image':
+                        `linear-gradient(to right, ${fromColor} 60%,
+                            ${toColor} 80%, ${toColor})`
+                };
+            }
+        },
+        initData() {
+            return {
+                loadingToast: 'Building history tree... ',
+                loading: false,
+                filterText: '',
+                beforeLoaded: false,
+                recording: false,
+                bridgeOptions: {
+                    bridgeName: 'History',
+                    bridgeActionName: 'fire',
+                    bridgeRecording: 'historyRecording'
+                },
+                columns: [
+                    {
+                        title: 'Timestamp',
+                        dataIndex: 'time',
+                        width:  '20%'
+                    },
+                    {
+                        title: 'Event',
+                        dataIndex: 'event',
+                        scopedSlots: {render: 'event'},
+                        width:  '10%'
+                    },
+                    {
+                        title: 'Component',
+                        dataIndex: 'component',
+                        scopedSlots: {render: 'component'},
+                        width:  '20%'
+                    },
+                    {
+                        title: 'Data',
+                        dataIndex: 'payload',
+                        scopedSlots: {render: 'payload'},
+                        width:  '50%'
+                    }
+                ],
+                tableHeight: 0
+            }
+        },
+
+        dataTypes: {
+            beforeLoaded: DataTypes.bool,
+            recording: DataTypes.bool,
+            historyAfterDevtoolPanelCreated: DataTypes.arrayOf(DataTypes.object),
+            historyBeforeDevtoolPanelCreated: DataTypes.arrayOf(DataTypes.object)
+        },
+        loadBefore() {
+            let loadBefore = this.data.get('beforeLoaded');
+            if (!loadBefore) {
+                this.data.set('loading', true);
+                // 假的
+                setTimeout(() => {
+                    if (this.data.get('loading')) {
+                        this.data.set('loading', false);
+                    }
+                }, 1000);
+            }
+            this.data.set('beforeLoaded', !loadBefore);
+        }
+    }
+)
+
+</script>
+
+<style lang="less">
+.sm-tree-view-loading-toast {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 150%;
+    width: 70%;
+    text-align: center;
+    overflow: hidden;
+    background-color: rgba(192, 192, 192, 0.7);
+    pointer-events: none;
+    transition: all 0.5s;
+    z-index: 1000;
+    padding: 10px;
+    border-radius: 10px;
+    &.show {
+        opacity: 1;
+    }
+    &.hide {
+        opacity: 0;
+    }
+    > .sm-tree-view-loading-toast-content {
+        -webkit-text-fill-color: transparent;
+        -webkit-background-clip: text;
+        background-image: linear-gradient(to right, #000, #000);
+    }
+}
+</style>

@@ -1,0 +1,36 @@
+<template>
+    <span>
+        <span on-click="testMessage">打酱油的，删除/增加</span>
+    </span>
+</template>
+
+<script>
+let count = 0;
+export default {
+    initData() {
+        return {
+
+        }
+    },
+    testMessage() {
+        this.dispatch('UI:test', 'message');
+    },
+    attached() {
+        console.log('[打酱油的挂载了]');
+    },
+    detached() {
+        console.log('[打酱油的卸载了]');
+    },
+    increment () {
+        count += 10
+        this.data.set('count', count);
+        this.data.push('todoList', count);
+    },
+    decrement (index) {
+        this.data.removeAt('todoList', index);
+    }
+}
+</script>
+
+<style>
+</style>

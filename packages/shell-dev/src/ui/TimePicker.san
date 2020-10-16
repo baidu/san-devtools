@@ -1,0 +1,84 @@
+
+<template>
+<div on-click="mainClick" class="ui-timepicker">
+    {{ value | formatHour }}
+</div>
+</template>
+
+<script>
+
+import Layer from './TimePickerLayer';
+import { formatHour } from '../filters';
+import $ from 'jquery';
+
+export default {
+    filters: {
+        formatHour
+    },
+
+    initLayer() {
+        let layer = new Layer();
+        layer.data.set('value', this.data.get('value'));
+
+        this.layer = layer;
+        this.layer.attach(document.body);
+
+        layer.on('valueChange', value => {
+            this.data.set('value', value);
+        });
+
+        this._docClicker = this.docClicker.bind(this);
+        $(document).on('click', this._docClicker);
+    },
+
+    docClicker(e) {
+        let target = e.target || e.srcElement;
+        if (target !== this.el
+            && $(target).closest(this.el).length === 0
+            && $(target).closest(this.layer.el).length === 0
+        ) {
+            this.hideLayer();
+        }
+    },
+
+    mainClick() {
+        this.layer || this.initLayer();
+        this.layer.isHide() ? this.showLayer() : this.hideLayer();
+    },
+
+    showLayer() {
+        let pos = $(this.el).offset();
+        this.layer.show({
+            left: pos.left,
+            top: pos.top + this.el.offsetHeight + 1
+        });
+    },
+
+    hideLayer() {
+        this.layer && this.layer.hide();
+    },
+
+    disposed() {
+        if (this.layer) {
+            this.layer.dispose();
+            this.layer = null;
+            $(document).off('click', this._docClicker);
+            this._docClicker = null;
+        }
+    }
+}
+</script>
+
+<style>
+.ui-timepicker {
+    width: 70px;
+    display: inline-block;
+    text-align: center;
+    cursor: pointer;
+}
+
+.ui-timepicker:hover {
+    background: #444;
+}
+
+</style>

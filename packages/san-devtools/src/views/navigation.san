@@ -1,0 +1,310 @@
+<template>
+    <div class="navigation {{disconnected ? 'navigation-disconnected' : ''}}">
+        <div class="version">
+            <san-button
+                type="primary"
+                s-if="sanVersion !== 'unknown version'"
+                class="logo"
+                href="https://github.com/baidu/san/releases/tag/{{sanVersion}}"
+                target="_blank"
+                style="background-color: rgba(0,0,0,0); border: 0px;height: 100%;"
+            >
+                <san-avatar
+                    size="{{46}}"
+                    src="../icons/san_logo_white.svg"
+                >
+                </san-avatar>
+                <span class="title">
+                    San {{sanVersion}}
+                </span>
+            </san-button>
+            <san-tooltip>
+                <span slot="title">
+                    1: only development san/san-native allowed.<br/>
+                    2: only 3.9.4+ version of san the EVENT and MESSAGE panel allowed.<br/>
+                    3: async dispatch detecting surported when your san-store's version is 2.0.3+. <br/>
+                </span>
+                <san-icon
+                    style="color:#fff;padding-left: 25px;"
+                    theme="filled"
+                    type="question-circle"
+                ></san-icon>
+            </san-tooltip>
+        </div>
+        <section class="main-tabs">
+            <san-tabs
+                defaultActiveKey="{{currentTab}}"
+                activeKey="{=currentTab=}"
+                s-ref="tabs"
+            >
+                <san-tab
+                    s-for="item, index in tabs"
+                    tab="{{item.label}}"
+                    key="{{item.value}}"
+                    s-ref="tab_{{index}}"
+                >
+                </san-tab>
+            </san-tabs>
+        </section>
+        <san-popover
+            trigger="click"
+            placement="bottomRight"
+        >
+            <san-checkboxgroup
+                defaultValue="{{defaultValue}}"
+                slot="content"
+                on-change="handleChange"
+                style="{{{width: '100%'}}}"
+            >
+                <div class="navigation-checkbox-wrap" s-for="item in options">
+                    <san-checkbox checked="{{item.checked}}" value="{{item.value}}">{{item.label}}</san-checkbox>
+                </div>
+            </san-checkboxgroup>
+            <div slot="title" class="navigation-popover-title">
+                <span>Settings</span>
+            </div>
+            <span class="setting">
+                <san-custom-icon
+                    type="largeicon-settings-gear"
+                ></san-custom-icon>
+            </span>
+        </san-popover>
+    </div>
+</template>
+
+<script>
+import san, {DataTypes} from 'san';
+import {connectStore, store} from '@san-devtools/store/index';
+import {versionCompare, isChromePanel, setSettings, getSettings} from '@san-devtools/utils/index';
+
+import CustomIcon from '@san-devtools/components/icon/spriteIcon.san';
+import {Grid, Icon, Avatar, AppBar, Button, Tabs, Tooltip, Popover, Checkbox} from 'santd';
+
+
+export default connectStore({
+    sanVersion: 'sanVersion',
+    bridge: 'bridge'
+})(
+    {
+        components: {
+            'san-col': Grid.Col,
+            'san-row': Grid.Row,
+            'san-avatar': Avatar,
+            'san-button': Button,
+            'san-icon': Icon,
+            'san-tabs': Tabs,
+            'san-tab': Tabs.TabPane,
+            'san-tooltip': Tooltip,
+            'san-custom-icon': CustomIcon,
+            'san-popover': Popover,
+            'san-checkboxgroup': Checkbox.Group,
+            'san-checkbox': Checkbox,
+        },
+
+        initData() {
+            return {
+                defaultValue: [], // checkboxgroup 无法与 slot 的 checkbox 同步
+                options: [
+                    {label: 'Readonly for component data.', value: 'Setting:component', checked: false},
+                    {label: 'Readonly for store.', value: 'Setting:store', checked: false}
+                ],
+                setting: false,
+                smallTabItem: false,
+                tabs: [
+                    {
+                        label: 'Component',
+                        icon: 'appstore',
+                        value: 'component'
+                    },
+                    {
+                        label: 'Store',
+                        icon: 'store',
+                        value: 'store'
+                    },
+                    {
+                        label: 'History',
+                        icon: 'history',
+                        value: 'history'
+                    }
+                ],
+                currentTab: 'component'
+            }
+        },
+
+        created() {
+            this.watch('currentTab', currentTab => {
+                store.dispatch('setActiveTab', currentTab);
+            });
+            this.watch('sanVersion', sanVersion => {
+                if (versionCompare(sanVersion, '3.9.4') >= 0) {
+                    this.data.splice(
+                        'tabs',
+                        [
+                            3,
+                            0,
+                            {
+                                label: 'Event',
+                                icon: 'event',
+                                value: 'event'
+                            },
+                            {
+                                label: 'Message',
+                                icon: 'message',
+                                value: 'message'
+                            }
+                        ]
+                    );
+                    this.data.splice(
+                        'options',
+                        [
+                            2,
+                            0,
+                            {label: 'Readonly for event.', value: 'Setting:event', checked: false},
+                            {label: 'Readonly for messages.', value: 'Setting:messages', checked: false}
+                        ]
+                    );
+                }
+                this.initOptions()
+            });
+        },
+
+        initOptions() {
+            if (isChromePanel) {
+                chrome.runtime.sendMessage(
+                    {
+                        event: 'Setting.get'
+                    },
+                    this.updateSetting.bind(this)
+                );
+            } else {
+                let localStorage = window.localStorage;
+                this.updateSetting(localStorage['settingData']);
+            }
+        },
+
+        updateSetting(res) {
+            let settings = getSettings(res);
+            this.data.set('defaultValue', settings);
+            let options = this.data.get('options');
+            let newOptions = options.map(item => {
+                if (settings.indexOf(item.value) > -1) {
+                    return Object.assign({}, item, {checked: true});
+                }
+                return item;
+            });
+            this.data.set('options', newOptions);
+            store.dispatch('settings', res);
+        },
+
+        handleChange(checkedValues) {
+            let settingData = setSettings(checkedValues);
+            let bridge = this.data.get('bridge');
+            if (isChromePanel) {
+                chrome.runtime.sendMessage({
+                    event: 'Setting.set',
+                    settingData: settingData
+                });
+            } else {
+                localStorage['settingData'] = settingData;
+            }
+            store.dispatch('settings', settingData);
+        },
+
+        dataTypes: {
+            sanVersion: DataTypes.string,
+            smallTabItem: DataTypes.bool,
+            tabs: DataTypes.arrayOf(DataTypes.objectOf(DataTypes.string))
+        }
+    }
+);
+
+</script>
+
+<style lang="less">
+@import '@san-devtools/views/style/variables.less';
+.navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: @bg-color;
+    .version {
+        height: 46px;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 20px;
+        font-size: 18px;
+        .logo {
+            padding: 0;
+            > span {
+                display: inline-flex;
+            }
+            .title {
+                color: @font-color;
+                align-self: center;
+            }
+        }
+    }
+    .main-tabs {
+        min-width: 170px;
+        .santd-tabs-nav-wrap {
+            user-select: none;
+            margin-bottom: 0;
+        }
+        .santd-tabs-bar {
+            margin: 0;
+            border: 0;
+        }
+        .santd-tabs-nav .santd-tabs-tab {
+            color: #000;
+        }
+        .santd-tabs-tab.santd-tabs-tab-active {
+            color: @font-color;
+        }
+        .santd-tabs-ink-bar {
+            position: relative;
+            background-color: @bg-color-light;
+        }
+    }
+    .setting {
+        display: flex;
+        padding-right: 12px;
+    }
+}
+.navigation-disconnected {
+    background-color: rgba(192, 192, 192, 0.7);
+}
+div .santd-popover-placement-bottomRight > .santd-popover-content .santd-popover-arrow {
+    right: 22px !important;
+}
+.santd-popover {
+    .navigation-popover-title {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        .confirm {
+            color: rgb(24, 144, 255);
+            cursor: pointer;
+        }
+    }
+    .navigation-checkbox-wrap {
+        .santd-checkbox-wrapper {
+            .santd-checkbox-inner {
+                width: 14px;
+                height: 14px;
+            }
+            .santd-checkbox-inner::after {
+                top: 45%;
+                left: 16%;
+            }
+        }
+    }
+    .navigation-checkbox-wrap:not(:first-child) {
+        margin-top: 8px;
+    }
+    .santd-popover-inner {
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35)
+    }
+}
+</style>

@@ -1,0 +1,260 @@
+<template>
+    <div class="sd-list">
+        <div class="toolbar">
+            <san-tooltip
+                title="{{ recording ? 'start record' : 'stop record' }}"
+                arrowPointAtCenter="{{true}}"
+            >
+                <span
+                    class="toolbar-icon"
+                    on-click="record"
+                >
+                    <san-custom-icon type="{{ recording ? 'largeicon-stop-recording' : 'largeicon-start-recording' }}"></san-custom-icon>
+                </span>
+            </san-tooltip>
+            <san-tooltip
+                title="clear all recorded"
+                arrowPointAtCenter="{{true}}"
+            >
+                <span
+                    class="toolbar-icon"
+                    on-click="clear"
+                >
+                    <san-custom-icon type="largeicon-clear"></san-custom-icon>
+                </span>
+            </san-tooltip>
+            <san-tooltip
+                title="{{ beforeLoaded ? 'hide history records before devtool first created' : 'show history records before devtool first created' }}"
+                arrowPointAtCenter="{{true}}"
+            >
+                <span
+                    class="toolbar-icon"
+                    on-click="loadBefore"
+                >
+                    <san-custom-icon type="largeicon-visibility"></san-custom-icon>
+                </span>
+            </san-tooltip>
+            <div class="filter">
+                <san-tooltip
+                    title="{{searchTip}}"
+                    arrowPointAtCenter="{{true}}"
+                >
+                    <san-input
+                        class="component-detail-filter"
+                        placeholder="{{filterPlaceholder}}"
+                        value="{=filterText=}"
+                    >
+                        <san-icon type="search" style="color: rgba(0, 0, 0, .54); font-size: 16px; line-height: 0;" slot="prefix" />
+                    </san-input>
+                </san-tooltip>
+            </div>
+        </div>
+        <san-table
+            pagination="{{false}}"
+            scroll="{{ {y: tableHeight} }}"
+            columns="{{columns}}"
+            data="{{data}}"
+        >
+            <span class="event-name" slot="event">
+                {{text}}
+            </span>
+            <div class="action" slot="action">
+                <san-button
+                    type="primary"
+                    on-click="actionHandler(index)"
+                >{{bridgeOptions.bridgeActionName}}</san-button>
+            </div>
+            <div slot="component">
+                <div
+                    class="button-wrapper"
+                    on-mouseover="highlightNativeNode(text.id)"
+                    on-mouseout="unhighlightNativeNode()"
+                >
+                    <san-button
+                        type="primary"
+                        on-click="inspectId(text.id)"
+                    >{{text.id}}</san-button>
+                </div>
+                <span>{{text.componentName}}</span>
+            </div>
+            <div slot="sender">
+                <div
+                    class="button-wrapper"
+                    on-mouseover="highlightNativeNode(text.id)"
+                    on-mouseout="unhighlightNativeNode()"
+                >
+                    <san-button
+                        type="primary"
+                        on-click="inspectId(text.id)"
+                    >{{text.id}}</san-button>
+                </div>
+                <span>{{text.componentName}}</span>
+            </div>
+            <div slot="receiver">
+                <div
+                    class="button-wrapper"
+                    on-mouseover="highlightNativeNode(text.id)"
+                    on-mouseout="unhighlightNativeNode()"
+                >
+                    <san-button
+                        type="primary"
+                        on-click="inspectId(text.id)"
+                    >{{text.id}}</san-button>
+                </div>
+                <span>{{text.componentName}}</span>
+            </div>
+            <san-json-tree-view
+                slot="payload"
+                s-if="!!text"
+                data="{{text}}"
+                expand="{{!!0}}"
+                rootName="data"
+                readonly="{{readonly}}"
+                on-change="change($event, index)"
+            >
+            </san-json-tree-view>
+        </san-table>
+    </div>
+</template>
+
+<script>
+import san, {DataTypes} from 'san';
+import {connectStore} from '@san-devtools/store/index';
+import {optimizedResize} from '@san-devtools/utils/index';
+
+import {Button, Icon, Table, Tooltip, Input} from 'santd';
+import JsonTreeView from '@san-devtools/components/misc/jsonTreeView.san';
+import CustomIcon from '@san-devtools/components/icon/spriteIcon.san';
+
+// TODO：长列表优化，替换 santd table
+// 表头两倍高度
+const TABLE_HEAD_HEIGHT = 150;
+
+
+export default connectStore({
+    bridge: 'bridge'
+})(
+    {
+        components: {
+            'san-table': Table,
+            'san-button': Button,
+            'san-icon': Icon,
+            'san-custom-icon': CustomIcon,
+            'san-json-tree-view': JsonTreeView,
+            'san-tooltip': Tooltip,
+            'san-input': Input
+        },
+        initData() {
+            return {
+                tableHeight: 0,
+                filterText: ''
+            }
+        },
+
+        dataTypes: {
+
+        },
+
+        record() {
+            let {bridgeRecording, bridgeName} = this.data.get('bridgeOptions');
+            let recording = !this.data.get('recording');
+            this.data.set('recording', recording);
+            this.data.get('bridge').send(`${bridgeName}.${bridgeRecording}`, {recording});
+        },
+        clear() {
+            this.fire('clear');
+        },
+        loadBefore() {
+            this.fire('loadBefore');
+            this.data.set('beforeLoaded', !this.data.get('beforeLoaded'));
+        },
+
+        actionHandler(index) {
+            let {bridgeActionName, bridgeName, targetName} = this.data.get('bridgeOptions');
+            let item = this.data.get('data')[index];
+            let id = item[targetName].id;
+            let eventName = item.event;
+            this.data.get('bridge').send(`${bridgeName}.${bridgeActionName}`, {componentId: id, payload: item.payload, eventName});
+        },
+
+        computeTableHeight() {
+            // 获取表格的宽度
+            let tableHeight = document.body.clientHeight - TABLE_HEAD_HEIGHT;
+            this.data.set('tableHeight', `${tableHeight > 0? tableHeight : 400}px`);
+        },
+
+        attached() {
+            optimizedResize.add(this.computeTableHeight.bind(this));
+            this.computeTableHeight();
+            this.watch('filterText', value => {
+                this.fire('filter', value);
+            });
+        },
+
+        change({changedData}, index) {
+            // 不需要通知 store 修改数据
+            this.data.set(`data[${index}].payload`, changedData);
+        },
+        highlightNativeNode(componentId) {
+            this.data.get('bridge') && this.data.get('bridge').send('Inspect.highlight', componentId);
+        },
+        unhighlightNativeNode() {
+            this.data.get('bridge') && this.data.get('bridge').send('Inspect.unhighlight', '');
+        }
+    }
+)
+
+</script>
+
+<style lang="less">
+@import '@san-devtools/views/style/variables.less';
+.sd-list {
+    .button-wrapper,.action {
+        display: inline-block;
+        .santd-btn:not(.santd-btn-circle):not(.santd-btn-circle-outline).santd-btn-icon-only {
+            padding: 2px 4px;
+        }
+        .santd-btn {
+            background-color: @bg-color-santd-btn;
+            border: 0;
+            height: 22px;
+            line-height: 1;
+        }
+    }
+    .event-name {
+        color: @font-color-event;
+    }
+    .toolbar {
+        padding-left: 20px;
+        height: 28px;
+        user-select: none;
+        cursor: pointer;
+        &-icon {
+            height: 28px;
+            display: inline-flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .start-record {
+            color: #ec3b11;
+        }
+        .filter {
+            display: inline-block;
+            height: 24px;
+            .santd-input-affix-wrapper .santd-input:not(:first-child) {
+                padding-left: 40px;
+            }
+            .santd-input {
+                height: 24px;
+                padding-top: 0;
+                padding-bottom: 0;
+                border: 0;
+                border-radius: 0;
+                background-color: rgba(0,0,0,0);
+            }
+            overflow: hidden;
+            position: relative;
+        }
+    }
+}
+</style>

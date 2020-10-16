@@ -1,0 +1,121 @@
+<template>
+    <div class="sd-main-wrapper {{prefix}}-wrapper">
+        <div class="sd-tree-wrapper {{prefix}}-left split-{{status}}">
+            <slot name="left"/>
+        </div>
+        <div class="sd-info-wrapper {{prefix}}-right split-{{status}}">
+            <slot name="right"/>
+        </div>
+    </div>
+</template>
+
+<script>
+import san, {DataTypes} from 'san';
+import Split from 'split.js';
+import {optimizedResize} from '@san-devtools/utils/index';
+
+const H_WIDTH = 680;
+let splitInstance = null;
+export default {
+    initData() {
+        let width = document.body.clientWidth;
+        let status = +width < H_WIDTH ? 'vertical' : 'horizontal';
+        return {
+            status: status
+        }
+    },
+    attached() {
+        let {prefix, status} = this.data.get();
+        splitInstance = Split([`.${prefix}-left`, `.${prefix}-right`], {
+            sizes: [50, 50],
+            gutterSize: 4,
+            minSize: 50,
+            direction: status,
+            gutter: this.gutter.bind(this, status)
+        });
+        optimizedResize.add(this.changeSplit.bind(this));
+
+    },
+
+    gutter(status) {
+        let wrapper = document.createElement('div');
+        let inner = document.createElement('div');
+        wrapper.className = `gutter-${status}-wrapper`;
+        inner.className = `gutter-${status}-inner`;
+        wrapper.appendChild(inner);
+        return wrapper;
+    },
+
+    changeSplit() {
+        let {prefix, status} = this.data.get();
+        let width = document.body.clientWidth;
+        let newStatus = +width < H_WIDTH ? 'vertical' : 'horizontal';
+        if (newStatus === status) {
+            return;
+        }
+        this.destorySplit(prefix, status);
+        this.data.set('status', newStatus);
+        splitInstance = Split([`.${prefix}-left`, `.${prefix}-right`], {
+            sizes: [50, 50],
+            gutterSize: 4,
+            minSize: 50,
+            direction: newStatus,
+            gutter: this.gutter.bind(this, newStatus)
+        });
+    },
+
+    destorySplit(prefix, status) {
+        document.querySelector(`.${prefix}-left`).style = 'width: 100%';
+        document.querySelector(`.${prefix}-right`).style = 'width: 100%';
+        let parent = document.querySelector(`.${prefix}-wrapper`);
+        let child = document.querySelector(`.gutter-${status}-wrapper`);
+        parent.removeChild(child);
+    }
+}
+</script>
+
+<style lang="less">
+.sd-main-wrapper {
+    height: 100%;
+    width: 100%;
+    min-width: 450px;
+    .gutter-horizontal-wrapper {
+        height: 100%;
+        float: left;
+        cursor: ew-resize;
+        .gutter-horizontal-inner {
+            height: 100%;
+            width: 1.5px;
+            margin: 0 auto;
+            background-color: rgba(0, 0, 0, 0.04);
+        }
+    }
+    .gutter-vertical-wrapper {
+        width: 100%;
+        cursor: ns-resize;
+        .gutter-vertical-inner {
+            height: 1.5px;
+            width: 100%;
+            margin: 0 auto;
+            background-color: rgba(0, 0, 0, 0.04);
+        }
+    }
+    .gutter-horizontal {
+        height: 100%;
+        float: left;
+        background-color: rgba(0, 0, 0, 0.04);
+        cursor: ew-resize;
+    }
+    .gutter-vertical {
+        background-color: rgba(0, 0, 0, 0.04);
+        cursor: ns-resize;
+    }
+    .sd-info-wrapper, .sd-tree-wrapper {
+        position: relative;
+        height: 100%;
+    }
+    .split-horizontal {
+        float: left;
+    }
+}
+</style>

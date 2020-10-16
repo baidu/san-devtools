@@ -1,0 +1,25 @@
+{
+    "compileOnSave": true,
+    "compilerOptions": {
+        "rootDir": ".",
+        "target": "esnext",
+        "module": "esnext",
+        "lib": ["dom", "esnext"],
+        "outDir": "dist",
+        "strict": true,
+        "moduleResolution": "node",
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "skipLibCheck": true,
+        "allowSyntheticDefaultImports": true,
+        "baseUrl": "./",
+        "paths": {
+            "@backend/*": ["packages/backend/src/*"],
+            "@frontend/*": ["packages/frontend/src/*"],
+            "@shared/*": ["packages/shared/src/*"],
+            "@san-devtools/*": ["packages/san-devtools/src/*"]
+        }
+    },
+    "exclude": ["node_modules", "dist", "docs", "__tests__", "**/*.test*", "**/*.spec*", "**/mock"],
+    "include": ["src", "packages", "node_modules/san/types/index.d.ts"]
+}

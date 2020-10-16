@@ -1,0 +1,24 @@
+<template>
+    <div>
+        从 store 中获取到的数据： {{ testObj.b.c.count }}
+    </div>
+</template>
+
+<script>
+import {connectStore} from '@src/store/index';
+export default connectStore({
+    count: 'globalCount',
+    count1: 'sonCount',
+    count2: 'testObj'
+})(
+    {
+        updated() {
+            // do something
+        }
+    }
+)
+
+</script>
+
+<style>
+</style>

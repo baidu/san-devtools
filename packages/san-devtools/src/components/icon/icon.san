@@ -1,0 +1,45 @@
+<template>
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="{{['Icon', className]}}"
+        width="24"
+        height="24"
+        viewBox="0 0 1024 1024">
+        <template s-for="item in pathData">
+            <path fill="currentColor" d="{{item}}" />
+        </template>
+    </svg>
+</template>
+<script>
+import san from 'san';
+import icons from './icon.ts';
+export default {
+    initData() {
+        return {
+            className: '',
+        }
+    },
+
+    inited() {
+        // this.watch('type', value => {
+        //     let type = this.data.get('type');
+        //     this.data.set('pathData', icons[type] || null);
+        // });
+    },
+
+    computed: {
+        pathData() {
+            let type = this.data.get('type');
+            return icons[type] || null;
+        }
+    }
+
+}
+</script>
+<style lang="less">
+.Icon {
+    width: 1em;
+    height: 1em;
+    fill: currentColor;
+}
+</style>

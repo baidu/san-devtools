@@ -1,0 +1,127 @@
+<template>
+    <div id="app">
+        <sandevtool-navigation s-ref="nav" currentTab="{=currentTab=}" disconnected="{{wsDisconnected}}"/>
+        <san-row type="flex" class="content" style="position: absolute">
+            <div
+                s-if="!wsDisconnected"
+                id="component_containter"
+                class="container {{containerShown.component ? 'show' : ''}}"
+            >
+                <sandevtool-component />
+            </div>
+            <div
+                s-if="!wsDisconnected"
+                id="store_containter"
+                class="container {{containerShown.store ? 'show' : ''}}"
+            >
+                <sandevtool-store />
+            </div>
+            <div
+                s-if="!wsDisconnected"
+                id="history_containter"
+                class="container {{containerShown.history ? 'show' : ''}}"
+            >
+                <sandevtool-history />
+            </div>
+            <div
+                s-if="!wsDisconnected"
+                id="message_containter"
+                class="container {{containerShown.message ? 'show' : ''}}"
+            >
+                <sandevtool-message />
+            </div>
+            <div
+                s-if="!wsDisconnected"
+                id="event_containter"
+                class="container {{containerShown.event ? 'show' : ''}}"
+            >
+                <sandevtool-event />
+            </div>
+        </san-row>
+    </div>
+</template>
+
+<script>
+import {Grid, Modal, Button} from 'santd';
+
+import Navigation from '@san-devtools/views/navigation.san';
+import Component from '@san-devtools/views/component/component.san';
+import Store from '@san-devtools/views/store/store.san';
+import History from '@san-devtools/views/history.san';
+import Message from '@san-devtools/views/message.san';
+import Event from '@san-devtools/views/event.san';
+
+import {store, connectStore} from './store';
+
+import 'normalize.css';
+import './index.less';
+
+export default connectStore({
+    wsDisconnected: 'wsDisconnected'
+})(
+    {
+        components: {
+            'san-row': Grid.Row,
+            's-button': Button,
+            'sandevtool-navigation': Navigation,
+            'sandevtool-component': Component,
+            'sandevtool-store': Store,
+            'sandevtool-history': History,
+            'sandevtool-message': Message,
+            'sandevtool-event': Event
+        },
+
+        initData() {
+            return {
+                current_component_id: '',
+                currentTab: 'component',
+                containerShown: {
+                    'component': true,
+                    'store': false,
+                    'history': false,
+                    'message': false,
+                    'event': false
+                }
+            }
+        },
+
+        inited() {
+            // 存储 bridge 到 store 中
+            store.dispatch('setBridge', this.data.get('bridge'));
+        },
+
+        attached() {
+            this.watch('currentTab', value => {
+                Object.keys(this.data.get('containerShown')).forEach(k => {
+                    this.data.set('containerShown.' + k, false);
+                });
+                this.data.set('containerShown.' + value, true);
+            });
+            this.watch('bridge', bridge => {
+                store.dispatch('setBridge', bridge);
+            });
+        }
+
+    }
+)
+
+</script>
+
+<style lang="less">
+.content {
+    position: absolute;
+    height: 100%;
+    top: 46px;
+    bottom: 0;
+    width: 100%;
+    .container {
+        width: 100%;
+        height: 100%;
+        min-width: 450px;
+        display: none;
+        &.show {
+            display: block;
+        }
+    }
+}
+</style>

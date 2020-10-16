@@ -1,0 +1,82 @@
+<template>
+    <div>
+        <span>count: {{ count }} /</span>
+        <span>countComputed: 是 10 倍 count: {{ countComputed }}</span>
+        <button class="increment" on-click="increment">添加 item<i class="fa fa-plus-square" /></button>
+        <div s-for="item, index in todoList">
+            {{ item }}
+            <ui-counter-item />
+            <span on-click="decrement(index)"> - </span>
+        </div>
+    </div>
+</template>
+
+<script>
+import CounteItem from './CounteItem.san';
+import {store} from '@src/store/index.js';
+export default {
+    components: {
+        'ui-counter-item': CounteItem
+    },
+    initData() {
+        return {
+            todoList: [],
+            count: 0,
+            test: {
+                7: 9
+            }
+        }
+    },
+    attached() {
+        this.watch('count', value => {
+            // do something
+        });
+        this.on('done', ()=>{}, 'test-listeners');
+        this.data.listen((_this, _change)=>{
+            // do something
+        });
+        for(let i = 0; i < 30; i++){
+            store.dispatch('setCount', -100);
+        }
+    },
+    increment () {
+        let count = this.data.get('count') + 10;
+        this.data.set('count', count);
+        this.data.push('todoList', count);
+        store.dispatch('setCount', count);
+        this.fire('counter', 'event fire');
+    },
+    decrement (index) {
+        this.data.removeAt('todoList', index);
+    },
+    computed: {
+        countComputed: function (){
+            return this.data.get('count') * 10;
+        },
+        emptyComputed() {
+            return 1;
+        }
+    },
+    filters: {
+        dateFormat: function (value, format) {
+            return 1;
+        }
+    },
+    messages: {
+        'UI:test'(arg) {
+            // do something
+        }
+    },
+}
+</script>
+
+<style>
+.increment {
+    position: absolute;
+    top: 0;
+    right: 0;
+    color: #fff;
+    font-size: 20px;
+    background: rgb(145, 199, 174);
+}
+</style>

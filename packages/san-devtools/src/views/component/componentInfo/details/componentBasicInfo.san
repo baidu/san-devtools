@@ -1,0 +1,59 @@
+<template>
+    <div>
+        <input type="hidden" value="{{selectedComponentId}}" />
+        <div s-for="info in data">
+            <san-row align="middle">
+                <san-col span="12">{{info.key}}</san-col>
+                <san-col span="12" s-if="info.isArray">
+                    <span
+                        class="arr-item"
+                        s-for="item in info.value"
+                    >
+                        {{item}}
+                    </span>
+                </san-col>
+                <san-col span="12" s-else>
+                    {{info.value}}
+                </san-col>
+            </san-row>
+        </div>
+    </div>
+</template>
+
+<script>
+
+import {Grid} from 'santd';
+
+import InspectableButton from '@san-devtools/components/misc/inspectableButton.san';
+
+export default {
+
+    components: {
+        'san-row': Grid.Row,
+        'san-col': Grid.Col,
+        'san-inspectable-button': InspectableButton
+    },
+
+    computed: {
+        data(){
+            let infoList = this.data.get('infoList') || [{key: 'No data', value: 'Please choose a component.'}];
+            let filterText = this.data.get('filterText');
+            filterText = filterText ? filterText.trim() : '';
+            let newData;
+            if (!filterText) {
+                newData = infoList;
+            } else {
+                newData = infoList.filter(item => JSON.stringify(item).indexOf(filterText) > -1);
+            }
+            return newData;
+        }
+    }
+}
+</script>
+
+<style lang="less">
+.arr-item {
+    display: inline-block;
+    margin-right: 10px;
+}
+</style>

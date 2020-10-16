@@ -1,0 +1,312 @@
+<template>
+    <div>
+        <div class="sd-none-wrapper" style="display:{{selectedComponentId?'none':'block'}}">
+            <div class="devtool-info">
+                <div class="logo" style="display:{{logoVisibility?'block':'none'}}">
+                    <img src="../../../icons/san_devtool_logo.svg" />
+                </div>
+                <div class="version">San DevTool {{version}}</div>
+            </div>
+            <div class="guide">Please select a component to inspect the detailed information.</div>
+        </div>
+        <div class="sd-detail-wrapper" style="display:{{selectedComponentId?'block':'none'}}">
+            <div class="title-wrapper">
+                <span class="component-name">
+                    {{selectedComponentName}}
+                </span>
+                <san-inspectable-button
+                    s-if="{{isChromePanel}}"
+                    class="inspector"
+                    selectedComponentId="{{selectedComponentId}}"
+                    hasIcon="{{!0}}"
+                    iconName="compass"
+                    spacing="0"
+                    text=""
+                >
+                </san-inspectable-button>
+                <div class="filter">
+                    <san-input
+                        class="component-detail-filter"
+                        placeholder="{{filterPlaceholder}}"
+                        value="{=filterText=}"
+                    >
+                        <san-icon type="search" style="color: rgba(0, 0, 0, .54); font-size: 16px; line-height: 0;" slot="prefix" />
+                    </san-input>
+                </div>
+            </div>
+            <div class="panel-container">
+                <div class="ex-panel-wrapper">
+                    <san-collapse defaultActiveKey="{{['1']}}">
+                        <san-collapse-panel header="Basic Information" key='1'>
+                            <sandevtool-component-basic-info
+                                infoList="{{selectedComponentBaseInfo | infoListFilter}}"
+                                selectedComponentId="{{selectedComponentId}}"
+                                filterText="{{filterText}}"
+                            >
+                            </sandevtool-component-basic-info>
+                        </san-collapse-panel>
+                    </san-collapse>
+                </div>
+                <div class="ex-panel-wrapper">
+                    <san-collapse defaultActiveKey="{{['1']}}">
+                        <san-collapse-panel header="Data" key='1'>
+                            <sandevtool-component-data-viewer
+                                data="{{componentInfo.data}}"
+                                selectedComponentId="{{selectedComponentId}}"
+                                dataReadonly="{=dataReadonly=}"
+                                filterText="{{filterText}}"
+                            >
+                            </sandevtool-component-data-viewer>
+                        </san-collapse-panel>
+                    </san-collapse>
+                </div>
+                <div class="ex-panel-wrapper" s-if="componentInfo.computed.length>0">
+                    <san-collapse defaultActiveKey="{{['1']}}">
+                        <san-collapse-panel header="Computed" key='1'>
+                            <sandevtool-component-computed
+                                computed="{{componentInfo.computed}}"
+                                computedDeps="{{componentInfo.computedDeps}}"
+                                selectedComponentId="{{selectedComponentId}}"
+                                filterText="{{filterText}}"
+                            >
+                            </sandevtool-component-computed>
+                        </san-collapse-panel>
+                    </san-collapse>
+                </div>
+                <div class="ex-panel-wrapper" s-if="componentInfo.filters.length>0">
+                    <san-collapse defaultActiveKey="{{['1']}}">
+                        <san-collapse-panel header="Filters" key='1'>
+                            <sandevtool-component-filters
+                                selectedComponentId="{{selectedComponentId}}"
+                                data="{{componentInfo.filters}}"
+                                filterText="{{filterText}}"
+                            >
+                            </sandevtool-component-filters>
+                        </san-collapse-panel>
+                    </san-collapse>
+                </div>
+                <div class="ex-panel-wrapper" s-if="componentInfo.messages.length>0">
+                    <san-collapse defaultActiveKey="{{['1']}}">
+                        <san-collapse-panel header="Messages" key='1'>
+                            <sandevtool-component-messages
+                                selectedComponentId="{{selectedComponentId}}"
+                                data="{{componentInfo.messages}}"
+                                filterText="{{filterText}}"
+                            >
+                            </sandevtool-component-messages>
+                        </san-collapse-panel>
+                    </san-collapse>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+<script>
+import san, {DataTypes} from 'san';
+import {connectStore} from '@san-devtools/store/index';
+
+import {Collapse, Input, Icon} from 'santd';
+
+import InspectableButton from '@san-devtools/components/misc/inspectableButton.san';
+import ComponentBasicInfo from './details/componentBasicInfo.san';
+import ComponentDataViewer from './details/componentDataViewer.san';
+import ComponentComputed from './details/componentComputed.san';
+import ComponentFilters from './details/componentFilters.san';
+import ComponentMessages from './details/componentMessages.san';
+
+import {isChromePanel} from '@san-devtools/utils/index';
+
+export default connectStore({
+    componentInfo: 'componentInfo',
+    selectedComponentId: 'selectedComponentBaseInfo.id',
+    selectedComponentName: 'selectedComponentBaseInfo.displayName',
+    selectedComponentBaseInfo: 'selectedComponentBaseInfo',
+    bridge: 'bridge'
+})(
+    {
+        initData() {
+            return {
+                version: '',
+                logoVisibility: false,
+                dataReadonly: false,
+                filterPlaceholder: 'Search keyword',
+                filterText: '',
+                isChromePanel
+            };
+        },
+        dataTypes: {
+            selectedComponentId: DataTypes.string,
+            version: DataTypes.string,
+            logoVisibility: DataTypes.bool,
+            dataReadonly: DataTypes.bool,
+            selectedComponentName: DataTypes.string,
+            filterPlaceholder: DataTypes.string,
+            filterText: DataTypes.string
+        },
+        filters: {
+            infoListFilter(value){
+                if (!value) return [];
+                return Object.entries(value).map(([key, value]) => {
+                    let isArray = false;
+                    if(Array.isArray(value)){
+                        isArray = true;
+                    }
+                    return {
+                        key,
+                        value,
+                        isArray
+                    }
+                });
+            }
+        },
+        components: {
+            'sandevtool-component-basic-info': ComponentBasicInfo,
+            'sandevtool-component-data-viewer': ComponentDataViewer,
+            'sandevtool-component-computed': ComponentComputed,
+            'sandevtool-component-filters': ComponentFilters,
+            'sandevtool-component-messages': ComponentMessages,
+
+            'san-collapse': Collapse,
+            'san-collapse-panel': Collapse.Panel,
+            'san-icon': Icon,
+            'san-input': Input,
+            'san-inspectable-button': InspectableButton
+        },
+        attached() {
+            setTimeout(() => {
+                this.data.set('logoVisibility', true);
+            }, 100);
+        }
+    }
+)
+
+</script>
+<style lang="less">
+@import '@san-devtools/views/style/variables.less';
+.sd-none-wrapper {
+    box-sizing: border-box;
+    padding: 5vw;
+    text-align: center;
+    .devtool-info {
+        .logo {
+            img {
+                width: 40%;
+            }
+        }
+        .version {
+            justify-content: center;
+            font-size: 3vw;
+        }
+    }
+    .guide {
+        font-weight: bold;
+        text-shadow: @shadow-color 0.15vw 0.15vw 0.1vw;
+        font-size: 2vw;
+        margin-top: 5vw;
+    }
+}
+.sd-detail-wrapper {
+    height: 100%;
+    .component-detail-filter {
+        top: 0;
+    }
+    .santd-input-affix-wrapper  {
+        height: 36px;
+        .santd-input:not(:first-child) {
+            padding-left: 50px;
+        }
+    }
+    .santd-input {
+        border: 0;
+        border-radius: 0;
+        background-color: rgba(0, 0, 0, 0);
+    }
+    .panel-container {
+        .santd-collapse {
+            border-radius: 0;
+            background-color: @bg-santd-collapse;
+        }
+        .santd-collapse-item:last-child > .santd-collapse-content {
+            border-radius: 0;
+        }
+        .santd-collapse > .santd-collapse-item > .santd-collapse-header {
+            line-height: 14px;
+            padding: 8px 16px 8px 40px;
+        }
+        .santd-collapse-content > .santd-collapse-content-box {
+            overflow-y: auto;
+        }
+        overflow: auto;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+        > .ex-panel-wrapper {
+            &:first-child {
+            margin-top: 46px;
+            }
+            padding: 0 10px;
+            margin: 10px 0;
+            box-sizing: border-box;
+            width: 100%;
+        }
+    }
+}
+.title-wrapper {
+    height: 36px;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 1000;
+    background-color: rgba(237,237,237,0.3) !important;
+    backdrop-filter: blur(8px);
+    > div {
+        height: 26px;
+    }
+    .component-name {
+        height: 36px;
+        display: inline-block;
+        float: left;
+        color: @font-color-title;
+        font-size: 22px;
+        padding: 2px 10px;
+        box-sizing: border-box;
+        &::before, &::after {
+            color: rgba(0, 0, 0, 0.65);
+            font-weight: 200;
+        }
+        &::before {
+            content: '<';
+        }
+        &::after {
+            content: '>';
+        }
+    }
+    .inspector {
+        float: left;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        .santd-btn-primary {
+            font-size: 16px;
+            background-color: @bg-color-inspector;
+            border: 0;
+        }
+        button {
+            position: relative;
+        }
+    }
+    .filter {
+        height: 36px;
+        .santd-input-affix-wrapper .santd-input:not(:first-child) {
+            padding-left: 40px;
+        }
+        .santd-input {
+            border: 0;
+            border-radius: 0;
+            background-color: rgba(0,0,0,0);
+        }
+        overflow: hidden;
+        position: relative;
+    }
+}
+</style>

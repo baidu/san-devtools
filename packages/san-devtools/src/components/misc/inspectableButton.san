@@ -1,0 +1,74 @@
+<template>
+    <div
+        class="inspectable-button-wrapper"
+        on-mouseover="highlight"
+        on-mouseout="unhighlight"
+    >
+        <san-button
+            type="{{type}}"
+            on-click="inspectId"
+        >
+            <san-icon style="margin-right:{{spacing}}" s-if="!!hasIcon" type="{{iconName}}">
+            </san-icon>
+            {{text}}
+        </san-button>
+    </div>
+</template>
+<script>
+import {Component, DataTypes} from 'san';
+
+import {Button, Icon} from 'santd';
+
+export default {
+    dataTypes: {
+        cid: DataTypes.oneOfType([DataTypes.string, DataTypes.number]),
+        type: DataTypes.string,
+        hasIcon: DataTypes.bool,
+        iconName: DataTypes.string,
+        spacing: DataTypes.string,
+        text: DataTypes.oneOfType([DataTypes.string, DataTypes.number])
+    },
+
+    components: {
+        'san-button': Button,
+        'san-icon': Icon
+    },
+    initData() {
+        return {
+            cid: '',
+            type: 'primary',
+            hasIcon: false,
+            iconName: '',
+            spacing: '0',
+            text: 'Inspect'
+        };
+    },
+    created() {
+    },
+
+    inspectId() {
+        let selectedComponentId = this.data.get('selectedComponentId');
+        let inspectCode = `
+            let component = window.__san_devtool__ && window.__san_devtool__.componentMap.get("${selectedComponentId}");
+            if (component && component.el) {
+                inspect(component.el);
+            }
+        `;
+        chrome.devtools.inspectedWindow.eval(inspectCode);// eslint-disable-line        
+    },
+
+    highlight() {
+    },
+
+    unhighlight() {
+    }
+}
+</script>
+<style lang="less">
+.inspectable-button-wrapper {
+    margin: 5px;
+    .santd-btn {
+        height: 26px;
+    }
+}
+</style>

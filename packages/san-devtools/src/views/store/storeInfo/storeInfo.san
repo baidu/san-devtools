@@ -1,0 +1,144 @@
+<template>
+    <div>
+        <div class="title-wrapper">
+            <div class="action-name" s-if="!!actionName">{{actionName}}</div>
+            <div class="filter">
+                <san-input
+                    class="store-detail-filter"
+                    placeholder="{{filterPlaceholder}}"
+                    value="{=filterText=}"
+                    s-ref="detailFilterInputBox"
+                >
+                    <san-icon type="search" style="color: rgba(0, 0, 0, .54); font-size: 16px; line-height: 0;" slot="prefix" />
+                </san-input>
+            </div>
+        </div>
+        <div class="panel-container" s-if="!!actionName">
+            <sandevtool-mutation-info filterText="{{filterText}}" />
+            <sandevtool-store-viewer filterText="{{filterText}}" />
+        </div>
+        <div s-else class="guide">Please select a mutation to inspect the detailed information.</div>
+    </div>
+</template>
+
+<script>
+import san, {DataTypes} from 'san';
+import {connectStore} from '@san-devtools/store/index';
+import {Collapse, Input, Icon} from 'santd';
+
+import MutationViewer from './mutation/mutation.san';
+import StoreViewer from './store/store.san';
+
+export default connectStore({
+    actionName: 'selectedMutationName'
+})(
+    {
+        components: {
+            'sandevtool-store-viewer': StoreViewer,
+            'sandevtool-mutation-info': MutationViewer,
+            'san-input': Input,
+            'san-icon': Icon
+        },
+
+        initData() {
+            return {
+                filterPlaceholder: 'Search keyword',
+                filterText: '',
+                payloadReadonly: false
+            };
+        },
+
+        dataTypes: {
+            filterPlaceholder: DataTypes.string,
+            filterText: DataTypes.string,
+            payloadReadonly: DataTypes.bool
+        }
+
+    }
+)
+</script>
+
+<style lang="less">
+@import '@san-devtools/views/style/variables.less';
+   .guide {
+        padding: 0 1vw;
+        font-weight: bold;
+        text-shadow: #ccc 0.15vw 0.15vw 0.1vw;
+        font-size: 2vw;
+        margin-top: 5vw;
+    }
+  .panel-container {
+        > div:first-child {
+            margin-top: 46px;
+        }
+      .santd-collapse {
+          border-radius: 0;
+          background-color: @bg-santd-collapse;
+      }
+      .santd-collapse-item:last-child > .santd-collapse-content {
+          border-radius: 0;
+      }
+      .santd-collapse > .santd-collapse-item > .santd-collapse-header {
+          line-height: 14px;
+          padding: 8px 16px 8px 40px;
+      }
+      .santd-collapse-content > .santd-collapse-content-box {
+          overflow-y: auto;
+      }
+      overflow: auto;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 100%;
+      .ex-panel-wrapper {
+          padding: 0 10px;
+          margin: 10px 0;
+          box-sizing: border-box;
+          width: 100%;
+    }
+  }
+    .title-wrapper {
+        height: 36px;
+        box-sizing: border-box;
+        position: relative;
+        z-index: 1000;
+        background-color: rgba(237,237,237,0.3) !important;
+        backdrop-filter: blur(8px);
+        .action-name {
+            height: 36px;
+            display: inline-block;
+            float: left;
+            color: @font-color-title;
+            font-size: 22px;
+            padding: 2px 10px;
+            box-sizing: border-box;
+            &::before, &::after {
+                color: rgba(0, 0, 0, 0.65);
+                font-weight: 200;
+            }
+            &::before {
+                content: '<';
+            }
+            &::after {
+                content: '>';
+            }
+        }
+        .filter {
+            height: 100%;
+            .store-detail-filter {
+                top: 0;
+            }
+            .santd-input-affix-wrapper  {
+                height: 36px;
+                .santd-input:not(:first-child) {
+                    padding-left: 50px;
+                }
+            }
+            .santd-input {
+                border: 0;
+                border-radius: 0;
+                background-color: rgba(0, 0, 0, 0);
+            }
+        }
+    }
+</style>
