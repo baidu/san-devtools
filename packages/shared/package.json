@@ -2,8 +2,11 @@
     "private": true,
     "name": "shared",
     "version": "0.0.0",
-    "repository": "ssh://git@icode.baidu.com:8235/baidu/hulk/san-devtools",
-    "author": "wangyongqing01 <wangyongqing01@baidu.com>",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/baidu/san-devtools"
+    },
+    "author": "ksky521 <ksky521@gmail.com>",
     "license": "MIT",
     "devDependencies": {
         "@types/circular-json": "^0.4.0",
