@@ -1,7 +1,7 @@
 /**
  * @file dom ready 方法
  * @module browser
- * @author wangyongqing <wangyongqing01@baidu.com>
+ * @author ksky521 <ksky521@gmail.com>
  */
 
 const fnList: Function[] = [];

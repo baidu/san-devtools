@@ -7,7 +7,7 @@ export function getBridgeMessageNameByHookName(name: string) {
 
 /**
  * 日期格式化
- * @author wangyongqing01
+ * @author ksky521 <ksky521@gmail.com>
  * @function dateFormat
  * @param {Date} d - date 对象
  * @param {string} [pattern = 'yyyy-MM-dd'] - 字符串
