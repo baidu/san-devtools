@@ -3,11 +3,14 @@
  */
 
 const path = require('path');
+const CopyPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const createConfig = require('../../createConfig');
 
+const WebpackExtensionManifestPlugin = require('webpack-extension-manifest-plugin');
 const pkg = require('./package.json');
 const resolve = p => path.resolve(__dirname, p);
+const baseManifest = require('./chrome/manifest.json');
 
 module.exports = createConfig({
     entry: {
@@ -42,6 +45,20 @@ module.exports = createConfig({
             title: 'San DevTools Page',
             filename: 'devtools_page.html',
             chunks: ['devtools_page']
-        })
+        }),
+        new CopyPlugin({
+            patterns: [
+                {
+                    from: './icons',
+                    to: 'icons'
+                }
+            ]
+        }),
+        new WebpackExtensionManifestPlugin({
+            config: {
+                base: baseManifest,
+                extend: {version: pkg.version}
+            }
+        }),
     ]
 });

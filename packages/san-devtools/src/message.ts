@@ -10,12 +10,10 @@ import {
     MUTATION_INFO_LISTENER,
     STORE_INFO_LISTENER,
     HISTORY_INFO_LISTENER,
-
     MESSAGE_INFO_LISTENER,
     EVENT_INFO_LISTENER,
     INSPECT_COMPONENT,
     STORE_DATA_CHANGED,
-
     BACKEND_CONNECTED,
     BACKEND_DISCONNECTED
 } from './common/constants';
@@ -45,7 +43,7 @@ export default class FrontendReceiver extends EventEmitter {
     onSanVersion(d: any) {
         store.dispatch('setWsDisconnected', false);
         store.dispatch('setSanVersion', d);
-        this._bridge.send('Component.getTreeData');
+        this._bridge.send('Component.getTreeData', '');
     }
     onTreeData(data: any) {
         // do something
@@ -64,7 +62,11 @@ export default class FrontendReceiver extends EventEmitter {
         store.dispatch('setStoreChanged', true);
     }
     onHistory(data: any) {
-        store.dispatch('setHistory', JSON.parse(data));
+        // history 数据的接收是一个频繁触发的动作，store 的修改是同步的，会阻塞用户的交互动作
+        // TODO: 这里可能会存在内存泄漏
+        setTimeout(() => {
+            store.dispatch('setHistory', JSON.parse(data));
+        }, 0);
     }
     onMessage(data: any) {
         store.dispatch('setMessage', JSON.parse(data));
@@ -104,6 +106,6 @@ export default class FrontendReceiver extends EventEmitter {
     // backend 重新建立链接
     onBackendConnected() {
         // 当 backend 链接上了，返回 frontend 已经 ok 的消息
-        this._bridge.send('HandShake.frontendReady');
+        this._bridge.send('HandShake.frontendReady', '');
     }
 }

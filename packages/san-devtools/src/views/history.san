@@ -20,12 +20,10 @@
         </div>
     </div>
 </template>
-
 <script>
 import san, {DataTypes} from 'san';
 import {connectStore, store} from '@san-devtools/store/index';
 import DevtoolsTable from '@san-devtools/components/misc/devtoolsTable.san';
-
 function filterData(filterText, data) {
     filterText = filterText.trim();
     if (!filterText) {
@@ -40,7 +38,6 @@ function filterData(filterText, data) {
     });
     return newData;
 }
-
 export default connectStore({
     bridge: 'bridge',
     historyRecordings: 'historyRecordings',
@@ -95,7 +92,7 @@ export default connectStore({
         initData() {
             return {
                 loadingToast: 'Building history tree... ',
-                loading: false,
+                loading: false, // TODO：假的 loading
                 filterText: '',
                 beforeLoaded: false,
                 recording: false,
@@ -132,12 +129,21 @@ export default connectStore({
                 tableHeight: 0
             }
         },
-
         dataTypes: {
             beforeLoaded: DataTypes.bool,
             recording: DataTypes.bool,
             historyAfterDevtoolPanelCreated: DataTypes.arrayOf(DataTypes.object),
             historyBeforeDevtoolPanelCreated: DataTypes.arrayOf(DataTypes.object)
+        },
+        attached() {
+            this.watch('historyRecordings', value => {
+                this.data.set('loading', true);
+            });
+        },
+        updated() {
+            setTimeout(() => {
+                this.data.set('loading', false);
+            }, 0);
         },
         loadBefore() {
             let loadBefore = this.data.get('beforeLoaded');
@@ -154,9 +160,7 @@ export default connectStore({
         }
     }
 )
-
 </script>
-
 <style lang="less">
 .sm-tree-view-loading-toast {
     position: absolute;

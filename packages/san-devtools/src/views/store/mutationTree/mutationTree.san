@@ -14,21 +14,14 @@
             initiallyOpen="{{!0}}"
             primaryTogglesNestedTreeView="{{!0}}"
             dataSource="JSON"
-            loadingToast="{{loadingToast}} {{processingComponentInfo}}"
-            loading="{=loading=}"
-            loadingToastContentFromColor="#3898b9"
-            loadingToastContentToColor="#000"
-            progress="{=progress=}"
         >
         </san-tree-view>
     </div>
 </template>
-
 <script>
 import san, {DataTypes} from 'san';
 import {connectStore, store} from '@san-devtools/store/index';
 import TreeView from '@san-devtools/components/treeView/treeView.san';
-
 export default connectStore({
     mutationTreeData: 'mutationTreeData',
     bridge: 'bridge'
@@ -60,30 +53,14 @@ export default connectStore({
     setSelectedStoreData(value) {
         store.dispatch('setStoreDataOnClickMutation', value.storeName);
     },
-    initData() {
-        return {
-            loadingToast: 'If your want to inspect the dispatched actions when the san-app ready, please reload the san-app !',
-            loading: true,
-            processingComponentInfo: ''
-        };
-    },
-
-    dataTypes: {
-        loadingToast: DataTypes.string,
-        loading: DataTypes.bool,
-        processingComponentInfo: DataTypes.string
-    },
-
     components: {
         'san-tree-view': TreeView,
     }
   }
 )
 </script>
-
 <style lang="less">
 .state-list-wrapper {
     height: 100%;
 }
-
 </style>

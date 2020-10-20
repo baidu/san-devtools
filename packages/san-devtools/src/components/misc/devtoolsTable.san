@@ -103,16 +103,17 @@
                 </div>
                 <span>{{text.componentName}}</span>
             </div>
-            <san-json-tree-view
-                slot="payload"
-                s-if="!!text"
-                data="{{text}}"
-                expand="{{!!0}}"
-                rootName="data"
-                readonly="{{readonly}}"
-                on-change="change($event, index)"
-            >
-            </san-json-tree-view>
+            <div slot="payload">
+                <san-json-tree-view
+                    s-if="!!text"
+                    data="{{text}}"
+                    expand="{{!!0}}"
+                    rootName="data"
+                    readonly="{{readonly}}"
+                    on-change="change($event, index)"
+                >
+                </san-json-tree-view>                
+            </div>
         </san-table>
     </div>
 </template>

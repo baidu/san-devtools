@@ -2,13 +2,48 @@
 /**
  * @file handle ports
  */
+type Port = chrome.runtime.Port;
+interface Ports {[key: string]: Port}
 class PortManager {
     _ports: any;
-    _messageIntercept: Function;
+    onMessage: Function;
+    onDisconnect: Function;
     constructor() {
         this._ports = {};
-        // eslint-disable-next-line
-        this._messageIntercept = (m: any) => true;
+        this.onMessage = this._defaultOnMessage;
+        this.onDisconnect = this._defaultOnDisconnect;
+    }
+    /**
+     * 默认广播
+     * @param message
+     * @param memberName
+     * @param ports
+     */
+    _defaultOnMessage(message: any, memberName: string, ports: Ports) {
+        Object.entries(ports).forEach((member: [string, any]) => {
+            if (member[0] !== memberName && member[1]) {
+                if (__DEBUG__) {
+                    console.log(`${memberName} -----> ${member[0]}`, message, member[1]);
+                }
+                member[1].postMessage(message);
+            }
+        });
+    }
+    /**
+     * 断开链接
+     * @param memberName
+     * @param ports
+     * @param listener
+     */
+    _defaultOnDisconnect(memberName: string, ports: Ports, listener: Function) {
+        Object.entries(ports).forEach((member: [string, any]) => {
+            if (member[0] !== memberName && member[1]) {
+                // 接触绑定，删除 port
+                member[1].onMessage.removeListener(listener);
+                member[1].disconnect();
+                delete ports[member[0]];
+            }
+        });
     }
     /**
      * 当接收到数据的时候/端开链接，发送给其他成员
@@ -16,7 +51,7 @@ class PortManager {
      * @param {*} memberName 某个成员
      * @param {*} port
      */
-    _broadCastForPort(tabId: string, memberName: string, port: any) {
+    _broadCastForPort(tabId: string, memberName: string, port: Port) {
         if (!port) {
             return;
         }
@@ -25,34 +60,16 @@ class PortManager {
         let self = this;
         // 监听，广播消息
         function sendMessage(message: any) {
-            if (self._messageIntercept(message, memberName)) {
-                Object.entries(ports).forEach((member: [string, any]) => {
-                    if (member[0] !== memberName && member[1]) {
-                        if (__DEBUG__) {
-                            console.log(`${memberName} -----> ${member[0]}`, message, member[1]);
-                        }
-                        member[1].postMessage(message);
-                    }
-                });
+            if (typeof self.onMessage === 'function') {
+                self.onMessage(message, memberName, ports);
             }
         }
         port.onMessage.addListener(sendMessage);
         // 断开链接
         function shutdown() {
-            Object.entries(ports).forEach((member: [string, any]) => {
-                if (
-                    memberName === 'san-devtools-panel'
-                    && member[1]
-                    || memberName === 'content-script'
-                    && member[1]
-                    && memberName === member[0]
-                ) {
-                    // 接触绑定，删除 port
-                    member[1].onMessage.removeListener(sendMessage);
-                    member[1].disconnect();
-                    delete ports[member[0]];
-                }
-            });
+            if (typeof self.onMessage === 'function') {
+                self.onDisconnect(memberName, ports, sendMessage);
+            }
         }
         port.onDisconnect.addListener(shutdown);
     }
@@ -65,21 +82,13 @@ class PortManager {
     }
     /**
      * 将当前port添加到对应的房间/或者新开房间，并绑定事件
+     * @param {*} port 端口对象
      * @param {*} tabId 房间号码
      * @param {*} memberName 某个成员
-     * @param {*} port
+     * @param {*} cb 添加成功之后的回调
      */
-    addPort(port: any, fn: Function) {
-        let tabId;
-        let memberName;
+    addPort(port: Port, tabId: string, memberName: string, cb: Function) {
         let existedPort = false;
-        if (+port.name + '' === port.name) {
-            tabId = port.name;
-            memberName = 'san-devtools-panel';
-        } else {
-            tabId = port.sender.tab.id;
-            memberName = port.name;
-        }
         if (!this._ports[tabId]) {
             this._ports[tabId] = {
                 [memberName]: port
@@ -92,7 +101,7 @@ class PortManager {
             this._ports[tabId][memberName] = port;
         }
         this._broadCastForPort(tabId, memberName, port);
-        fn(tabId, memberName, existedPort);
+        cb(existedPort);
         return port;
     }
     /**
@@ -102,17 +111,6 @@ class PortManager {
      */
     getPortFromRoom(tabId: string, memberName: string) {
         return this._ports[tabId] ? this._ports[tabId][memberName] : null;
-    }
-    /**
-     * 设置消息拦截器
-     * @param fn 用于拦截 message
-     */
-    setMessageIntercept(fn: Function) {
-        if (typeof fn === 'function') {
-            this._messageIntercept = fn;
-            return true;
-        }
-        return false;
     }
 }
 const portManager = new PortManager();
