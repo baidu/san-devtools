@@ -2,45 +2,51 @@
     <pre class="pre-wrapper"><code class="language-js">{{fnStr | prettyCode | raw}}</code></pre>
 </template>
 <script>
-import 'highlight.js/styles/github.css';
+    import 'highlight.js/styles/github.css';
 
-import san, {DataTypes} from 'san';
-import hljs from 'highlight.js/lib/core';
-import javascript from 'highlight.js/lib/languages/javascript';
-hljs.registerLanguage('javascript', javascript);
+    import san, { DataTypes } from 'san';
+    import hljs from 'highlight.js/lib/core';
+    import javascript from 'highlight.js/lib/languages/javascript';
+    hljs.registerLanguage('javascript', javascript);
 
-export default {
-    dataTypes: {
-        fnStr: DataTypes.string
-    },
-    initData() {
-        return {
-            fnStr: 'loading...'
-        }
-    },
-    filters: {
-        prettyCode(code) {
-            return hljs.highlight('javascript', code).value
-            // return Prism.highlight(fnStr, Prism.languages.javascript, 'javascript');
+    export default {
+        dataTypes: {
+            fnStr: DataTypes.string
+        },
+        initData() {
+            return {
+                fnStr: 'loading...'
+            }
+        },
+        filters: {
+            prettyCode(code) {
+                return hljs.highlight('javascript', code).value
+                // return Prism.highlight(fnStr, Prism.languages.javascript, 'javascript');
+            }
         }
     }
-}
 </script>
 <style lang="less">
-.deps-wrapper{
-    margin-bottom: 10px;
-}
-.pre-wrapper {
-    font-size: 14px;
-    margin-bottom: 10px;
-}
-pre {
-    .language-js {
-      color: #444;
-      display: block;
-      overflow-x: auto;
-      padding: 0.5em;
-      background: rgba(56, 152, 185, 0.05)!important;
+    @import '@san-devtools/views/style/variables.less';
+    @hljs-title-color: ;
+    .deps-wrapper {
+        margin-bottom: 10px;
     }
-}
+    .pre-wrapper {
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+    pre {
+        .language-js {
+            color: #444;
+            display: block;
+            overflow-x: auto;
+            padding: 0.5em;
+            border-radius: 12px;
+            background: @func-bg-color!important;
+            .hljs-title, .hljs-string {
+                color:  #ff5050;
+            }
+        }
+    }
 </style>

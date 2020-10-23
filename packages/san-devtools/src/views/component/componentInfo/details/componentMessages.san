@@ -70,13 +70,13 @@ export default {
 </script>
 
 <style lang="less">
+@import '@san-devtools/views/style/variables.less';
 .messages-wrapper {
     .messages {
         margin: 3px 0;
         .func-name {
-            color: #3898b9;
+            color: @func-font-color;
             font-size: 120%;
-            border-bottom: 2px solid #3898b9;
             margin-bottom: 5px;
         }
     }

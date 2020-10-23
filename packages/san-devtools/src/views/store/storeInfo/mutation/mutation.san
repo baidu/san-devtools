@@ -1,5 +1,5 @@
 <template>
-    <div class="ex-panel-panel">
+    <div class="ex-panel-panel mutation-wrap">
         <div class="ex-panel-wrapper" s-if="infoList.length>0">
             <san-collapse defaultActiveKey="{{['1']}}">
                 <san-collapse-panel header="Basic Information" key='1'>
@@ -50,9 +50,8 @@
                     <template slot="extra">
                         <san-tooltip
                             title="当 oldData 以及 newData 出现 '~payload' 字符串的时候，表示是引用了 payload 中的数据"
-                            arrowPointAtCenter="{{true}}"
                         >
-                            <san-icon type="info-circle"/>
+                            <san-icon class="diff-tip" type="tip"></san-icon>
                         </san-tooltip>
                     </template>
                     <div class="diff" s-for="diff, index in diffData">
@@ -107,140 +106,172 @@
                 </san-collapse-panel>
             </san-collapse>
         </div>
-        <san-divider s-if="infoList.length>0 || diffData.length>0">{{ storeName }}</san-divider>
+        <div class="store-name" s-if="infoList.length>0 || diffData.length>0">{{ storeName }}</div>
     </div>
 </template>
 
 <script>
-import san, {DataTypes} from 'san';
-import {connectStore, store} from '@san-devtools/store/index';
-import JSONView from 'json-tree-view';
-import 'json-tree-view/devtools.css';
+    import san, { DataTypes } from 'san';
+    import { connectStore, store } from '@san-devtools/store/index';
+    import JSONView from 'json-tree-view';
+    import 'json-tree-view/devtools.css';
 
-import pageheader from 'santd/es/pageheader';
-import {Switch, Grid, Divider, Icon, Button, Collapse, Tooltip} from 'santd';
+    import pageheader from 'santd/es/pageheader';
+    import { Switch, Grid, Divider, Button, Collapse, Tooltip } from 'santd';
 
-import JsonTreeView from '@san-devtools/components/misc/jsonTreeView.san';
+    import JsonTreeView from '@san-devtools/components/misc/jsonTreeView.san';
+    import Icon from '@san-devtools/components/icon/icon.san';
 
-export default connectStore({
-    selectedMutationInfo: 'selectedMutationInfo',
-    storeName: 'selectedMutationInfo.storeName',
-    diffData: 'selectedMutationInfo.diff',
-    bridge: 'bridge',
-    readonly: 'settings.storeReadOnly'
-})(
-    {
-        filters: {
-            formateTarget(value) {
-                return value.join('.');
-            }
-        },
+    export default connectStore({
+        selectedMutationInfo: 'selectedMutationInfo',
+        storeName: 'selectedMutationInfo.storeName',
+        diffData: 'selectedMutationInfo.diff',
+        bridge: 'bridge',
+        readonly: 'settings.storeReadOnly'
+    })(
+        {
+            filters: {
+                formateTarget(value) {
+                    return value.join('.');
+                }
+            },
 
-        computed: {
-            infoList() {
-                let filterText = this.data.get('filterText');
-                let selectedMutationInfo = this.data.get('selectedMutationInfo') || [];
-                let infoList = Object.entries(selectedMutationInfo).map(([key, value]) => {
-                    if(key !== 'diff' && key !== 'payload' && JSON.stringify([key, value]).indexOf(filterText) > -1) {
-                        return {
-                            key,
-                            value
+            computed: {
+                infoList() {
+                    let filterText = this.data.get('filterText');
+                    let selectedMutationInfo = this.data.get('selectedMutationInfo') || [];
+                    let infoList = Object.entries(selectedMutationInfo).map(([key, value]) => {
+                        if (key !== 'diff' && key !== 'payload' && JSON.stringify([key, value]).indexOf(filterText) > -1) {
+                            return {
+                                key,
+                                value
+                            }
                         }
-                    }
-                });
-                return infoList;
+                    });
+                    return infoList;
+                }
+            },
+
+            dispatchHandler() {
+                let bridge = this.data.get('bridge');
+                let storeName = this.data.get('storeName');
+                let actionName = this.data.get('selectedMutationInfo.actionName');
+                let payload = this.ref('payload').viewer().value;
+                let message = {
+                    storeName,
+                    actionName,
+                    payload
+                }
+                bridge.send('Store.dispatchAction', message);
+            },
+            components: {
+                'san-divider': Divider,
+                'san-sub-header': pageheader,
+                'san-switch': Switch,
+                'san-divider': Divider,
+                'san-icon': Icon,
+                'san-row': Grid.Row,
+                'san-col': Grid.Col,
+                'san-button': Button,
+                'san-json-tree-view': JsonTreeView,
+                'san-collapse': Collapse,
+                'san-collapse-panel': Collapse.Panel,
+                'san-tooltip': Tooltip,
+            },
+
+            initData() {
+                return {
+                    diffState: [true],
+                    filterText: ''
+                };
+            },
+
+            dataTypes: {
+                diffState: DataTypes.arrayOf(DataTypes.bool),
+                filterText: DataTypes.string
             }
-        },
-
-        dispatchHandler() {
-            let bridge = this.data.get('bridge');
-            let storeName = this.data.get('storeName');
-            let actionName = this.data.get('selectedMutationInfo.actionName');
-            let payload = this.ref('payload').viewer().value;
-            let message = {
-                storeName,
-                actionName,
-                payload
-            }
-            bridge.send('Store.dispatchAction', message);
-        },
-        components: {
-            'san-divider': Divider,
-            'san-sub-header': pageheader,
-            'san-switch': Switch,
-            'san-divider': Divider,
-            'san-icon': Icon,
-            'san-row': Grid.Row,
-            'san-col': Grid.Col,
-            'san-button': Button,
-            'san-json-tree-view': JsonTreeView,
-            'san-collapse': Collapse,
-            'san-collapse-panel': Collapse.Panel,
-            'san-tooltip': Tooltip,
-        },
-
-        initData() {
-            return {
-                diffState: [true],
-                filterText: ''
-            };
-        },
-
-        dataTypes: {
-            diffState: DataTypes.arrayOf(DataTypes.bool),
-            filterText: DataTypes.string
         }
-    }
-)
+    )
 
 </script>
 
 <style lang="less">
-.payload-wrapper {
-    .payload {
-        margin: 3px 0;
-        .payload-header {
-            .santd-btn {
-                margin: 4px 0;
-                height: 30px;
+    @import '@san-devtools/views/style/variables.less';
+    @switch-bg-color: rgba(25, 104, 250, 1);
+    .mutation-wrap {
+        .payload-wrapper {
+            .payload {
+                margin: 3px 0;
+                .payload-header {
+                    .santd-btn {
+                        margin: 4px 0;
+                        height: 28px;
+                        border-radius: 24px;
+                    }
+                    .santd-btn-primary {
+                        background-color: @button-color;
+                    }
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    color: @button-color;
+                    font-size: 120%;
+                    margin-bottom: 5px;
+                }
             }
-            .santd-btn-primary {
-                background-color: #3898b9;
-            }
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: #3898b9;
-            font-size: 120%;
-            border-bottom: 2px solid #3898b9;
-            margin-bottom: 5px;
         }
-    }
-}
-.switch-wrapper {
-    margin: 5px 0;
-    .new {
-        text-align: end;
-    }
-    .switch {
-        > span {
-            width: 100%;
+        .switch-wrapper {
+            margin: 15px 0;
+            .new {
+                text-align: end;
+            }
+            .switch {
+                > span {
+                    width: 100%;
+                    height: 6px;
+                }
+            }
+            .santd-switch-checked:after {
+                top: 50%;
+                left: 100%;
+                transform: translate(-100%, -50%);
+            }
+            .santd-switch-checked {
+                background-color: @switch-bg-color !important;
+            }
+        }
+        .santd-switch .santd-switch-handler,
+        .santd-switch:after {
+            top: 50% !important;
+            transform: translateY(-50%);
+            width: 16px;
             height: 16px;
         }
+        .path {
+            margin-bottom: 10px;
+            .target {
+                padding: 2px 10px;
+                border-radius: 12px;
+                color: #fff;
+                font-size: 12px;
+                background-color: @target-color;
+            }
+        }
+        .store-name {
+            color: @color-sd-grey;
+            width: 100%;
+            text-align: center;
+            font-size: 14px;
+            margin: 20px 0;
+        }
+        .santd-collapse-extra > span {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            & > span {
+                font-size: 24px;
+                line-height: 10px;
+            }
+        }
     }
-    .santd-switch-checked:after {
-        top: 50%;
-        left: 100%;
-        transform: translate(-100%, -50%);
-    }
-}
-.santd-switch .santd-switch-handler, .santd-switch:after {
-    top: 50% !important;
-    transform: translateY(-50%);
-}
-.target {
-    padding: 0 3px;
-    border-radius: 5px;
-    background-color: rgba(255, 163, 24, 0.5);
-}
 </style>

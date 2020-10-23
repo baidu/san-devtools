@@ -108,10 +108,13 @@ export default connectStore({
 </script>
 
 <style lang="less">
+@import '@san-devtools/views/style/variables.less';
+@content-bg-color: rgba(246,251,255,1);
 .content {
+    background-color: @content-bg-color;
     position: absolute;
     height: 100%;
-    top: 46px;
+    top: @nav-height;
     bottom: 0;
     width: 100%;
     .container {

@@ -1,13 +1,13 @@
 
 @import '@san-devtools/views/style/variables.less';
 .custom .sm-tree-view-item > .pad > .sm-touch-ripple {
-    height: 24px !important;
+    height: 31px !important;
 }
 .custom .sm-tree-view-item > .pad > .sm-touch-ripple.selected {
-    background-color: @bg-color-selected !important;
+    background-color: @ripple-bg-color-selected !important;
 }
 .custom .sm-tree-view-item > .pad > .sm-touch-ripple:hover {
-    background-color: @bg-color-hover !important;
+    background-color: @ripple-bg-color-hover !important;
 }
 .custom .sm-tree-view-item > .pad > .sm-touch-ripple:hover ~ .sm-tree-view-item-content,
 .custom
@@ -27,24 +27,20 @@
     top: 50%;
     transform: translateY(-50%);
     padding: 2px 4px;
-    border-radius: 3px;
+    border-radius: 9px;
     color: #fff;
-    background-color: @bg-color-secondary-text-selected;
+    background-color: @secondary-text-bg-color;
     max-width: 100px;
     max-height: 18px;
     font-size: 12px;
+    font-weight: 100;
+    height: 16px;
 }
 .custom .sm-tree-view-item > .pad.selected > .sm-tree-view-item-content.selected,
 .custom .sm-tree-view-item > .pad.selected > .sm-tree-view-item-content.selected > *,
 .custom .sm-tree-view-item > .pad.selected > .sm-tree-view-item-expand,
 .custom .sm-tree-view-item > .pad.selected > .sm-tree-view-item-content.selected .sm-checkbox-icon > svg {
     color: #fff;
-}
-.custom .sm-tree-view-item > .pad.selected > .sm-tree-view-item-content > .sm-tree-view-item-secondary-text {
-    background-color: #fff !important;
-    color: @font-color-secondary-text !important;
-    display: inline-block;
-    line-height: 1;
 }
 .custom .sm-tree-view-item > .pad .sm-checkbox:not(.disabled) .sm-checkbox-icon > svg {
     color: #000;

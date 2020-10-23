@@ -1,0 +1,87 @@
+<template>
+    <san-input
+        class="san-devtool-input"
+        placeholder="{{placeholder}}"
+        value="{=filterText=}"
+    >
+        <div class="search" slot="prefix" />
+    </san-input>
+</template>
+<script>
+import san, {DataTypes} from 'san';
+import {Input, Icon} from 'santd';
+export default {
+    components: {
+        'san-input': Input,
+        'san-icon': Icon
+    },
+
+    inited() {
+    },
+
+    initData() {
+        return {
+            filterText: ''
+        };
+    }
+}
+</script>
+<style lang="less">
+@placeholder-font-color: rgba(25, 104, 250, 0.3);
+@caret-color: rgba(25, 104, 250, 1);
+@placeholder-font-size: 16px;
+@bg-color: rgba(246,251,255,1);
+.san-devtool-input {
+    .search {
+        width: 20px;
+        height: 20px;
+        background-image: url('../../icons/search.svg');
+        background-size: cover;
+        background-repeat: no-repeat;
+    }
+    input::-webkit-input-placeholder{
+        padding-left: 1px;
+        color: @placeholder-font-color;
+        font-size: @placeholder-font-size;
+    }
+    input::-moz-placeholder{   /* Mozilla Firefox 19+ */
+        padding-left: 1px;
+        color: @placeholder-font-color;
+        font-size: @placeholder-font-size;
+    }
+    input:-moz-placeholder{    /* Mozilla Firefox 4 to 18 */
+        padding-left: 1px;
+        color: @placeholder-font-color;
+        font-size: @placeholder-font-size;
+    }
+    input:-ms-input-placeholder{  /* Internet Explorer 10-11 */
+        padding-left: 1px;
+        color: @placeholder-font-color;
+        font-size: @placeholder-font-size;
+    }
+    input {
+        // TODO: 与 UE 确认
+        caret-color: @caret-color;
+    }
+    .santd-input-affix-wrapper .santd-input-prefix {
+        left: 18px;
+    }
+    .santd-input-affix-wrapper .santd-input:focus {
+        background: #FFFFFF;
+        box-shadow: 0 3px 20px 0 rgba(231,231,231,0.50);
+        background-color: #fff;
+    }
+    .santd-input-affix-wrapper {
+        height: 32px;
+    }
+    .santd-input-affix-wrapper .santd-input{
+        border-radius: 22px;
+        border: 0px;
+        box-shadow: 0 0 0 1.5px rgba(24, 144, 255, 0.2);
+        background-color: @bg-color;
+    }
+    .santd-input-affix-wrapper .santd-input:not(:first-child) {
+        padding-left: 46px;
+    }
+}
+</style>
