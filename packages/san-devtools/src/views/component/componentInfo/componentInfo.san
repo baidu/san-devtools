@@ -208,13 +208,13 @@ export default connectStore({
             .version {
                 margin-top: 2.5vw;
                 justify-content: center;
-                font-size: 3vw;
+                font-size: 2vw;
                 color: #333333;
             }
         }
         .guide {
             margin-top: 3vw;
-            font-size: 2vw;
+            font-size: 1.5vw;
             color: #999999;
             text-align: center;
             line-height: 3vw;
@@ -271,7 +271,7 @@ export default connectStore({
             width: 100%;
             > .ex-panel-wrapper {
                 padding: 0 10px;
-                margin-bottom: 10px;
+                margin-bottom: 20px;
                 box-sizing: border-box;
                 width: 100%;
                 user-select: none;

@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import {Grid, Modal, Button} from 'santd';
+import {Grid, Modal} from 'santd';
 
 import Navigation from '@san-devtools/views/navigation.san';
 import Component from '@san-devtools/views/component/component.san';
@@ -62,7 +62,6 @@ export default connectStore({
     {
         components: {
             'san-row': Grid.Row,
-            's-button': Button,
             'sandevtool-navigation': Navigation,
             'sandevtool-component': Component,
             'sandevtool-store': Store,

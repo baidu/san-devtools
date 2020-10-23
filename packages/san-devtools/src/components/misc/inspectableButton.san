@@ -69,6 +69,10 @@ export default {
     margin: 5px;
     .santd-btn {
         height: 26px;
+        border-radius: 12px;
+    }
+    .santd-btn-primary {
+        border: 0;
     }
 }
 </style>

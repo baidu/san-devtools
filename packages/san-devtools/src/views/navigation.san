@@ -23,13 +23,11 @@
             <san-tabs
                 defaultActiveKey="{{currentTab}}"
                 activeKey="{=currentTab=}"
-                s-ref="tabs"
             >
                 <san-tab
                     s-for="item, index in tabs"
                     tab="{{item.label}}"
                     key="{{item.value}}"
-                    s-ref="tab_{{index}}"
                 >
                 </san-tab>
             </san-tabs>

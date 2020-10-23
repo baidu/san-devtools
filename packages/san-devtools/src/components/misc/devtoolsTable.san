@@ -223,6 +223,9 @@ export default connectStore({
             line-height: 1;
             font-size: 12px;
         }
+        .santd-btn-primary {
+            border: 0;
+        }
     }
     .event-name {
         color: @button-color;

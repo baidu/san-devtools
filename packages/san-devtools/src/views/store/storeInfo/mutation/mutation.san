@@ -210,6 +210,7 @@
                     }
                     .santd-btn-primary {
                         background-color: @button-color;
+                        border: 0;
                     }
                     display: flex;
                     justify-content: space-between;

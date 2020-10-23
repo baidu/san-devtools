@@ -147,6 +147,7 @@ export default connectStore({
     }
     .santd-btn-primary {
         background-color: @button-color;
+        border: 0;
     }
 }
 .actions-wrapper {
