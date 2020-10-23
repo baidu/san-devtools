@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="40px" height="40px" viewBox="0 0 40 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>icon / 40 / 储存已选择</title>
+    <g id="icon-/-40-/-储存已选择" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="编组-2" transform="translate(5.000000, 3.000000)">
+            <rect id="矩形" fill="#06CE96" opacity="0.5" x="5" y="0" width="27" height="27" rx="6"></rect>
+            <g id="储存" transform="translate(0.000000, 2.000000)" stroke="#1968FA" stroke-width="2">
+                <rect id="矩形" x="1" y="1" width="28" height="28" rx="6"></rect>
+                <path d="M23,1 L23,7 C23,7.55228475 22.7761424,8.05228475 22.4142136,8.41421356 C22.0522847,8.77614237 21.5522847,9 21,9 L21,9 L9,9 C8.44771525,9 7.94771525,8.77614237 7.58578644,8.41421356 C7.22385763,8.05228475 7,7.55228475 7,7 L7,7 L7,1 L23,1 Z" id="矩形"></path>
+                <line x1="19" y1="4" x2="19" y2="6" id="路径-6" stroke-linecap="round"></line>
+            </g>
+        </g>
+    </g>
+</svg>

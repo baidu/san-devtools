@@ -23,13 +23,8 @@
             <san-tabs
                 defaultActiveKey="{{currentTab}}"
                 activeKey="{=currentTab=}"
+                tabs="{{tabs}}"
             >
-                <san-tab
-                    s-for="item, index in tabs"
-                    tab="{{item.label}}"
-                    key="{{item.value}}"
-                >
-                </san-tab>
             </san-tabs>
         </section>
         <div class="icon-group">
@@ -65,9 +60,10 @@
 
 <script>
 import san, {DataTypes} from 'san';
+import Tabs from '@san-devtools/components/tabs/tabs.san';
 import {connectStore, store} from '@san-devtools/store/index';
 import {versionCompare, isChromePanel, setSettings, getSettings} from '@san-devtools/utils/index';
-import {Grid, Icon, Avatar, AppBar, Button, Tabs, Tooltip, Popover, Checkbox} from 'santd';
+import {Grid, Icon, Avatar, AppBar, Button, Tooltip, Popover, Checkbox} from 'santd';
 
 
 export default connectStore({
@@ -82,7 +78,6 @@ export default connectStore({
             'san-button': Button,
             'san-icon': Icon,
             'san-tabs': Tabs,
-            'san-tab': Tabs.TabPane,
             'san-tooltip': Tooltip,
             'san-popover': Popover,
             'san-checkboxgroup': Checkbox.Group,
@@ -250,6 +245,7 @@ export default connectStore({
     }
     .main-tabs {
         min-width: 170px;
+        overflow: auto;
         .santd-tabs-nav-wrap {
             user-select: none;
             margin-bottom: 0;
@@ -281,10 +277,10 @@ export default connectStore({
             width: 20px;
             height: 20px;
             display: inline-block;
-            margin-right: 30px;
         }
         .help-desc {
             background-image: url('../icons/help.svg');
+            margin-left: 30px;
         }
         .setting {
             background-image: url('../icons/setting.svg');
