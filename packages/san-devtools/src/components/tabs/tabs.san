@@ -1,13 +1,16 @@
 <template>
     <div class="san-devtools-tabs">
         <div class="san-devtools-tabs-content">
-            <div class="san-devtools-tabs-content-item {{activeKey === tab.value? 'san-devtools-tabs-active' : 'grey'}}" s-for="tab, index in tabs">
+            <div 
+                on-click="onChangeTab(tab.value)"
+                class="san-devtools-tabs-content-item {{activeKey === tab.value? 'san-devtools-tabs-active' : 'grey'}}"
+                s-for="tab, index in tabs"
+            >
                 <san-tooltip>
                     <span slot="title">
                         {{ tab.label }}
                     </span>
                     <span
-                        on-click="onChangeTab(tab.value)"
                         class="tab-{{tab.value}}-{{activeKey === tab.value? 'color' : 'grey'}}"
                     ></span>
                 </san-tooltip>
