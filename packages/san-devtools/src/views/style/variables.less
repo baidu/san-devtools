@@ -1,23 +1,43 @@
 // 命名：【属性】-【属性值】-【级别】
+@color-blue-l1: rgba(25, 104, 250, .1);
 @color-blue-l2: rgba(25, 104, 250, 0.2);
 @color-blue-l3: rgba(25, 104, 250, 0.3);
+@color-blue-l10: rgba(25, 104, 250, 1);
+@color-black-3: #333333;
+@color-grey: #999999;
+@color-white: #ffffff;
+@color-white-e: #eeeeee;
 
-@button-color: rgba(25, 104, 250, 1);
-@color-sd-grey: #999999;
 
-/* =============== navigation Light ================= */
+@button-color: @color-blue-l10;
+@color-sd-grey: @color-grey;
+
+/* ============================== navigation Light ================================ */
 // 字体颜色
-@nav-font-color:#1968FA;
-@nav-version-font-color: #999999;
+@nav-font-color:@color-blue-l10;
+@nav-version-font-color: @color-grey;
 
 // height
 @nav-height: 60px;
 
 // 背景颜色
-@bg-color:#FFFFFF;
-@ink-bar-bg-color: #1968FA;
+@nav-disconnected-bg-color:rgba(192, 192, 192, 0.7) ;
+@nav-bg-color: @color-white;
+@setting-bg-color: @color-blue-l3;
+@ink-bar-bg-color: @color-blue-l10;
+@popover-bg-color: rgba(255, 255, 255, 1);
 
-/* =============== treeView Light ================= */
+// 阴影颜色
+@popover-shadow-color: rgba(189, 189, 189, 0.3);
+
+// border 颜色
+@popover-border-top-color: @color-white-e;
+
+// checkbox 颜色
+@checkbox-border-color: @color-grey;
+@checkbox-bg-color: #1890ff;
+
+/* ============================== treeView Light ================================ */
 // touch-ripple bg
 @ripple-bg-color-selected: rgba(35, 110, 255, 0.2); // 
 @ripple-bg-color-hover: rgba(35, 110, 255, 0.08);
@@ -33,35 +53,21 @@
 // expend icon color
 @expand-icon-color: rgba(154, 154, 154, 1);
 
-/* =============== 卡片 Light ================= */
+/* ============================== 卡片 Light ================================ */
 // info
-@collapse-bg-color: #fff;
-@title-font-color: rgba(25, 104, 250, 1);
+@collapse-bg-color: @color-white;
+@title-font-color: @color-blue-l10;
 
-/* =============== JSON Light ================= */
+/* ============================== JSON Light ================================ */
 @json-font-color-yellow: #FF933A;
 @json-font-color-red: #ff5050;
-@json-font-color-blue: #1968FA;
+@json-font-color-blue: @color-blue-l10;
 
-/* =============== 函数 ================= */
-@func-bg-color: rgba(25, 104, 250, .1);;
-@func-font-color: rgba(25, 104, 250, 1);
+/* ============================== 函数 ================================ */
+@func-bg-color: @color-blue-l1;
+@func-font-color: @color-blue-l10;
 @tag-color: #FF933A;
 @target-color: #FF933A;
-
-/* ----------------------------------------------- */
-// 颜色
-// @color-sd-blue: rgba(25, 104, 250, 1);
-// @color-sd-black: rgba(51,51,51,1);
-// @color-sd-grey: rgba(140,140,140,1);
-
-
-// // 字体颜色
-// @font-color: @color-sd-blue;
-// @font-search-color: rgba(25, 104, 250, 0.5);
-
-// // 背景颜色
-// @bg-color: rgba(25, 104, 250, 0.3);
 
 
 

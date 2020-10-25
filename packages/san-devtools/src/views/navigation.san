@@ -59,295 +59,267 @@
 </template>
 
 <script>
-import san, {DataTypes} from 'san';
-import Tabs from '@san-devtools/components/tabs/tabs.san';
-import {connectStore, store} from '@san-devtools/store/index';
-import {versionCompare, isChromePanel, setSettings, getSettings} from '@san-devtools/utils/index';
-import {Grid, Icon, Avatar, AppBar, Button, Tooltip, Popover, Checkbox} from 'santd';
+    import san, { DataTypes } from 'san';
+    import Tabs from '@san-devtools/components/tabs/tabs.san';
+    import { connectStore, store } from '@san-devtools/store/index';
+    import { versionCompare, isChromePanel, setSettings, getSettings } from '@san-devtools/utils/index';
+    import { Grid, Icon, Avatar, AppBar, Button, Tooltip, Popover, Checkbox } from 'santd';
 
 
-export default connectStore({
-    sanVersion: 'sanVersion',
-    bridge: 'bridge'
-})(
-    {
-        components: {
-            'san-col': Grid.Col,
-            'san-row': Grid.Row,
-            'san-avatar': Avatar,
-            'san-button': Button,
-            'san-icon': Icon,
-            'san-tabs': Tabs,
-            'san-tooltip': Tooltip,
-            'san-popover': Popover,
-            'san-checkboxgroup': Checkbox.Group,
-            'san-checkbox': Checkbox,
-        },
+    export default connectStore({
+        sanVersion: 'sanVersion',
+        bridge: 'bridge'
+    })(
+        {
+            components: {
+                'san-col': Grid.Col,
+                'san-row': Grid.Row,
+                'san-avatar': Avatar,
+                'san-button': Button,
+                'san-icon': Icon,
+                'san-tabs': Tabs,
+                'san-tooltip': Tooltip,
+                'san-popover': Popover,
+                'san-checkboxgroup': Checkbox.Group,
+                'san-checkbox': Checkbox,
+            },
 
-        initData() {
-            return {
-                defaultValue: [], // checkboxgroup 无法与 slot 的 checkbox 同步
-                options: [
-                    {label: 'Readonly for component data.', value: 'Setting:component', checked: false},
-                    {label: 'Readonly for store.', value: 'Setting:store', checked: false}
-                ],
-                setting: false,
-                smallTabItem: false,
-                tabs: [
-                    {
-                        label: 'Component',
-                        icon: 'appstore',
-                        value: 'component'
-                    },
-                    {
-                        label: 'Store',
-                        icon: 'store',
-                        value: 'store'
-                    },
-                    {
-                        label: 'History',
-                        icon: 'history',
-                        value: 'history'
-                    }
-                ],
-                currentTab: 'component'
-            }
-        },
-
-        created() {
-            this.watch('currentTab', currentTab => {
-                store.dispatch('setActiveTab', currentTab);
-            });
-            this.watch('sanVersion', sanVersion => {
-                if (versionCompare(sanVersion, '3.9.4') >= 0) {
-                    this.data.splice(
-                        'tabs',
-                        [
-                            3,
-                            0,
-                            {
-                                label: 'Event',
-                                icon: 'event',
-                                value: 'event'
-                            },
-                            {
-                                label: 'Message',
-                                icon: 'message',
-                                value: 'message'
-                            }
-                        ]
-                    );
-                    this.data.splice(
-                        'options',
-                        [
-                            2,
-                            0,
-                            {label: 'Readonly for event.', value: 'Setting:event', checked: false},
-                            {label: 'Readonly for messages.', value: 'Setting:messages', checked: false}
-                        ]
-                    );
+            initData() {
+                return {
+                    defaultValue: [], // checkboxgroup 无法与 slot 的 checkbox 同步
+                    options: [
+                        { label: 'Readonly for component data.', value: 'Setting:component', checked: false },
+                        { label: 'Readonly for store.', value: 'Setting:store', checked: false }
+                    ],
+                    setting: false,
+                    smallTabItem: false,
+                    tabs: [
+                        {
+                            label: 'Component',
+                            icon: 'appstore',
+                            value: 'component'
+                        },
+                        {
+                            label: 'Store',
+                            icon: 'store',
+                            value: 'store'
+                        },
+                        {
+                            label: 'History',
+                            icon: 'history',
+                            value: 'history'
+                        }
+                    ],
+                    currentTab: 'component'
                 }
-                this.initOptions()
-            });
-        },
+            },
 
-        initOptions() {
-            if (isChromePanel) {
-                chrome.runtime.sendMessage(
-                    {
-                        event: 'Setting.get'
-                    },
-                    this.updateSetting.bind(this)
-                );
-            } else {
-                let localStorage = window.localStorage;
-                this.updateSetting(localStorage['settingData']);
-            }
-        },
-
-        updateSetting(res) {
-            let settings = getSettings(res);
-            this.data.set('defaultValue', settings);
-            let options = this.data.get('options');
-            let newOptions = options.map(item => {
-                if (settings.indexOf(item.value) > -1) {
-                    return Object.assign({}, item, {checked: true});
-                }
-                return item;
-            });
-            this.data.set('options', newOptions);
-            store.dispatch('settings', res);
-        },
-
-        handleChange(checkedValues) {
-            let settingData = setSettings(checkedValues);
-            let bridge = this.data.get('bridge');
-            if (isChromePanel) {
-                chrome.runtime.sendMessage({
-                    event: 'Setting.set',
-                    settingData: settingData
+            created() {
+                this.watch('currentTab', currentTab => {
+                    store.dispatch('setActiveTab', currentTab);
                 });
-            } else {
-                localStorage['settingData'] = settingData;
-            }
-            store.dispatch('settings', settingData);
-        },
+                this.watch('sanVersion', sanVersion => {
+                    if (versionCompare(sanVersion, '3.9.4') >= 0) {
+                        this.data.splice(
+                            'tabs',
+                            [
+                                3,
+                                0,
+                                {
+                                    label: 'Event',
+                                    icon: 'event',
+                                    value: 'event'
+                                },
+                                {
+                                    label: 'Message',
+                                    icon: 'message',
+                                    value: 'message'
+                                }
+                            ]
+                        );
+                        this.data.splice(
+                            'options',
+                            [
+                                2,
+                                0,
+                                { label: 'Readonly for event.', value: 'Setting:event', checked: false },
+                                { label: 'Readonly for messages.', value: 'Setting:messages', checked: false }
+                            ]
+                        );
+                    }
+                    this.initOptions()
+                });
+            },
 
-        dataTypes: {
-            sanVersion: DataTypes.string,
-            smallTabItem: DataTypes.bool,
-            tabs: DataTypes.arrayOf(DataTypes.objectOf(DataTypes.string))
+            initOptions() {
+                if (isChromePanel) {
+                    chrome.runtime.sendMessage(
+                        {
+                            event: 'Setting.get'
+                        },
+                        this.updateSetting.bind(this)
+                    );
+                } else {
+                    let localStorage = window.localStorage;
+                    this.updateSetting(localStorage['settingData']);
+                }
+            },
+
+            updateSetting(res) {
+                let settings = getSettings(res);
+                this.data.set('defaultValue', settings);
+                let options = this.data.get('options');
+                let newOptions = options.map(item => {
+                    if (settings.indexOf(item.value) > -1) {
+                        return Object.assign({}, item, { checked: true });
+                    }
+                    return item;
+                });
+                this.data.set('options', newOptions);
+                store.dispatch('settings', res);
+            },
+
+            handleChange(checkedValues) {
+                let settingData = setSettings(checkedValues);
+                let bridge = this.data.get('bridge');
+                if (isChromePanel) {
+                    chrome.runtime.sendMessage({
+                        event: 'Setting.set',
+                        settingData: settingData
+                    });
+                } else {
+                    localStorage['settingData'] = settingData;
+                }
+                store.dispatch('settings', settingData);
+            },
+
+            dataTypes: {
+                sanVersion: DataTypes.string,
+                smallTabItem: DataTypes.bool,
+                tabs: DataTypes.arrayOf(DataTypes.objectOf(DataTypes.string))
+            }
         }
-    }
-);
+    );
 
 </script>
 
 <style lang="less">
-@import '@san-devtools/views/style/variables.less';
-@setting-bg-color: rgba(25, 104, 250, .3);
-.navigation {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: @bg-color;
-    .navigation-header {
-        height: @nav-height;
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0 20px;
-        font-size: 18px;
-        .logo {
-            padding: 0;
-            > span {
-                display: inline-flex;
-            }
-            .title {
-                padding-left: 20px;
-                font-size: 24px;
-                line-height: 20px;
-                color: @nav-font-color;
-                align-self: center;
-            }
-            .version {
-                padding-left: 8px;
-                font-size: 12px;
-                color: @nav-version-font-color;
-                text-align: left;
-                line-height: 12px;
-                align-self: center;
-                top: 3px;
-                position: relative;
-            }
-        }
-    }
-    .main-tabs {
-        min-width: 170px;
-        overflow: auto;
-        .santd-tabs-nav-wrap {
-            user-select: none;
-            margin-bottom: 0;
-        }
-        .santd-tabs-bar {
-            margin: 0;
-            border: 0;
-        }
-        .santd-tabs-nav .santd-tabs-tab {
-            padding: 18px 16px;
-            color: #000;
-        }
-        .santd-tabs-tab.santd-tabs-tab-active {
-            color: @nav-font-color;
-        }
-        .santd-tabs-ink-bar {
-            height: 4px;
-            position: relative;
-            background-color: @ink-bar-bg-color;
-        }
-    }
-    .icon-group {
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        .setting, .help-desc {
-            background-repeat: no-repeat;
-            background-size: cover;
-            width: 20px;
-            height: 20px;
-            display: inline-block;
-        }
-        .help-desc {
-            background-image: url('../icons/help.svg');
-            margin-left: 30px;
-        }
-        .setting {
-            background-image: url('../icons/setting.svg');
-        }
-    }
-}
-.navigation-disconnected {
-    background-color: rgba(192, 192, 192, 0.7);
-}
-div .santd-popover-placement-bottomRight > .santd-popover-content .santd-popover-arrow {
-    right: 34px !important;
-}
-.santd-popover {
-    .santd-checkbox {
-        top: 0;
-    }
-    .navigation-popover-title {
+    @import '@san-devtools/views/style/variables.less';
+    .navigation {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        .confirm {
-            color: rgb(24, 144, 255);
-            cursor: pointer;
+        background-color: @nav-bg-color;
+        .navigation-header {
+            height: @nav-height;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 18px;
+            .logo {
+                padding: 0;
+                > span {
+                    display: inline-flex;
+                }
+                .title {
+                    padding-left: 20px;
+                    font-size: 24px;
+                    line-height: 20px;
+                    color: @nav-font-color;
+                    align-self: center;
+                }
+                .version {
+                    padding-left: 8px;
+                    font-size: 12px;
+                    color: @nav-version-font-color;
+                    text-align: left;
+                    line-height: 12px;
+                    align-self: center;
+                    top: 3px;
+                    position: relative;
+                }
+            }
+        }
+        .main-tabs {
+            overflow: auto;
+        }
+        .icon-group {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 28px;
+            .setting,
+            .help-desc {
+                background-repeat: no-repeat;
+                background-size: cover;
+                width: 20px;
+                height: 20px;
+                display: inline-block;
+            }
+            .help-desc {
+                background-image: url('../icons/help.svg');
+                margin-left: 30px;
+            }
+            .setting {
+                cursor: pointer;
+                background-image: url('../icons/setting.svg');
+            }
         }
     }
-    .santd-popover-inner-content {
-        padding: 0 0;
+    .navigation-disconnected {
+        background-color: @nav-disconnected-bg-color;
     }
-    .navigation-checkbox-wrap {
-        padding: 12px 16px;
-        &:hover {
-            background-color: @setting-bg-color;
-        }
+    div .santd-popover-placement-bottomRight > .santd-popover-content .santd-popover-arrow {
+        right: 34px !important;
+    }
+    .santd-popover {
         .santd-checkbox {
-            // 避免 icon 被挤压
-            top: -1px;
+            top: 0;
         }
-        &:first-child {
-            border-top-left-radius: 9px;
-            border-top-right-radius: 9px;
+        .santd-popover-inner-content {
+            padding: 0 0;
         }
-        &:last-child {
-            border-bottom-right-radius: 9px;
-            border-bottom-left-radius: 9px;
-        }
-        .santd-checkbox-checked .santd-checkbox-inner {
-            background-color: #1890ff;
-            border: 1px solid #999999;
-        }
-        .santd-checkbox-wrapper {
-            .santd-checkbox-inner {
-                border-radius: 50%;
-                width: 9px;
-                height: 9px;
+        .navigation-checkbox-wrap {
+            padding: 12px 16px;
+            &:hover {
+                background-color: @setting-bg-color;
             }
-            .santd-checkbox-inner::after {
-                display: none;
+            .santd-checkbox {
+                // 避免 icon 被挤压
+                top: -1px;
+            }
+            &:first-child {
+                border-top-left-radius: 9px;
+                border-top-right-radius: 9px;
+            }
+            &:last-child {
+                border-bottom-right-radius: 9px;
+                border-bottom-left-radius: 9px;
+            }
+            .santd-checkbox-checked .santd-checkbox-inner {
+                background-color: @checkbox-bg-color;
+                border: 1px solid @checkbox-border-color;
+            }
+            .santd-checkbox-wrapper {
+                .santd-checkbox-inner {
+                    border-radius: 50%;
+                    width: 9px;
+                    height: 9px;
+                }
+                .santd-checkbox-inner::after {
+                    display: none;
+                }
             }
         }
+        .navigation-checkbox-wrap:not(:first-child) {
+            border-top: 1px solid @popover-border-top-color;
+        }
+        .santd-popover-inner {
+            border-radius: 9px;
+            background: @popover-bg-color;
+            box-shadow: 0 2px 8px 0 @popover-shadow-color;
+        }
     }
-    .navigation-checkbox-wrap:not(:first-child) {
-        border-top: 1px solid #EEEEEE;
-    }
-    .santd-popover-inner {
-        border-radius: 9px;
-        background: rgba(255,255,255,1);
-        box-shadow: 0 2px 8px 0 rgba(189,189,189,0.30);
-    }
-}
 </style>

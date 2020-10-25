@@ -27,10 +27,14 @@ export default {
 }
 </script>
 <style lang="less">
-@placeholder-font-color: rgba(25, 104, 250, 0.3);
-@caret-color: rgba(25, 104, 250, 1);
+@import '@san-devtools/views/style/variables.less';
+@placeholder-font-color: @color-blue-l3;
+@caret-color: @color-blue-l10;
 @placeholder-font-size: 16px;
-@bg-color: rgba(246,251,255,1);
+@input-focus-bg-color: @color-white;
+@input-focus-shadow-color: rgba(231,231,231,0.50);
+@input-bg-color: rgba(246,251,255,1);
+@input-shadow-color: rgba(24, 144, 255, 0.2);
 .san-devtool-input {
     .search {
         width: 20px;
@@ -67,9 +71,8 @@ export default {
         left: 18px;
     }
     .santd-input-affix-wrapper .santd-input:focus {
-        background: #FFFFFF;
-        box-shadow: 0 3px 20px 0 rgba(231,231,231,0.50);
-        background-color: #fff;
+        box-shadow: 0 3px 20px 0 @input-focus-shadow-color;
+        background-color: @input-focus-bg-color;
     }
     .santd-input-affix-wrapper {
         height: 32px;
@@ -77,8 +80,8 @@ export default {
     .santd-input-affix-wrapper .santd-input{
         border-radius: 22px;
         border: 0px;
-        box-shadow: 0 0 0 1.5px rgba(24, 144, 255, 0.2);
-        background-color: @bg-color;
+        box-shadow: 0 0 0 1.5px @input-shadow-color;
+        background-color: @input-bg-color;
     }
     .santd-input-affix-wrapper .santd-input:not(:first-child) {
         padding-left: 46px;

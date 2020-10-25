@@ -67,6 +67,7 @@
 
 <style lang="less">
     @import '@san-devtools/views/style/variables.less';
+    @collapse-content-front-color: @color-black-3;
     @title-wrapper-height: 32px;
     @title-wrapper-margin-bottom: 12px;
     .sd-store-info {
@@ -76,14 +77,14 @@
             height: 100%;
             width: 100%;
             border-radius: 23px;
-            background-color: #fff;
+            background-color: @color-white;
             box-sizing: border-box;
             padding: 5vw;
             text-align: center;
             .guide {
                 margin-top: 3vw;
                 font-size: 1.5vw;
-                color: #999999;
+                color: @color-grey;
                 text-align: center;
                 line-height: 3vw;
             }
@@ -100,7 +101,7 @@
                     border: 0;   
                 }
                 .santd-collapse-item:last-child > .santd-collapse-content {
-                    border-top: 1px solid #EEEEEE;
+                    border-top: 1px solid @color-white-e;
                     border-bottom-right-radius: 18px;
                     border-bottom-left-radius: 18px;
                 }
@@ -124,12 +125,12 @@
                 .santd-collapse > .santd-collapse-item > .santd-collapse-header .santd-collapse-arrow {
                     right: 24px;
                     left: auto;
-                    color: #999999;
+                    color: @color-grey;
                 }
                 .santd-collapse-content > .santd-collapse-content-box {
                     overflow-y: auto;
                     padding: 18px 36px;
-                    color: #333333;
+                    color: @collapse-content-front-color;
                 }
                 overflow: auto;
                 height: calc(100% - @title-wrapper-height - @title-wrapper-margin-bottom);

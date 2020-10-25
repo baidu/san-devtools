@@ -75,6 +75,7 @@ export default {
 </script>
 
 <style lang="less">
+@gutter-bg-color: rgba(0, 0, 0, 0.04);
 @split-bg-color: #E5E5E5;
 @split-button-more: 105px;
 @split-button-less: 5px;
@@ -100,20 +101,21 @@ export default {
         width: 100%;
         cursor: ns-resize;
         .gutter-vertical-inner {
+            border-radius: 3.5px;
             height: 100%;
             width:  @split-button-more;
             margin: 0 auto;
-            background-color: rgba(0, 0, 0, 0.04);
+            background-color: @gutter-bg-color;
         }
     }
     .gutter-horizontal {
         height: 100%;
         float: left;
-        background-color: rgba(0, 0, 0, 0.04);
+        background-color: @gutter-bg-color;
         cursor: ew-resize;
     }
     .gutter-vertical {
-        background-color: rgba(0, 0, 0, 0.04);
+        background-color: @gutter-bg-color;
         cursor: ns-resize;
     }
     .sd-info-wrapper, .sd-tree-wrapper {

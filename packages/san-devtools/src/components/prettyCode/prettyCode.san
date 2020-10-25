@@ -28,7 +28,8 @@
 </script>
 <style lang="less">
     @import '@san-devtools/views/style/variables.less';
-    @hljs-title-color: ;
+    @hljs-title-color: #ff5050;
+    @language-js-color: #444444;
     .deps-wrapper {
         margin-bottom: 10px;
     }
@@ -38,14 +39,14 @@
     }
     pre {
         .language-js {
-            color: #444;
+            color: @language-js-color;
             display: block;
             overflow-x: auto;
             padding: 0.5em;
             border-radius: 12px;
             background: @func-bg-color!important;
             .hljs-title, .hljs-string {
-                color:  #ff5050;
+                color: @hljs-title-color;
             }
         }
     }

@@ -197,7 +197,6 @@
 
 <style lang="less">
     @import '@san-devtools/views/style/variables.less';
-    @switch-bg-color: rgba(25, 104, 250, 1);
     .mutation-wrap {
         .payload-wrapper {
             .payload {
@@ -238,7 +237,7 @@
                 transform: translate(-100%, -50%);
             }
             .santd-switch-checked {
-                background-color: @switch-bg-color !important;
+                background-color: @color-blue-l10 !important;
             }
         }
         .santd-switch .santd-switch-handler,
