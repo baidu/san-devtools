@@ -6,7 +6,7 @@
                 class="san-devtools-tabs-content-item {{activeKey === tab.value? 'san-devtools-tabs-active' : 'grey'}}"
                 s-for="tab, index in tabs"
             >
-                <san-tooltip>
+                <san-tooltip placement="bottom">
                     <span slot="title">
                         {{ tab.label }}
                     </span>

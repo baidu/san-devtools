@@ -44,7 +44,7 @@
                 </san-checkboxgroup>
                 <span class="setting"></span>
             </san-popover>
-            <san-tooltip>
+            <san-tooltip placement="bottomRight">
                 <span slot="title">
                     1: only development san/san-native allowed.<br/>
                     2: only 3.9.4+ version of san the EVENT and MESSAGE panel allowed.<br/>
@@ -319,6 +319,10 @@
                     display: none;
                 }
             }
+        }
+        .santd-popover-arrow {
+            border-top-color: @popover-bg-color !important;
+            border-left-color: @popover-bg-color !important;
         }
         .navigation-checkbox-wrap:not(:first-child) {
             border-top: 1px solid @popover-border-top-color;

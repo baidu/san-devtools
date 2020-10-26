@@ -3,6 +3,7 @@
         <div class="toolbar">
             <div class="filter">
                 <san-tooltip
+                    placement="bottomRight"
                     title="{{searchTip}}"
                 >
                     <sand-input
@@ -15,6 +16,7 @@
             </div>
             <div class="action">
                 <san-tooltip
+                    placement="bottomRight"
                     title="{{ recording ? 'start record' : 'stop record' }}"
                 >
                     <span
@@ -25,6 +27,7 @@
                     </span>
                 </san-tooltip>
                 <san-tooltip
+                    placement="bottomRight"
                     title="clear all recorded"
                 >
                     <span
@@ -35,6 +38,7 @@
                     </span>
                 </san-tooltip>
                 <san-tooltip
+                    placement="bottomRight"
                     title="{{ beforeLoaded ? 'hide history records before devtool first created' : 'show history records before devtool first created' }}"
                 >
                     <span
