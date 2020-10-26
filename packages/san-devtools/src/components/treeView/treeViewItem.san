@@ -854,7 +854,7 @@ export default {
                 }
                 margin-left: 3px;
                 border-radius: 9px;
-                -webkit-text-fill-color: #fff;
+                -webkit-text-fill-color: @extra-font-color;
                 padding: 0 6px;
                 background-color: @extra-bg-color;
                 font-size: 12px;
@@ -937,6 +937,26 @@ export default {
     .hidden {
         display: none;
     }
+}
+
+.dark {
+    .sm-tree-view-item {
+        .sm-tree-view-item-content {
+            .sm-tree-view-item-primary-text {
+                &-extra {
+                    -webkit-text-fill-color: @dark-extra-font-color;
+                    background-color: @dark-extra-bg-color;
+                }
+            }
+        }
+    }
+    .sm-tree-view-item.compact {
+        .sm-tree-view-item-expand {
+            .santd-icon {
+                color: @dark-expand-icon-color;
+            }
+        }
+    }  
 }
 
 

@@ -41,6 +41,10 @@
                     <div class="navigation-checkbox-wrap" s-for="item in options">
                         <san-checkbox checked="{{item.checked}}" value="{{item.value}}">{{item.label}}</san-checkbox>
                     </div>
+                    <div class="navigation-checkbox-wrap" on-click="handleClick">
+                        <span class="theme">{{theme}}</span>
+                        <san-switch on-change='onThemeChange' defaultChecked="{{true}}" />
+                    </div>
                 </san-checkboxgroup>
                 <span class="setting"></span>
             </san-popover>
@@ -63,8 +67,11 @@
     import Tabs from '@san-devtools/components/tabs/tabs.san';
     import { connectStore, store } from '@san-devtools/store/index';
     import { versionCompare, isChromePanel, setSettings, getSettings } from '@san-devtools/utils/index';
-    import { Grid, Icon, Avatar, AppBar, Button, Tooltip, Popover, Checkbox } from 'santd';
+    import { Grid, Icon, Avatar, AppBar, Button, Tooltip, Popover, Checkbox, Switch } from 'santd';
+    import less from 'less';
 
+    const LIGHT_MODE = 'Light Mode';
+    const DARK_MODE = 'Dark Mode';
 
     export default connectStore({
         sanVersion: 'sanVersion',
@@ -82,10 +89,12 @@
                 'san-popover': Popover,
                 'san-checkboxgroup': Checkbox.Group,
                 'san-checkbox': Checkbox,
+                'san-switch': Switch
             },
 
             initData() {
                 return {
+                    theme: 'Light Mode',
                     defaultValue: [], // checkboxgroup 无法与 slot 的 checkbox 同步
                     options: [
                         { label: 'Readonly for component data.', value: 'Setting:component', checked: false },
@@ -111,6 +120,16 @@
                         }
                     ],
                     currentTab: 'component'
+                }
+            },
+
+            onThemeChange(value) {
+                if (!value) {
+                    document.body.classList.add('dark');
+                    this.data.set('theme', DARK_MODE);
+                } else {
+                    document.body.classList.remove('dark');
+                    this.data.set('theme', LIGHT_MODE);
                 }
             },
 
@@ -289,6 +308,19 @@
             padding: 0 0;
         }
         .navigation-checkbox-wrap {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            .santd-switch-checked {
+                background-color: #236eff;
+            }
+            .santd-switch {
+                min-width: auto;
+            }
+            .theme {
+                color: @setting-font-color;
+                padding-left: 20px;
+            }
             padding: 12px 16px;
             &:hover {
                 background-color: @setting-bg-color;
@@ -310,6 +342,7 @@
                 border: 1px solid @checkbox-border-color;
             }
             .santd-checkbox-wrapper {
+                color: @setting-font-color;
                 .santd-checkbox-inner {
                     border-radius: 50%;
                     width: 9px;
@@ -331,6 +364,59 @@
             border-radius: 9px;
             background: @popover-bg-color;
             box-shadow: 0 2px 8px 0 @popover-shadow-color;
+        }
+    }
+
+    .dark {
+        .navigation {
+            background-color: @dark-nav-bg-color;
+            .navigation-header {
+                .logo {
+                    .title {
+                        color: @dark-nav-font-color;
+                    }
+                    .version {
+                        color: @dark-nav-version-font-color;
+                    }
+                }
+            }
+            .icon-group {
+                .setting:hover {
+                    background-color: @dark-icon-hover-bg-color;
+                    border: 1px solid @dark-icon-hover-border-color;
+                }
+            }
+        }
+        .navigation-disconnected {
+            background-color: @dark-nav-disconnected-bg-color;
+        }
+        .santd-popover {
+            .navigation-checkbox-wrap {
+                .theme {
+                    color: @dark-setting-font-color;
+                }
+                &:hover {
+                    background-color: @dark-setting-bg-color;
+                }
+                .santd-checkbox-checked .santd-checkbox-inner {
+                    background-color: @dark-checkbox-bg-color;
+                    border: 1px solid @dark-checkbox-border-color;
+                }
+                .santd-checkbox-wrapper {
+                    color: @dark-setting-font-color;
+                }
+            }
+            .santd-popover-arrow {
+                border-top-color: @dark-popover-bg-color !important;
+                border-left-color: @dark-popover-bg-color !important;
+            }
+            .navigation-checkbox-wrap:not(:first-child) {
+                border-top: 1px solid @dark-popover-border-top-color;
+            }
+            .santd-popover-inner {
+                background: @dark-popover-bg-color;
+                box-shadow: 0 2px 8px 0 @dark-popover-shadow-color;
+            }
         }
     }
 </style>

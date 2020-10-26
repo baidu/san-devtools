@@ -39,7 +39,7 @@
     }
     pre {
         .language-js {
-            color: @language-js-color;
+            color: #ffffff;
             display: block;
             overflow-x: auto;
             padding: 0.5em;
@@ -47,6 +47,20 @@
             background: @func-bg-color!important;
             .hljs-title, .hljs-string {
                 color: @hljs-title-color;
+            }
+        }
+    }
+    .dark {
+        pre {
+            .language-js {
+                color: #ffffff;
+                background: @dark-func-bg-color !important;
+                .hljs-title, .hljs-string {
+                    color: @hljs-title-color;
+                }
+                .hljs-keyword, .hljs-selector-tag, .hljs-subst {
+                    color: #ffffff;
+                }
             }
         }
     }

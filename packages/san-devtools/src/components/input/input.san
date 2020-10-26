@@ -31,11 +31,20 @@ export default {
 @placeholder-font-color: @color-blue-l3;
 @focus-placeholder-font-color: @color-blue-l5;
 @caret-color: @color-blue-l10;
-@placeholder-font-size: 16px;
 @input-focus-bg-color: @color-white;
 @input-focus-shadow-color: rgba(231,231,231,0.50);
 @input-bg-color: rgba(246,251,255,1);
 @input-shadow-color: rgba(24, 144, 255, 0.2);
+
+@dark-placeholder-font-color: rgba(255, 255, 255, .3);
+@dark-focus-placeholder-font-color: rgba(255, 255, 255, .3);
+@dark-caret-color: @color-blue-l10;
+@dark-input-focus-bg-color: #50555A;
+@dark-input-focus-shadow-color: transparent;
+@dark-input-bg-color: transparent;
+@dark-input-shadow-color: rgba(255, 255, 255, 0.3);
+
+@placeholder-font-size: 16px;
 .san-devtool-input {
     .search {
         width: 20px;
@@ -73,6 +82,27 @@ export default {
     }
     .santd-input-affix-wrapper .santd-input:not(:first-child) {
         padding-left: 46px;
+    }
+}
+.dark {
+    .san-devtool-input {
+        input::-webkit-input-placeholder{
+            color: @dark-placeholder-font-color;
+        }
+        input {
+            caret-color: @dark-caret-color;
+        }
+        .santd-input-affix-wrapper .santd-input:focus {
+            box-shadow: 0 3px 20px 0 @dark-input-focus-shadow-color;
+            background-color: @dark-input-focus-bg-color;
+        }
+        .santd-input:focus::-webkit-input-placeholder{
+            color: @dark-focus-placeholder-font-color;
+        }    
+        .santd-input-affix-wrapper .santd-input{
+            box-shadow: 0 0 0 1.5px @dark-input-shadow-color;
+            background-color: @dark-input-bg-color;
+        }
     }
 }
 </style>

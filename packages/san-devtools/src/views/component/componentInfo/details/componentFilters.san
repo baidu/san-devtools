@@ -84,4 +84,14 @@ export default {
     display: none;
 }
 
+.dark {
+    .filters-wrapper {
+        .filters {
+            .func-name {
+                color: @dark-func-font-color;
+            }
+        }
+    }
+}
+
 </style>

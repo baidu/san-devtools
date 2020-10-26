@@ -85,4 +85,13 @@ export default {
     display: none;
 }
 
+.dark {
+    .messages-wrapper {
+        .messages {
+            .func-name {
+                color: @dark-func-font-color;
+            }
+        }
+    }
+}
 </style>

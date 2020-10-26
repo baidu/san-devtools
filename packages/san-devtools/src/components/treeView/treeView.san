@@ -220,4 +220,32 @@ export default {
         }
     }
 }
+.dark {
+    .sm-tree-view {
+        .sm-tree-view-item-wrapper {
+            .sm-tree-view-item {
+                .sm-touch-ripple.selected:hover {
+                    & ~ .sm-tree-view-item-content.selected {
+                        .sm-tree-view-item-primary-text {
+                            background-image: linear-gradient(
+                                to right,
+                                @dark-bg-color-primary-text-selected calc(100% - @nav-height),
+                                transparent
+                            );
+                        }
+                    }
+                }
+                .sm-tree-view-item-content {
+                    .sm-tree-view-item-primary-text, &:hover {
+                        background-image: linear-gradient(
+                            to right,
+                            @dark-bg-color-primary-text calc(100% - 44px),
+                            transparent
+                        );
+                    }
+                }
+            }
+        }
+    }
+}
 </style>

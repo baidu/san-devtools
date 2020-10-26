@@ -183,4 +183,14 @@ export default connectStore({
 .hidden {
     display: none;
 }
+
+.dark {
+    .actions-wrapper {
+        .actions {
+            .func-name {
+                color: @dark-func-font-color;
+            }
+        }
+    }
+}
 </style>

@@ -279,6 +279,12 @@ export default connectStore({
         .santd-table-scroll {
             border-radius: 18px;
         }
+        .santd-table-tbody > tr {
+            box-shadow: 0 1px 1px 0 @color-white-e;
+        }
+        .santd-table-tbody > tr > td {
+            border: 0;
+        }
         .santd-table-tbody > tr:hover:not(.santd-table-expanded-row):not(.santd-table-row-selected) > td {
             background: @color-blue-l2;
             &:first-child {
@@ -288,6 +294,51 @@ export default connectStore({
             &:last-child {
                 border-top-right-radius: 8px;
                 border-bottom-right-radius: 8px;
+            }
+        }
+    }
+}
+.dark {
+    .sd-list {
+        background-color: #272B2E;
+        .button-wrapper,.action {
+            .santd-btn {
+                background-color: #50555A;
+            }
+        }
+        .event-name {
+            color: @button-color;
+        }
+        .toolbar {
+            &-icon {
+                .Icon {
+                    border: 1px solid transparent;
+                }
+                .Icon:hover {
+                    background-color: @dark-icon-hover-bg-color;
+                    border: 1px solid @dark-icon-hover-border-color;
+                }
+            }
+            .start-record {
+                color: @start-record-color;
+            }
+        }
+        .santd-table {
+            .santd-table-header,
+            .santd-table-body,
+            .santd-table-placeholder,
+            .santd-table-thead > tr > th {
+                background-color: #272B2E !important;
+                color: @color-white;
+            }
+            .santd-empty-description {
+                color: @color-white;
+            }
+            .santd-table-tbody > tr {
+                box-shadow: 0 1px 1px 0 rgba(238, 238, 238, 0.1);
+            }         
+            .santd-table-tbody > tr:hover:not(.santd-table-expanded-row):not(.santd-table-row-selected) > td {
+                background: @color-blue-l2;
             }
         }
     }

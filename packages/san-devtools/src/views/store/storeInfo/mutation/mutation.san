@@ -274,4 +274,15 @@
             }
         }
     }
+    .dark {
+        .mutation-wrap {
+            .payload-wrapper {
+                .payload {
+                    .payload-header {
+                        color: @color-white;
+                    }
+                }
+            }
+        }
+    }
 </style>

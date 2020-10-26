@@ -114,4 +114,27 @@ export default {
         }
     }
 }
+.dark {
+    .san-devtools-tabs {
+        &-content {
+            &-item {
+                .tab-store-color {
+                    background-image: url('~@san-devtools/icons/dark-store-color.svg');
+                }
+                .tab-message-color {
+                    background-image: url('~@san-devtools/icons/dark-message-color.svg');
+                }
+                .tab-event-color {
+                    background-image: url('~@san-devtools/icons/dark-event-color.svg');
+                }
+                .tab-history-color {
+                    background-image: url('~@san-devtools/icons/dark-history-color.svg');
+                }
+                .tab-component-color {
+                    background-image: url('~@san-devtools/icons/dark-component-color.svg');
+                }
+            }
+        }
+    }
+}
 </style>

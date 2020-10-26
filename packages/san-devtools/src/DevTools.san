@@ -125,6 +125,9 @@ export default connectStore({
         &.show {
             display: block;
         }
+        .dark & {
+            background-color: #1D2126;
+        }
     }
 }
 </style>

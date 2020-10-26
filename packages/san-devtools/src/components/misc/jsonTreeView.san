@@ -174,4 +174,19 @@
             zoom: 0.7;
         }
     }
+    .dark {
+        .s-json-tree-view {
+            div:focus {
+                outline: #E4E4E4 auto 1px;
+            }
+            .jsonView {
+                & > .value {
+                    color: @color-white;
+                }
+            }
+            .insert:hover, .delete:hover {
+                background-color: transparent;
+            }
+        }
+    }
 </style>
