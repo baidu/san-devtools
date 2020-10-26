@@ -242,6 +242,14 @@ export default connectStore({
             font-size: 24px;
             display: flex;
             padding: 0 11px;
+            .Icon {
+                border: 1px solid transparent;
+            }
+            .Icon:hover {
+                border-radius: 50%;
+                background-color: @icon-hover-bg-color;
+                border: 1px solid @icon-hover-border-color;
+            }
         }
         .start-record {
             color: @start-record-color;

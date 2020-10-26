@@ -2,11 +2,17 @@ body {
     font-weight: 360;
     min-width: 450px;
 }
-body #root, body #root .santd-collapse,
-body #root .sm-tree-view .sm-tree-view-item-wrapper .sm-tree-view-item .sm-tree-view-item-content .sm-tree-view-item-primary-text,
-body #root .sm-tree-view .sm-tree-view-item-wrapper .sm-tree-view-item .sm-tree-view-item-content:hover
-{
-    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+body #root,
+body #root .santd-collapse,
+body
+    #root
+    .sm-tree-view
+    .sm-tree-view-item-wrapper
+    .sm-tree-view-item
+    .sm-tree-view-item-content
+    .sm-tree-view-item-primary-text,
+body #root .sm-tree-view .sm-tree-view-item-wrapper .sm-tree-view-item .sm-tree-view-item-content:hover {
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
 }
 
 .santd-tooltip-arrow {
@@ -14,7 +20,11 @@ body #root .sm-tree-view .sm-tree-view-item-wrapper .sm-tree-view-item .sm-tree-
 }
 
 .santd-tooltip-inner {
-    background: rgba(31,31,31,0.95);
-    box-shadow: 0 2px 8px 0 rgba(0,0,0,.3);
+    background: rgba(31, 31, 31, 0.95);
+    box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.3);
     border-radius: 12px;
+}
+
+.santd-btn-primary:hover {
+    background: rgba(25, 104, 250, 0.8) !important;
 }

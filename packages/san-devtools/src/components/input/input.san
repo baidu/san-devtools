@@ -29,6 +29,7 @@ export default {
 <style lang="less">
 @import '@san-devtools/views/style/variables.less';
 @placeholder-font-color: @color-blue-l3;
+@focus-placeholder-font-color: @color-blue-l5;
 @caret-color: @color-blue-l10;
 @placeholder-font-size: 16px;
 @input-focus-bg-color: @color-white;
@@ -48,23 +49,7 @@ export default {
         color: @placeholder-font-color;
         font-size: @placeholder-font-size;
     }
-    input::-moz-placeholder{   /* Mozilla Firefox 19+ */
-        padding-left: 1px;
-        color: @placeholder-font-color;
-        font-size: @placeholder-font-size;
-    }
-    input:-moz-placeholder{    /* Mozilla Firefox 4 to 18 */
-        padding-left: 1px;
-        color: @placeholder-font-color;
-        font-size: @placeholder-font-size;
-    }
-    input:-ms-input-placeholder{  /* Internet Explorer 10-11 */
-        padding-left: 1px;
-        color: @placeholder-font-color;
-        font-size: @placeholder-font-size;
-    }
     input {
-        // TODO: 与 UE 确认
         caret-color: @caret-color;
     }
     .santd-input-affix-wrapper .santd-input-prefix {
@@ -74,6 +59,9 @@ export default {
         box-shadow: 0 3px 20px 0 @input-focus-shadow-color;
         background-color: @input-focus-bg-color;
     }
+    .santd-input:focus::-webkit-input-placeholder{
+            color: @focus-placeholder-font-color;
+    }    
     .santd-input-affix-wrapper {
         height: 32px;
     }

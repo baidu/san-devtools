@@ -252,19 +252,26 @@
             padding-right: 28px;
             .setting,
             .help-desc {
+                box-sizing: content-box;
                 background-repeat: no-repeat;
                 background-size: cover;
                 width: 20px;
                 height: 20px;
                 display: inline-block;
+                border: 1px solid transparent;
             }
             .help-desc {
                 background-image: url('../icons/help.svg');
                 margin-left: 30px;
             }
             .setting {
+                border-radius: 50%;
                 cursor: pointer;
                 background-image: url('../icons/setting.svg');
+            }
+            .setting:hover {
+                background-color: @icon-hover-bg-color;
+                border: 1px solid @icon-hover-border-color;
             }
         }
     }
@@ -272,7 +279,7 @@
         background-color: @nav-disconnected-bg-color;
     }
     div .santd-popover-placement-bottomRight > .santd-popover-content .santd-popover-arrow {
-        right: 34px !important;
+        right: 8px !important;
     }
     .santd-popover {
         .santd-checkbox {
