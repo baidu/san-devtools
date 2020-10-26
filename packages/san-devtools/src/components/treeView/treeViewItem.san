@@ -142,12 +142,6 @@ export default {
                 target.data.set('dataSource', this.data.get('dataSource'));
             }
         },
-        'UI:query-loading-toast-attribute'(arg) {
-            let target = arg.target;
-            if (target.data.get('loadingToast') === undefined) {
-                target.data.set('loadingToast', this.data.get('loadingToast'));
-            }
-        },
         'UI:query-parent-checkbox-state'(arg) {
             this.dispatch('UI:query-parent-checkbox-state');
             let child = arg.target;
@@ -279,7 +273,6 @@ export default {
         this.dispatch('UI:query-whole-line-selected-attribute');
         this.dispatch('UI:query-keeping-selected-attribute');
         this.dispatch('UI:query-data-source-attribute');
-        this.dispatch('UI:query-loading-toast-attribute');
 
         if (this.data.get('dataSource') === 'JSON') {
             this.initFromTreeData(this.data.get('treeData'));
@@ -883,10 +876,6 @@ export default {
         overflow: hidden;
         z-index: 0;
         border-radius: 6px;
-    }
-    .sm-touch-ripple:hover,
-    .sm-touch-ripple.selected {
-        background: rgba(0, 0, 0, 0.1);
     }
     .sm-tree-view-item-primary-text {
         font-size: 16px;
