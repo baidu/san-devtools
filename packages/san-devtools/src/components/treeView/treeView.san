@@ -220,33 +220,6 @@ export default {
                 }
         }
     }
-    .sm-tree-view-loading-toast {
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-        font-size: 150%;
-        width: 70%;
-        text-align: center;
-        overflow: hidden;
-        background-color: rgba(192, 192, 192, 0.7);
-        pointer-events: none;
-        transition: all 0.5s;
-        z-index: 1000;
-        padding: 10px;
-        border-radius: 10px;
-        &.show {
-            opacity: 1;
-        }
-        &.hide {
-            opacity: 0;
-        }
-        > .sm-tree-view-loading-toast-content {
-            -webkit-text-fill-color: transparent;
-            -webkit-background-clip: text;
-            background-image: linear-gradient(to right, #000, #000);
-        }
-    }
     .sm-tree-view-item-wrapper {
         position: relative;
         height: calc(100% - @sand-input-height - @sand-input-margin-bottom);
