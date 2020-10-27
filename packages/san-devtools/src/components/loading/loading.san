@@ -52,7 +52,7 @@ export default {
         overflow: hidden;
         text-overflow:ellipsis;
         white-space: nowrap;
-        font-size: 20px;
+        font-size: 16px;
         text-align: left;
         line-height: 20px;
         word-wrap: none;

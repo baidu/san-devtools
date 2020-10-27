@@ -18,7 +18,7 @@
             dataSource="JSON"
             loadingToast="{{loadingToast}} {{processingComponentInfo}}"
             loading="{=loading=}"
-            loadingToastContentFromColor="rgba(119, 199, 252, 0.9)"
+            loadingToastContentFromColor="rgba(0, 175, 255, 1)"
             loadingToastContentToColor="#fff"
             progress="{=progress=}"
             type="component"

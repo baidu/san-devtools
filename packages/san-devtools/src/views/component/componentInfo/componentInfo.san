@@ -5,7 +5,7 @@
                 <div class="logo" style="display:{{logoVisibility?'block':'none'}}">
                     <img src="../../../icons/san_devtool_logo.svg" />
                 </div>
-                <div class="version">San DevTool</div>
+                <div class="version">San DevTools</div>
             </div>
             <div class="guide">Please select a component to inspect the detailed information.</div>
         </div>

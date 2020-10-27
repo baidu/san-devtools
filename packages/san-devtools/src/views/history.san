@@ -86,7 +86,7 @@ export default connectStore({
                 progress: 0,
                 loadingToast: 'Building history tree... ',
                 loading: false, // TODO：假的 loading
-                loadingToastContentFromColor: 'rgba(119, 199, 252, 0.9)',
+                loadingToastContentFromColor: 'rgba(0, 175, 255, 1)',
                 loadingToastContentToColor: '#fff',
                 filterText: '',
                 beforeLoaded: false,
