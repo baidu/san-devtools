@@ -34,7 +34,6 @@ export default {
             gutter: this.gutter.bind(this, status)
         });
         optimizedResize.add(this.changeSplit.bind(this));
-
     },
 
     gutter(status) {

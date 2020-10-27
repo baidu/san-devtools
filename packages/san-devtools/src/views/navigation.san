@@ -68,7 +68,6 @@
     import { connectStore, store } from '@san-devtools/store/index';
     import { versionCompare, isChromePanel, setSettings, getSettings } from '@san-devtools/utils/index';
     import { Grid, Icon, Avatar, AppBar, Button, Tooltip, Popover, Checkbox, Switch } from 'santd';
-    import less from 'less';
 
     const LIGHT_MODE = 'Light Mode';
     const DARK_MODE = 'Dark Mode';
