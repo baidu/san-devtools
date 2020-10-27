@@ -1,7 +1,7 @@
 {
     "name": "san-devtools",
-    "version": "1.0.0",
-    "description": "san-devtools",
+    "version": "3.0.0",
+    "description": "Development tool for debugging San.js applications.",
     "private": true,
     "scripts": {
         "start:ext": "yarn workspace extensions start",
