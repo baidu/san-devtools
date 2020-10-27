@@ -49,10 +49,12 @@ export default {
     inspectId() {
         let selectedComponentId = this.data.get('selectedComponentId');
         let inspectCode = `
-            let component = window.__san_devtool__ && window.__san_devtool__.componentMap.get("${selectedComponentId}");
-            if (component && component.el) {
-                inspect(component.el);
-            }
+            (function() {
+                let component = window.__san_devtool__ && window.__san_devtool__.componentMap.get("${selectedComponentId}");
+                if (component && component.el) {
+                    inspect(component.el);
+                }
+            })()
         `;
         chrome.devtools.inspectedWindow.eval(inspectCode);// eslint-disable-line        
     },
