@@ -1,4 +1,4 @@
-shell-dev
+example
 ===
 
 > Todos demo use `.san` components and `esnext`

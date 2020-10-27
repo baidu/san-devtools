@@ -4,15 +4,16 @@
     "description": "Development tool for debugging San.js applications.",
     "private": true,
     "scripts": {
-        "start:ext": "yarn workspace extensions start",
-        "start": "concurrently -p \"yarn dev:standalone\" \"yarn dev:todo\"",
-        "dev:standalone": "yarn workspace san-devtools start",
+        "dev:example": "yarn workspace example start",
+        "dev:standalone": "concurrently -p none \"yarn start:standalone\" \"yarn dev:example\"",
+        "start:standalone": "yarn workspace san-devtools start",
         "build:standalone": "yarn workspace san-devtools build",
-        "build:extensions": "yarn workspace extensions build",
-        "dev:todo": "yarn workspace shell-dev start"
+        "start:extensions": "yarn workspace extensions start",
+        "build:extensions": "yarn workspace extensions build"
     },
     "workspaces": [
-        "packages/*"
+        "packages/*",
+        "example"
     ],
     "files": [
         "packages"

@@ -13,7 +13,7 @@ module.exports = {
             '@backend': resolve('backend/src/'),
             '@shared': resolve('shared/src/'),
             '@frontend': resolve('frontend/src/'),
-            '@src': resolve('shell-dev/src/')
+            '@src': resolve('example/src/')
         }
     },
     // entry: ['../san-devtool/standalone/backend.ts?http://0.0.0.0:8090&sock&sockHost=localhost&sockPort=8090&sockPath=/sds-sockjs-node', path.join(__dirname, 'src', 'main.js')],
