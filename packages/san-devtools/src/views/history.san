@@ -13,17 +13,20 @@
             beforeLoaded="{{true}}"
         >
         </san-devtools-table>
-        <div class="sm-tree-view-loading-toast {{loading ? 'show' : 'hide'}}">
-            <div class="sm-tree-view-loading-toast-content" style="{{loadingToastContentStyle}}">
-                {{loadingToast}}
-            </div>
-        </div>
+        <sand-loading 
+            loadingToastContentFromColor="{{loadingToastContentFromColor}}"
+            loadingToastContentToColor="{{loadingToastContentToColor}}"
+            loadingToast="{{loadingToast}}"
+            progress="{{progress}}"
+            loading="{{loading}}"
+        />
     </div>
 </template>
 <script>
 import san, {DataTypes} from 'san';
 import {connectStore, store} from '@san-devtools/store/index';
 import DevtoolsTable from '@san-devtools/components/misc/devtoolsTable.san';
+import SdLoading from '@san-devtools/components/loading/loading.san';
 function filterData(filterText, data) {
     filterText = filterText.trim();
     if (!filterText) {
@@ -45,7 +48,8 @@ export default connectStore({
 })(
     {
         components: {
-            'san-devtools-table': DevtoolsTable
+            'san-devtools-table': DevtoolsTable,
+            'sand-loading': SdLoading
         },
         clearHandler() {
             store.dispatch('clearHistory');
@@ -75,24 +79,15 @@ export default connectStore({
                 }
                 let filterText = this.data.get('filterText');
                 return filterData(filterText, newData);
-            },
-            loadingToastContentStyle() {
-                let fromColor = '#3898b9';
-                let toColor = '#000';
-                let progress = this.data.get('progress');
-                let leftBound = Math.max(0, progress - 3);
-                let rightBound = Math.min(100, progress + 3);
-                return {
-                    'background-image':
-                        `linear-gradient(to right, ${fromColor} 60%,
-                            ${toColor} 80%, ${toColor})`
-                };
             }
         },
         initData() {
             return {
+                progress: 0,
                 loadingToast: 'Building history tree... ',
                 loading: false, // TODO：假的 loading
+                loadingToastContentFromColor: 'rgba(0, 175, 255, 1)',
+                loadingToastContentToColor: '#fff',
                 filterText: '',
                 beforeLoaded: false,
                 recording: false,
@@ -137,11 +132,13 @@ export default connectStore({
         },
         attached() {
             this.watch('historyRecordings', value => {
+                this.data.set('progress', 90);
                 this.data.set('loading', true);
             });
         },
         updated() {
             setTimeout(() => {
+                this.data.set('progress', 0);
                 this.data.set('loading', false);
             }, 0);
         },
@@ -162,31 +159,4 @@ export default connectStore({
 )
 </script>
 <style lang="less">
-.sm-tree-view-loading-toast {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 150%;
-    width: 70%;
-    text-align: center;
-    overflow: hidden;
-    background-color: rgba(192, 192, 192, 0.7);
-    pointer-events: none;
-    transition: all 0.5s;
-    z-index: 1000;
-    padding: 10px;
-    border-radius: 10px;
-    &.show {
-        opacity: 1;
-    }
-    &.hide {
-        opacity: 0;
-    }
-    > .sm-tree-view-loading-toast-content {
-        -webkit-text-fill-color: transparent;
-        -webkit-background-clip: text;
-        background-image: linear-gradient(to right, #000, #000);
-    }
-}
 </style>

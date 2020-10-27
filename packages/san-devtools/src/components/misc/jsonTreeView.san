@@ -2,135 +2,191 @@
     <div class="s-json-tree-view"></div>
 </template>
 <script>
-import {Component, DataTypes} from 'san';
+    import { Component, DataTypes } from 'san';
 
-import JSONTreeView from 'json-tree-view';
-import 'json-tree-view/devtools.css';
+    import JSONTreeView from 'json-tree-view';
+    import 'json-tree-view/devtools.css';
 
-export default {
-    dataTypes: {
-        expand: DataTypes.bool,
-        rootName: DataTypes.string,
-        withRootName: DataTypes.bool,
-        alwaysShowRoot: DataTypes.bool,
-        readonlyWhenFiltering: DataTypes.bool,
-        filterText: DataTypes.string,
-        readonly: DataTypes.bool,
-        dataChange: DataTypes.bool // 避免data的变化误判为修改了值导致死循环
-    },
-    initData() {
-        return {
-            expand: true,
-            rootName: '',
-            withRootName: false,
-            alwaysShowRoot: false,
-            readonlyWhenFiltering: true,
-            filterText: '',
-            readonly: false,
-            dataChange: true
+    export default {
+        dataTypes: {
+            expand: DataTypes.bool,
+            rootName: DataTypes.string,
+            withRootName: DataTypes.bool,
+            alwaysShowRoot: DataTypes.bool,
+            readonlyWhenFiltering: DataTypes.bool,
+            filterText: DataTypes.string,
+            readonly: DataTypes.bool,
+            dataChange: DataTypes.bool // 避免data的变化误判为修改了值导致死循环
+        },
+        initData() {
+            return {
+                expand: true,
+                rootName: '',
+                withRootName: false,
+                alwaysShowRoot: false,
+                readonlyWhenFiltering: true,
+                filterText: '',
+                readonly: false,
+                dataChange: true
+            }
+        },
+        refresh() {
+            this.view && this.view.refresh();
+        },
+
+        validKey(path) {
+            if (path.length >= 1 && /^([\d])*$/.test(path[0] + '')) {
+                return false;
+            }
+            return true;
+        },
+
+        bind(event) {
+            this.view.on(event, (JSONTreeView, path, oldVal, newVal, original) => {
+                if (!this.validKey(path)) {
+                    // alert(`you can not set/get number in initData of san component instance ${path.toString()}`);
+                    return;
+                }
+                // 特别需要注意这里，很容易出现死循环，json-view npm 包可能需要重写一下
+                if (this.data.get('dataChange') && (typeof this.data.get('data') === 'object')) {
+                    // 一批操作是一个循环通知订阅者的操作，是同步的，所以需要等这个同步操作结束之后，解锁 dataChange
+                    setTimeout(() => {
+                        this.data.set('dataChange', false);
+                    }, 0);
+                    return;
+                }
+                // 只是展开操作
+                if (event === 'append' && newVal) {
+                    return;
+                }
+                if (!this.data.get('readonly') || (typeof this.data.get('data') !== 'object') || !JSONTreeView.isRoot) {
+                    this.fire.call(this, event, { path, oldVal, newVal, original, changedData: this.view.value });
+                }
+            });
+        },
+
+        watchProp(key) {
+            this.watch(key, value => {
+                this.view[key] = value;
+            });
+        },
+
+        viewer() {
+            return this.view;
+        },
+
+        attached() {
+            this.watchProp('alwaysShowRoot');
+            this.watchProp('readonlyWhenFiltering');
+            this.watchProp('filterText');
+            this.watchProp('readonly');
+
+            this.watch('data', value => {
+                this.data.set('dataChange', true);
+                this.view.value = value;
+                this.view.refresh();
+                this.view.readonly = this.data.get('readonly');
+            });
+
+            let rootName = this.data.get('rootName');
+            let withRootName = this.data.get('withRootName');
+            let alwaysShowRoot = this.data.get('alwaysShowRoot');
+            let readonlyWhenFiltering = this.data.get('readonlyWhenFiltering');
+            let filterText = this.data.get('filterText');
+            let readonly = this.data.get('readonly');
+            let expand = this.data.get('expand');
+            let data = this.data.get('data');
+            this.view = new JSONTreeView(rootName, data);
+            expand ? this.view.expand(true, true) : this.view.collapse(true, true);
+            this.view.withRootName = withRootName;
+            this.view.alwaysShowRoot = alwaysShowRoot;
+            this.view.readonlyWhenFiltering = readonlyWhenFiltering;
+            this.view.filterText = filterText;
+            this.view.readonly = readonly;
+            this.el.appendChild(this.view.dom);
+
+            this.bind('change');
+            this.bind('rename');
+            this.bind('delete');
+            this.bind('append');
         }
-    },
-    refresh() {
-        this.view && this.view.refresh();
-    },
-
-    validKey(path) {
-        if (path.length >= 1 && /^([\d])*$/.test(path[0] + '')) {
-            return false;
-        }
-        return true;
-    },
-
-    bind(event) {
-        this.view.on(event, (JSONTreeView, path, oldVal, newVal, original) => {
-            if (!this.validKey(path)) {
-                // alert(`you can not set/get number in initData of san component instance ${path.toString()}`);
-                return;
-            }
-            // 特别需要注意这里，很容易出现死循环，json-view npm 包可能需要重写一下
-            if (this.data.get('dataChange') && (typeof this.data.get('data') === 'object')) {
-                // 一批操作是一个循环通知订阅者的操作，是同步的，所以需要等这个同步操作结束之后，解锁 dataChange
-                setTimeout(() => {
-                    this.data.set('dataChange', false);
-                }, 0);
-                return;
-            }
-            // 只是展开操作
-            if (event === 'append' && newVal) {
-                return;
-            }
-            if (!this.data.get('readonly') || (typeof this.data.get('data') !== 'object') || !JSONTreeView.isRoot) {
-                this.fire.call(this, event, {path, oldVal, newVal, original, changedData: this.view.value});
-            }
-        });
-    },
-
-    watchProp(key) {
-        this.watch(key, value => {
-            this.view[key] = value;
-        });
-    },
-
-    viewer() {
-        return this.view;
-    },
-
-    attached() {
-        this.watchProp('alwaysShowRoot');
-        this.watchProp('readonlyWhenFiltering');
-        this.watchProp('filterText');
-        this.watchProp('readonly');
-
-        this.watch('data', value => {
-            this.data.set('dataChange', true);
-            this.view.value = value;
-            this.view.refresh();
-            this.view.readonly = this.data.get('readonly');
-        });
-
-        let rootName = this.data.get('rootName');
-        let withRootName = this.data.get('withRootName');
-        let alwaysShowRoot = this.data.get('alwaysShowRoot');
-        let readonlyWhenFiltering = this.data.get('readonlyWhenFiltering');
-        let filterText = this.data.get('filterText');
-        let readonly = this.data.get('readonly');
-        let expand = this.data.get('expand');
-        let data = this.data.get('data');
-        this.view = new JSONTreeView(rootName, data);
-        expand ? this.view.expand(true, true) : this.view.collapse(true, true);
-        this.view.withRootName = withRootName;
-        this.view.alwaysShowRoot = alwaysShowRoot;
-        this.view.readonlyWhenFiltering = readonlyWhenFiltering;
-        this.view.filterText = filterText;
-        this.view.readonly = readonly;
-        this.el.appendChild(this.view.dom);
-
-        this.bind('change');
-        this.bind('rename');
-        this.bind('delete');
-        this.bind('append');
     }
-}
 
 </script>
 <style lang="less">
-.s-json-tree-view{
-    div:focus {
-        outline: rgba(56, 152, 185, 0.3) auto 1px;
-    }
-    .jsonView {
-        &> .name {
-            color: #ffa318;
+    @import '@san-devtools/views/style/variables.less';
+    @action-font-color: #4768fa;
+    .s-json-tree-view {
+        div:focus {
+            outline: #E4E4E4 auto 1px;
         }
-        font-weight: 300;
-        font-size: 14px;
-        -webkit-font-smoothing: antialiased;
-    }
-    .collapse, .expand, .insert {
-        .name.item {
-            color: #de6218;
+        .jsonView {
+            & > .name {
+                color: @json-font-color-yellow;
+            }
+            .boolean, .number {
+                color: @json-font-color-blue;
+            }
+            .string {
+                color: @json-font-color-red;
+            }
+            .expand:before,
+            .collapse:before {
+                color: @expand-icon-color;
+            }
+            .delete:before, .insert:before {
+                width: 16px;
+                height: 16px;
+                border-radius: 4px;
+                display: inline-flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: center;
+                background-color: @action-font-color;
+                color: #fff;
+            }
+            .delete {
+                zoom: 0.7;
+            }
+            .delete:before {
+                content: '×';
+                transform: none;
+            }
+            .insert {
+                margin-left: 30px;
+            }
+            .insert:hover, .delete:hover {
+                background-color: #fff;
+            }
+            .insert:before {
+                content: '+';
+            }
+            font-weight: 300;
+            font-size: 14px;
+            -webkit-font-smoothing: antialiased;
         }
-        zoom: 0.7;
+        .collapse,
+        .expand,
+        .insert {
+            .name.item {
+                color: #de6218;
+            }
+            zoom: 0.7;
+        }
     }
-}
+    .dark {
+        .s-json-tree-view {
+            div:focus {
+                outline: #E4E4E4 auto 1px;
+            }
+            .jsonView {
+                & > .value {
+                    color: @color-white;
+                }
+            }
+            .insert:hover, .delete:hover {
+                background-color: transparent;
+            }
+        }
+    }
 </style>

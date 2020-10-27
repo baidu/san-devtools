@@ -37,7 +37,7 @@ export function setupInspectInstance(hook: DevToolsHook<{}>) {
     if (!inspectorListened) {
         inspectorListened = true;
         // FIXME: chrome 修改 ua 后，右键选择的 dom 不正确。
-        document && document.addEventListener('contextmenu', event => {
+        typeof document !== 'undefined' && document.addEventListener('contextmenu', event => {
             const el = event.target;
             if (el) {
                 // eslint-disable-next-line

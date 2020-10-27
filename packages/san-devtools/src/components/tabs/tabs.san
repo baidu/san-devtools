@@ -1,0 +1,140 @@
+<template>
+    <div class="san-devtools-tabs">
+        <div class="san-devtools-tabs-content">
+            <div 
+                on-click="onChangeTab(tab.value)"
+                class="san-devtools-tabs-content-item {{activeKey === tab.value? 'san-devtools-tabs-active' : 'grey'}}"
+                s-for="tab, index in tabs"
+            >
+                <san-tooltip placement="bottom">
+                    <span slot="title">
+                        {{ tab.label }}
+                    </span>
+                    <span
+                        class="tab-{{tab.value}}-{{activeKey === tab.value? 'color' : 'grey'}}"
+                    ></span>
+                </san-tooltip>
+            </div>
+        </div>
+        <div class="san-devtools-ink-wrap"></div>
+    </div>
+</template>
+<script>
+import san, {DataTypes} from 'san';
+import {Tooltip} from 'santd';
+export default {
+    dataTypes: {
+        tabs: DataTypes.arrayOf(DataTypes.object),
+        activeKey: DataTypes.string,
+        defaultActiveKey: DataTypes.string
+    },
+    inited() {
+        this.data.set('activeKey', this.data.get('activeKey') || this.data.get('defaultActiveKey'));
+    },
+    components: {
+        'san-tooltip': Tooltip
+    },
+    onChangeTab(selectedTab) {
+        this.data.set('activeKey', selectedTab);
+    }
+}
+</script>
+<style lang="less">
+@import '@san-devtools/views/style/variables.less';
+.san-devtools-tabs {
+    &-content {
+        .san-devtools-tabs-active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 4px;
+            background-color: @ink-bar-bg-color;
+        }
+        height: 60px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        &-item {
+            display: flex;
+            align-items: center;
+            margin: 0 10px;
+            padding: 0 10px;
+            text-decoration: none;
+            cursor: pointer;
+            position: relative;
+            height: 100%;
+            .tab-store-grey,
+            .tab-store-color,
+            .tab-message-grey,
+            .tab-message-color,
+            .tab-event-grey,
+            .tab-event-color,
+            .tab-history-grey,
+            .tab-history-color,
+            .tab-component-grey,
+            .tab-component-color{
+                background-size: 100%;
+                background-repeat: no-repeat;
+                width: 30px;
+                height: 30px;
+                display: inline-block;
+            }
+            .tab-store-grey {
+                background-image: url('~@san-devtools/icons/store-grey.svg');
+            }
+            .tab-store-color {
+                background-image: url('~@san-devtools/icons/store-color.svg');
+            }
+            .tab-message-grey {
+                background-image: url('~@san-devtools/icons/message-grey.svg');
+            }
+            .tab-message-color {
+                background-image: url('~@san-devtools/icons/message-color.svg');
+            }
+            .tab-event-grey {
+                background-image: url('~@san-devtools/icons/event-grey.svg');
+            }
+            .tab-event-color {
+                background-image: url('~@san-devtools/icons/event-color.svg');
+            }
+            .tab-history-grey {
+                background-image: url('~@san-devtools/icons/history-grey.svg');
+            }
+            .tab-history-color {
+                background-image: url('~@san-devtools/icons/history-color.svg');
+            }
+            .tab-component-grey {
+                background-image: url('~@san-devtools/icons/component-grey.svg');
+            }
+            .tab-component-color {
+                background-image: url('~@san-devtools/icons/component-color.svg');
+            }
+        }
+    }
+}
+.dark {
+    .san-devtools-tabs {
+        &-content {
+            &-item {
+                .tab-store-color {
+                    background-image: url('~@san-devtools/icons/dark-store-color.svg');
+                }
+                .tab-message-color {
+                    background-image: url('~@san-devtools/icons/dark-message-color.svg');
+                }
+                .tab-event-color {
+                    background-image: url('~@san-devtools/icons/dark-event-color.svg');
+                }
+                .tab-history-color {
+                    background-image: url('~@san-devtools/icons/dark-history-color.svg');
+                }
+                .tab-component-color {
+                    background-image: url('~@san-devtools/icons/dark-component-color.svg');
+                }
+            }
+        }
+    }
+}
+</style>

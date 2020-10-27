@@ -18,8 +18,8 @@
             dataSource="JSON"
             loadingToast="{{loadingToast}} {{processingComponentInfo}}"
             loading="{=loading=}"
-            loadingToastContentFromColor="#3898b9"
-            loadingToastContentToColor="#000"
+            loadingToastContentFromColor="rgba(0, 175, 255, 1)"
+            loadingToastContentToColor="#fff"
             progress="{=progress=}"
             type="component"
         >

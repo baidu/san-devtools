@@ -1,18 +1,20 @@
 <template>
-    <div>
+    <div class="sd-component-info">
         <div class="sd-none-wrapper" style="display:{{selectedComponentId?'none':'block'}}">
             <div class="devtool-info">
                 <div class="logo" style="display:{{logoVisibility?'block':'none'}}">
                     <img src="../../../icons/san_devtool_logo.svg" />
                 </div>
-                <div class="version">San DevTool {{version}}</div>
+                <div class="version">San DevTools</div>
             </div>
             <div class="guide">Please select a component to inspect the detailed information.</div>
         </div>
         <div class="sd-detail-wrapper" style="display:{{selectedComponentId?'block':'none'}}">
             <div class="title-wrapper">
                 <span class="component-name">
-                    {{selectedComponentName}}
+                    <span class="arrow"><</span>
+                    <span class="component-name-content">{{selectedComponentName}}</span>
+                    <span class="arrow">></span>
                 </span>
                 <san-inspectable-button
                     s-if="{{isChromePanel}}"
@@ -25,19 +27,18 @@
                 >
                 </san-inspectable-button>
                 <div class="filter">
-                    <san-input
-                        class="component-detail-filter"
+                    <sand-input
                         placeholder="{{filterPlaceholder}}"
-                        value="{=filterText=}"
+                        filterText="{=filterText=}"
+                        filterIcon="search"
                     >
-                        <san-icon type="search" style="color: rgba(0, 0, 0, .54); font-size: 16px; line-height: 0;" slot="prefix" />
-                    </san-input>
+                    </sand-input>
                 </div>
             </div>
             <div class="panel-container">
                 <div class="ex-panel-wrapper">
                     <san-collapse defaultActiveKey="{{['1']}}">
-                        <san-collapse-panel header="Basic Information" key='1'>
+                        <san-collapse-panel header="Basic Information" key='1' expandIcon="left">
                             <sandevtool-component-basic-info
                                 infoList="{{selectedComponentBaseInfo | infoListFilter}}"
                                 selectedComponentId="{{selectedComponentId}}"
@@ -49,7 +50,7 @@
                 </div>
                 <div class="ex-panel-wrapper">
                     <san-collapse defaultActiveKey="{{['1']}}">
-                        <san-collapse-panel header="Data" key='1'>
+                        <san-collapse-panel header="Data" key='1' expandIcon="left">
                             <sandevtool-component-data-viewer
                                 data="{{componentInfo.data}}"
                                 selectedComponentId="{{selectedComponentId}}"
@@ -62,7 +63,7 @@
                 </div>
                 <div class="ex-panel-wrapper" s-if="componentInfo.computed.length>0">
                     <san-collapse defaultActiveKey="{{['1']}}">
-                        <san-collapse-panel header="Computed" key='1'>
+                        <san-collapse-panel header="Computed" key='1' expandIcon="left">
                             <sandevtool-component-computed
                                 computed="{{componentInfo.computed}}"
                                 computedDeps="{{componentInfo.computedDeps}}"
@@ -75,7 +76,7 @@
                 </div>
                 <div class="ex-panel-wrapper" s-if="componentInfo.filters.length>0">
                     <san-collapse defaultActiveKey="{{['1']}}">
-                        <san-collapse-panel header="Filters" key='1'>
+                        <san-collapse-panel header="Filters" key='1' expandIcon="left">
                             <sandevtool-component-filters
                                 selectedComponentId="{{selectedComponentId}}"
                                 data="{{componentInfo.filters}}"
@@ -87,7 +88,7 @@
                 </div>
                 <div class="ex-panel-wrapper" s-if="componentInfo.messages.length>0">
                     <san-collapse defaultActiveKey="{{['1']}}">
-                        <san-collapse-panel header="Messages" key='1'>
+                        <san-collapse-panel header="Messages" key='1' expandIcon="left">
                             <sandevtool-component-messages
                                 selectedComponentId="{{selectedComponentId}}"
                                 data="{{componentInfo.messages}}"
@@ -108,6 +109,7 @@ import {connectStore} from '@san-devtools/store/index';
 import {Collapse, Input, Icon} from 'santd';
 
 import InspectableButton from '@san-devtools/components/misc/inspectableButton.san';
+import SdInput from '@san-devtools/components/input/input.san';
 import ComponentBasicInfo from './details/componentBasicInfo.san';
 import ComponentDataViewer from './details/componentDataViewer.san';
 import ComponentComputed from './details/componentComputed.san';
@@ -166,6 +168,7 @@ export default connectStore({
             'sandevtool-component-filters': ComponentFilters,
             'sandevtool-component-messages': ComponentMessages,
 
+            'sand-input': SdInput,
             'san-collapse': Collapse,
             'san-collapse-panel': Collapse.Panel,
             'san-icon': Icon,
@@ -183,130 +186,186 @@ export default connectStore({
 </script>
 <style lang="less">
 @import '@san-devtools/views/style/variables.less';
-.sd-none-wrapper {
-    box-sizing: border-box;
-    padding: 5vw;
-    text-align: center;
-    .devtool-info {
-        .logo {
-            img {
-                width: 40%;
-            }
-        }
-        .version {
-            justify-content: center;
-            font-size: 3vw;
-        }
-    }
-    .guide {
-        font-weight: bold;
-        text-shadow: @shadow-color 0.15vw 0.15vw 0.1vw;
-        font-size: 2vw;
-        margin-top: 5vw;
-    }
-}
-.sd-detail-wrapper {
+@title-wrapper-height: 32px;
+@title-wrapper-margin-bottom: 20px;
+.sd-component-info {
     height: 100%;
-    .component-detail-filter {
-        top: 0;
-    }
-    .santd-input-affix-wrapper  {
-        height: 36px;
-        .santd-input:not(:first-child) {
-            padding-left: 50px;
-        }
-    }
-    .santd-input {
-        border: 0;
-        border-radius: 0;
-        background-color: rgba(0, 0, 0, 0);
-    }
-    .panel-container {
-        .santd-collapse {
-            border-radius: 0;
-            background-color: @bg-santd-collapse;
-        }
-        .santd-collapse-item:last-child > .santd-collapse-content {
-            border-radius: 0;
-        }
-        .santd-collapse > .santd-collapse-item > .santd-collapse-header {
-            line-height: 14px;
-            padding: 8px 16px 8px 40px;
-        }
-        .santd-collapse-content > .santd-collapse-content-box {
-            overflow-y: auto;
-        }
-        overflow: auto;
-        position: absolute;
-        top: 0;
-        bottom: 0;
+    width: 100%;
+    .sd-none-wrapper {
+        height: 100%;
         width: 100%;
-        > .ex-panel-wrapper {
-            &:first-child {
-            margin-top: 46px;
+        border-radius: 23px;
+        background-color: @color-white;
+        box-sizing: border-box;
+        padding: 5vw;
+        text-align: center;
+        .devtool-info {
+            .logo {
+                img {
+                    width: 40%;
+                }
             }
-            padding: 0 10px;
-            margin: 10px 0;
-            box-sizing: border-box;
+            .version {
+                margin-top: 2.5vw;
+                justify-content: center;
+                font-size: 2vw;
+                color: @color-black-3;
+            }
+        }
+        .guide {
+            margin-top: 3vw;
+            font-size: 1.5vw;
+            color: @color-grey;
+            text-align: center;
+            line-height: 3vw;
+        }
+    }
+    .sd-detail-wrapper {
+        height: 100%;
+        .component-detail-filter {
+            top: 0;
+        }
+        .panel-container {
+            .santd-collapse {
+                border: 0;
+                border-radius: 18px;
+                background-color: @collapse-bg-color;
+            }
+            .santd-collapse-item {
+                border: 0;   
+            }
+            .santd-collapse-item:last-child > .santd-collapse-content {
+                border-top: 1px solid @color-white-e;
+                border-bottom-right-radius: 18px;
+                border-bottom-left-radius: 18px;
+            }
+            .santd-collapse > .santd-collapse-item > .santd-collapse-header {
+                display: flex;
+                align-items: center;
+                height: 40px;
+                line-height: 40px;
+                font-size: 16px;
+                color: @title-font-color;
+                padding: 8px 16px 8px 24px;
+            }
+            .santd-collapse-item-active {
+                .santd-icon-left {
+                    svg {
+                        msTransform: rotate(-90deg) !important;
+                        transform: rotate(-90deg) !important;
+                    }
+                }
+            }
+            .santd-collapse > .santd-collapse-item > .santd-collapse-header .santd-collapse-arrow {
+                right: 24px;
+                left: auto;
+                color: @color-grey;
+            }
+            .santd-collapse-content > .santd-collapse-content-box {
+                overflow-y: auto;
+                padding: 16px 36px;
+                color: @color-black-3;
+            }
+            overflow: auto;
+            height: calc(100% - @title-wrapper-height - @title-wrapper-margin-bottom);
             width: 100%;
+            > .ex-panel-wrapper {
+                padding: 0 10px;
+                margin-bottom: 20px;
+                box-sizing: border-box;
+                width: 100%;
+                user-select: none;
+            }
+        }
+    }
+    .title-wrapper {
+        display: flex;
+        justify-content: space-between;
+        height: @title-wrapper-height;
+        box-sizing: border-box;
+        margin-bottom: @title-wrapper-margin-bottom;
+        .component-name {
+            white-space: nowrap;
+            display: flex;
+            height: 32px;
+            color: @title-font-color;
+            font-size: 22px;
+            box-sizing: border-box;
+            &-content {
+                overflow: hidden;
+                text-overflow:ellipsis;
+                white-space: nowrap;
+                max-width: 180px;
+                display: inline-block;             
+            }
+        }
+        .inspector {
+            float: left;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            .santd-btn-primary {
+                font-size: 16px;
+                background-color: @button-color;
+                border: 0;
+            }
+            button {
+                position: relative;
+            }
+        }
+        .filter {
+            flex: 1;
+            display: table;
+            margin-left: 6px;
         }
     }
 }
-.title-wrapper {
-    height: 36px;
-    box-sizing: border-box;
-    position: relative;
-    z-index: 1000;
-    background-color: rgba(237,237,237,0.3) !important;
-    backdrop-filter: blur(8px);
-    > div {
-        height: 26px;
-    }
-    .component-name {
-        height: 36px;
-        display: inline-block;
-        float: left;
-        color: @font-color-title;
-        font-size: 22px;
-        padding: 2px 10px;
-        box-sizing: border-box;
-        &::before, &::after {
-            color: rgba(0, 0, 0, 0.65);
-            font-weight: 200;
+
+.dark {
+    .sd-component-info {
+        .sd-none-wrapper {
+            background-color: #272B2E;
+            .devtool-info {
+                .version {
+                    color: @color-white;
+                }
+            }
+            .guide {
+                color: #8C8C8C;
+            }
         }
-        &::before {
-            content: '<';
+        .sd-detail-wrapper {
+            .panel-container {
+                .santd-collapse {
+                    background-color: @dark-collapse-bg-color;
+                }
+                .santd-collapse-item:last-child > .santd-collapse-content {
+                    border-top: 1px solid rgba(238, 238, 238, .1);
+                }
+                .santd-collapse > .santd-collapse-item > .santd-collapse-header {
+                    color: @color-white;
+                }
+                .santd-collapse > .santd-collapse-item > .santd-collapse-header .santd-collapse-arrow {
+                    color: #656565;
+                }
+                .santd-collapse-content > .santd-collapse-content-box {
+                    color: #999999;
+                }
+                .santd-collapse-content {
+                    background-color: @dark-collapse-bg-color;
+                }
+            }
         }
-        &::after {
-            content: '>';
+        .title-wrapper {
+            .component-name {
+                color: @dark-title-font-color;
+            }
+            .inspector {
+                .santd-btn-primary {
+                    background-color: @button-color;
+                }
+            }
         }
-    }
-    .inspector {
-        float: left;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        .santd-btn-primary {
-            font-size: 16px;
-            background-color: @bg-color-inspector;
-            border: 0;
-        }
-        button {
-            position: relative;
-        }
-    }
-    .filter {
-        height: 36px;
-        .santd-input-affix-wrapper .santd-input:not(:first-child) {
-            padding-left: 40px;
-        }
-        .santd-input {
-            border: 0;
-            border-radius: 0;
-            background-color: rgba(0,0,0,0);
-        }
-        overflow: hidden;
-        position: relative;
     }
 }
 </style>

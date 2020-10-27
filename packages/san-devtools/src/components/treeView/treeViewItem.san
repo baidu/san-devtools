@@ -142,12 +142,6 @@ export default {
                 target.data.set('dataSource', this.data.get('dataSource'));
             }
         },
-        'UI:query-loading-toast-attribute'(arg) {
-            let target = arg.target;
-            if (target.data.get('loadingToast') === undefined) {
-                target.data.set('loadingToast', this.data.get('loadingToast'));
-            }
-        },
         'UI:query-parent-checkbox-state'(arg) {
             this.dispatch('UI:query-parent-checkbox-state');
             let child = arg.target;
@@ -279,7 +273,6 @@ export default {
         this.dispatch('UI:query-whole-line-selected-attribute');
         this.dispatch('UI:query-keeping-selected-attribute');
         this.dispatch('UI:query-data-source-attribute');
-        this.dispatch('UI:query-loading-toast-attribute');
 
         if (this.data.get('dataSource') === 'JSON') {
             this.initFromTreeData(this.data.get('treeData'));
@@ -783,7 +776,7 @@ export default {
 @one-line-height: 48px;
 @two-line-height: 72px;
 @tree-view-padding-horz: 16px;
-@one-line-height-compact: 24px;
+@one-line-height-compact: 31px;
 @two-line-height-compact: 48px;
 @tree-view-padding-horz-compact: 4px;
 .sm-tree-view-item {
@@ -835,7 +828,7 @@ export default {
     }
     .sm-tree-view-item-content {
         position: relative;
-        line-height: 1;
+        line-height: 31px;
         padding: 12px;
         font-size: 16px;
         z-index: 1;
@@ -853,18 +846,20 @@ export default {
         .sm-tree-view-item-primary-text {
             display: inline-block;
             vertical-align: middle;
-            height: 24px;
-            line-height: 24px;
+            height: 31px;
+            line-height: 31px;
             &-extra {
                 :first-child {
                     margin-left: 0;
                 }
                 margin-left: 3px;
-                border-radius: 3px;
-                -webkit-text-fill-color: #fff;
+                border-radius: 9px;
+                -webkit-text-fill-color: @extra-font-color;
                 padding: 0 6px;
-                background-color: @bg-color-extra;
+                background-color: @extra-bg-color;
                 font-size: 12px;
+                height: 16px;
+                display: inline-block;
             }
         }
     }
@@ -880,10 +875,7 @@ export default {
         bottom: 0;
         overflow: hidden;
         z-index: 0;
-    }
-    .sm-touch-ripple:hover,
-    .sm-touch-ripple.selected {
-        background: rgba(0, 0, 0, 0.1);
+        border-radius: 6px;
     }
     .sm-tree-view-item-primary-text {
         font-size: 16px;
@@ -891,7 +883,6 @@ export default {
     .sm-tree-view-item-secondary-text {
         font-size: 14px;
         line-height: 1;
-        color: @item-font-color-secondary-text;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -913,11 +904,8 @@ export default {
         height: 18px;
         line-height: 18px;
     }
-    .sm-tree-view-item-secondary-text {
-        font-size: 0.8em;
-    }
     .sm-tree-view-item-content {
-        padding: 3px;
+        padding: 0 3px;
         .sm-checkbox {
             zoom: 0.75;
         }
@@ -927,10 +915,6 @@ export default {
             zoom: 0.7;
         }
     }
-    .sm-tree-view-item-expand {
-        width: @one-line-height-compact;
-        height: @one-line-height-compact;
-    }
     .sm-touch-ripple,
     &.nested .sm-touch-ripple {
         height: @one-line-height-compact;
@@ -939,7 +923,10 @@ export default {
         width: @one-line-height-compact;
         height: @one-line-height-compact;
         .sm-icon {
-            line-height: 24px;
+            line-height: 31px;
+        }
+        .santd-icon {
+            color: @expand-icon-color;
         }
     }
     .sm-tree-view-item-left {
@@ -950,6 +937,26 @@ export default {
     .hidden {
         display: none;
     }
+}
+
+.dark {
+    .sm-tree-view-item {
+        .sm-tree-view-item-content {
+            .sm-tree-view-item-primary-text {
+                &-extra {
+                    -webkit-text-fill-color: @dark-extra-font-color;
+                    background-color: @dark-extra-bg-color;
+                }
+            }
+        }
+    }
+    .sm-tree-view-item.compact {
+        .sm-tree-view-item-expand {
+            .santd-icon {
+                color: @dark-expand-icon-color;
+            }
+        }
+    }  
 }
 
 

@@ -1,28 +1,18 @@
 <template>
     <div class="sm-tree-view {{treeViewClass}}">
-        <div
-            class="sm-tree-view-filter-bar {{treeViewClass}}"
-            san-if="filterBar"
+        <sand-input
+            placeholder="{{placeholder}}"
+            filterText="{=filterText=}"
+            filterIcon="{{filterIcon}}"
         >
-            <san-input
-                class="component-detail-filter"
-                placeholder="{{filterPlaceholder}}, {{totalNums}} components"
-                value="{=filterText=}"
-                s-ref="filterInputBox"
-            >
-                <san-icon type="{{filterIcon}}" style="color: rgba(0, 0, 0, .54); font-size: 16px; line-height: 0;" slot="prefix" />
-            </san-input>
-        </div>
-        <div
-            class="sm-tree-view-loading-toast {{loading ? 'show' : 'hide'}}"
-        >
-            <div
-                class="sm-tree-view-loading-toast-content"
-                style="{{loadingToastContentStyle}}"
-            >
-                {{loadingToast}}
-            </div>
-        </div>
+        </sand-input>
+        <sand-loading
+            loadingToastContentFromColor="{{loadingToastContentFromColor}}"
+            loadingToastContentToColor="{{loadingToastContentToColor}}"
+            loadingToast="{{loadingToast}}"
+            progress="{{progress}}"
+            loading="{{loading}}"
+        />
         <div class="sm-tree-view-item-wrapper">
             <slot s-if="dataSource!=='JSON'"></slot>
             <san-tree-view-item
@@ -46,8 +36,10 @@
 </template>
 <script>
 import san, {DataTypes} from 'san';
-import {Input, Icon} from 'santd';
+import {Icon} from 'santd';
 import TreeViewItem from './treeViewItem.san';
+import SdInput from '@san-devtools/components/input/input.san';
+import SdLoading from '@san-devtools/components/loading/loading.san';
 export default {
     dataTypes: {
         compact: DataTypes.bool,
@@ -61,14 +53,14 @@ export default {
         treeData: DataTypes.arrayOf(DataTypes.object),
         loading: DataTypes.bool,
         loadingToast: DataTypes.string,
-        loadingAsync: DataTypes.bool,
         progress: DataTypes.number
     },
 
     components: {
-        'san-input': Input,
         'san-icon': Icon,
         'san-tree-view-item': TreeViewItem,
+        'sand-input': SdInput,
+        'sand-loading': SdLoading
     },
 
     inited() {
@@ -85,9 +77,8 @@ export default {
             highlighted: false,
             loading: true,
             loadingToast: '',
-            loadingAsync: true,
-            loadingToastContentFromColor: 'blue',
-            loadingToastContentToColor: 'red',
+            loadingToastContentFromColor: 'rgba(0, 175, 255, 1)',
+            loadingToastContentToColor: '#fff',
             progress: 0,
             rootTreeView: true,
             filterText: '',
@@ -96,7 +87,7 @@ export default {
     },
 
     updated() {
-        if (this.data.get('totalNumsChange')) {
+        if (this.data.get('totalNumsChange') || true) {
             setTimeout(() => {
                 let totalNums = this.data.get('totalNums');
                 let type = this.data.get('type');
@@ -106,11 +97,18 @@ export default {
                 }
                 let progress = curNums / totalNums * 100;
                 this.data.set('progress', progress);
-            }, 0);
+            }, 60);
         }
     },
 
     attached() {
+
+    },
+
+    created() {
+        if (!this.data.get('loadingToast')) {
+            this.data.set('loading', false);
+        }
         this.watch('progress', value => {
             this.data.set('loading', value < 100);
             value === 100 && this.data.set('totalNumsChange', false);
@@ -118,12 +116,6 @@ export default {
         this.watch('totalNums', value => {
             this.data.set('totalNumsChange', true);
         })
-    },
-
-    created() {
-        if (!this.data.get('loadingToast')) {
-            this.data.set('loading', false);
-        }
     },
 
     messages: {
@@ -155,132 +147,48 @@ export default {
             if (target.data.get('dataSource') === undefined) {
                 target.data.set('dataSource', this.data.get('dataSource'));
             }
-        },
-        'UI:query-loading-toast-attribute'(arg) {
-            arg.target && arg.target.data && arg.target.data.set(
-                'loadingToast', this.data.get('loadingToast'));
         }
     },
 
     computed: {
+        placeholder() {
+            let totalNums = this.data.get('totalNums');
+            let filterPlaceholder = this.data.get('filterPlaceholder');
+            let componentsPlaceholder = typeof totalNums !== 'undefined' ? `,${totalNums} components` : ''
+            return `${filterPlaceholder}${componentsPlaceholder}`;
+        },
         treeViewClass() {
             return this.data.get('compact') ? 'compact ' : '';
-        },
-        loadingToastContentStyle() {
-            let fromColor = this.data.get('loadingToastContentFromColor');
-            let toColor = this.data.get('loadingToastContentToColor');
-            let progress = this.data.get('progress');
-            let leftBound = Math.max(0, progress - 3);
-            let rightBound = Math.min(100, progress + 3);
-            return {
-                'background-image':
-                    `linear-gradient(to right, ${fromColor} ${leftBound}%,
-                        ${toColor} ${rightBound}%, ${toColor})`
-            };
         }
     }
 }
 </script>
 <style lang="less">
 @import '@san-devtools/views/style/variables.less';
+@sand-input-height: 32px;
+@sand-input-margin-bottom: 12px;
 .sm-tree-view {
     height: 100%;
-    background: #fff;
     position: relative;
+    .san-devtool-input .santd-input-affix-wrapper {
+        height: @sand-input-height;
+        margin-bottom: @sand-input-margin-bottom;
+    }
     .compact {
         padding: 0;
         line-height: normal;
     }
-    .sm-tree-view-filter-bar {
-        width: 100%;
-        height: 36px;
-        overflow: hidden;
-        z-index: 1000;
-        position: absolute;
-        padding: 0;
-        box-sizing: border-box;
-        background-color: hsla(0,0%,93%,.3)!important;
-        backdrop-filter: blur(8px);
-        .santd-input-affix-wrapper {
-                // TODO: 这里挪到misc中的组件一起修改
-                height: 36px;
-                .santd-input:not(:first-child) {
-                    padding-left: 50px;
-                }
-        }
-        .santd-input {
-                border: 0;
-                border-radius: 0;
-                background-color: rgba(0, 0, 0, 0);
-        }
-        .sm-text-field {
-                margin: 0;
-                min-height: 40px;
-            &.has-icon {
-                box-sizing: border-box;
-                hr {
-                    left: -56px;
-                }
-            }
-            .sm-text-field-icon {
-                top: 4px;
-            }
-            .sm-text-field-content {
-                position: relative;
-            }
-        }
-        &.compact {
-                .sm-text-field {
-                    zoom: 0.85;
-                    min-height: auto;
-                    margin: 0;
-                    .sm-text-field-content {
-                        padding: 0;
-                    }
-                }
-        }
-    }
-    .sm-tree-view-loading-toast {
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-        font-size: 150%;
-        width: 70%;
-        text-align: center;
-        overflow: hidden;
-        background-color: rgba(192, 192, 192, 0.7);
-        pointer-events: none;
-        transition: all 0.5s;
-        z-index: 1000;
-        padding: 10px;
-        border-radius: 10px;
-        &.show {
-            opacity: 1;
-        }
-        &.hide {
-            opacity: 0;
-        }
-        > .sm-tree-view-loading-toast-content {
-            -webkit-text-fill-color: transparent;
-            -webkit-background-clip: text;
-            background-image: linear-gradient(to right, #000, #000);
-        }
-    }
     .sm-tree-view-item-wrapper {
         position: relative;
-        height: 100%;
+        height: calc(100% - @sand-input-height - @sand-input-margin-bottom);
         overflow: auto;
-        > .sm-tree-view-item:first-child {
-            margin-top: 46px;
-        }
         .sm-tree-view-item {
             .sm-touch-ripple.selected:hover {
                 & ~ .sm-tree-view-item-content.selected {
                     .sm-tree-view-item-primary-text {
                         background-image: linear-gradient(
                             to right,
-                            @bg-color-primary-text-selected calc(100% - 46px),
+                            @bg-color-primary-text-selected calc(100% - @nav-height),
                             transparent
                         );
                     }
@@ -303,19 +211,38 @@ export default {
                     background-size: calc(100% - 80px) auto;
                     background-repeat-x: no-repeat;
                 }
-                &.selected {
-                    .sm-tree-view-item-primary-text {
-                        background-image: linear-gradient(
-                            90deg,
-                            #fff calc(100% - 40px),
-                            transparent
-                        );
-                    }
-                }
                 .sm-tree-view-item-extras {
                     top: 50%;
                     left: 50%;
                     transform: translate(-50%, -50%);
+                }
+            }
+        }
+    }
+}
+.dark {
+    .sm-tree-view {
+        .sm-tree-view-item-wrapper {
+            .sm-tree-view-item {
+                .sm-touch-ripple.selected:hover {
+                    & ~ .sm-tree-view-item-content.selected {
+                        .sm-tree-view-item-primary-text {
+                            background-image: linear-gradient(
+                                to right,
+                                @dark-bg-color-primary-text-selected calc(100% - @nav-height),
+                                transparent
+                            );
+                        }
+                    }
+                }
+                .sm-tree-view-item-content {
+                    .sm-tree-view-item-primary-text, &:hover {
+                        background-image: linear-gradient(
+                            to right,
+                            @dark-bg-color-primary-text calc(100% - 44px),
+                            transparent
+                        );
+                    }
                 }
             }
         }

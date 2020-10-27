@@ -1,12 +1,13 @@
 <template>
     <svg
         xmlns="http://www.w3.org/2000/svg"
+        xmlns:xlink="http://www.w3.org/1999/xlink"
         class="{{['Icon', className]}}"
         width="24"
         height="24"
-        viewBox="0 0 1024 1024">
+        viewBox="0 0 24 24">
         <template s-for="item in pathData">
-            <path fill="currentColor" d="{{item}}" />
+            <path fill="{{item.fill}}" transform="{{item.transform}}" d="{{item.d}}" />
         </template>
     </svg>
 </template>
@@ -18,13 +19,6 @@ export default {
         return {
             className: '',
         }
-    },
-
-    inited() {
-        // this.watch('type', value => {
-        //     let type = this.data.get('type');
-        //     this.data.set('pathData', icons[type] || null);
-        // });
     },
 
     computed: {

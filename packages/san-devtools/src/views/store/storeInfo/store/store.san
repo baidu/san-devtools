@@ -135,21 +135,27 @@ export default connectStore({
 </script>
 
 <style lang="less">
+@import '@san-devtools/views/style/variables.less';
 .store-button {
     display: flex;
     justify-content: center;
     align-items: center;
+    .santd-btn {
+        margin: 4px 0;
+        height: 28px;
+        border-radius: 24px;
+    }
     .santd-btn-primary {
-        background-color: #3898b9;
+        background-color: @button-color;
+        border: 0;
     }
 }
 .actions-wrapper {
     .actions {
         margin: 3px 0;
         .func-name {
-            color: #3898b9;
+            color: @func-font-color;
             font-size: 120%;
-            border-bottom: 2px solid #3898b9;
             margin-bottom: 5px;
         }
     }
@@ -159,18 +165,32 @@ export default connectStore({
         display: inline-block;
         white-space: nowrap;
         margin-right: 20px;
+        margin-bottom: 8px;
         span {
-            padding: 3px;
-            border-radius: 5px;
-            color: #fff;
+            font-size: 14px;
+            height: 20px;
+            box-sizing: border-box;
+            padding: 3px 8px;
+            border-radius: 12px;
+            border: 1px solid @tag-color;
             cursor: pointer;
             &.component-id {
-                background-color: rgba(255, 163, 24, 0.5);;
+                color: @tag-color;
             }
         }
     }
 }
 .hidden {
     display: none;
+}
+
+.dark {
+    .actions-wrapper {
+        .actions {
+            .func-name {
+                color: @dark-func-font-color;
+            }
+        }
+    }
 }
 </style>

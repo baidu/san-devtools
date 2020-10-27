@@ -1,51 +1,52 @@
 <template>
     <div class="sd-list">
         <div class="toolbar">
-            <san-tooltip
-                title="{{ recording ? 'start record' : 'stop record' }}"
-                arrowPointAtCenter="{{true}}"
-            >
-                <span
-                    class="toolbar-icon"
-                    on-click="record"
-                >
-                    <san-custom-icon type="{{ recording ? 'largeicon-stop-recording' : 'largeicon-start-recording' }}"></san-custom-icon>
-                </span>
-            </san-tooltip>
-            <san-tooltip
-                title="clear all recorded"
-                arrowPointAtCenter="{{true}}"
-            >
-                <span
-                    class="toolbar-icon"
-                    on-click="clear"
-                >
-                    <san-custom-icon type="largeicon-clear"></san-custom-icon>
-                </span>
-            </san-tooltip>
-            <san-tooltip
-                title="{{ beforeLoaded ? 'hide history records before devtool first created' : 'show history records before devtool first created' }}"
-                arrowPointAtCenter="{{true}}"
-            >
-                <span
-                    class="toolbar-icon"
-                    on-click="loadBefore"
-                >
-                    <san-custom-icon type="largeicon-visibility"></san-custom-icon>
-                </span>
-            </san-tooltip>
             <div class="filter">
                 <san-tooltip
+                    placement="bottomRight"
                     title="{{searchTip}}"
-                    arrowPointAtCenter="{{true}}"
                 >
-                    <san-input
-                        class="component-detail-filter"
+                    <sand-input
                         placeholder="{{filterPlaceholder}}"
-                        value="{=filterText=}"
+                        filterText="{=filterText=}"
+                        filterIcon="{{filterIcon}}"
                     >
-                        <san-icon type="search" style="color: rgba(0, 0, 0, .54); font-size: 16px; line-height: 0;" slot="prefix" />
-                    </san-input>
+                    </sand-input>
+                </san-tooltip>
+            </div>
+            <div class="action">
+                <san-tooltip
+                    placement="bottomRight"
+                    title="{{ recording ? 'start record' : 'stop record' }}"
+                >
+                    <span
+                        class="toolbar-icon"
+                        on-click="record"
+                    >
+                        <san-icon type="{{ recording ? 'stop-record' : 'start-record' }}"></san-icon>
+                    </span>
+                </san-tooltip>
+                <san-tooltip
+                    placement="bottomRight"
+                    title="clear all recorded"
+                >
+                    <span
+                        class="toolbar-icon"
+                        on-click="clear"
+                    >
+                        <san-icon type="clear"></san-icon>
+                    </span>
+                </san-tooltip>
+                <san-tooltip
+                    placement="bottomRight"
+                    title="{{ beforeLoaded ? 'hide history records before devtool first created' : 'show history records before devtool first created' }}"
+                >
+                    <span
+                        class="toolbar-icon"
+                        on-click="loadBefore"
+                    >
+                        <san-icon type="eye"></san-icon>
+                    </span>
                 </san-tooltip>
             </div>
         </div>
@@ -67,8 +68,7 @@
             <div slot="component">
                 <div
                     class="button-wrapper"
-                    on-mouseover="highlightNativeNode(text.id)"
-                    on-mouseout="unhighlightNativeNode()"
+                    on-click="highlightNativeNode(text.id)"
                 >
                     <san-button
                         type="primary"
@@ -80,8 +80,7 @@
             <div slot="sender">
                 <div
                     class="button-wrapper"
-                    on-mouseover="highlightNativeNode(text.id)"
-                    on-mouseout="unhighlightNativeNode()"
+                    on-click="highlightNativeNode(text.id)"
                 >
                     <san-button
                         type="primary"
@@ -93,8 +92,7 @@
             <div slot="receiver">
                 <div
                     class="button-wrapper"
-                    on-mouseover="highlightNativeNode(text.id)"
-                    on-mouseout="unhighlightNativeNode()"
+                    on-click="highlightNativeNode(text.id)"
                 >
                     <san-button
                         type="primary"
@@ -123,13 +121,14 @@ import san, {DataTypes} from 'san';
 import {connectStore} from '@san-devtools/store/index';
 import {optimizedResize} from '@san-devtools/utils/index';
 
-import {Button, Icon, Table, Tooltip, Input} from 'santd';
+import {Button, Table, Tooltip} from 'santd';
+import SdInput from '@san-devtools/components/input/input.san';
 import JsonTreeView from '@san-devtools/components/misc/jsonTreeView.san';
-import CustomIcon from '@san-devtools/components/icon/spriteIcon.san';
+import Icon from '@san-devtools/components/icon/icon.san';
 
 // TODO：长列表优化，替换 santd table
 // 表头两倍高度
-const TABLE_HEAD_HEIGHT = 150;
+const TABLE_HEAD_HEIGHT = 200;
 
 
 export default connectStore({
@@ -140,10 +139,9 @@ export default connectStore({
             'san-table': Table,
             'san-button': Button,
             'san-icon': Icon,
-            'san-custom-icon': CustomIcon,
             'san-json-tree-view': JsonTreeView,
             'san-tooltip': Tooltip,
-            'san-input': Input
+            'sand-input': SdInput
         },
         initData() {
             return {
@@ -198,9 +196,6 @@ export default connectStore({
         },
         highlightNativeNode(componentId) {
             this.data.get('bridge') && this.data.get('bridge').send('Inspect.highlight', componentId);
-        },
-        unhighlightNativeNode() {
-            this.data.get('bridge') && this.data.get('bridge').send('Inspect.unhighlight', '');
         }
     }
 )
@@ -209,52 +204,136 @@ export default connectStore({
 
 <style lang="less">
 @import '@san-devtools/views/style/variables.less';
+@start-record-color: #ec3b11;
 .sd-list {
+    margin: 20px 14px;
+    border-radius: 18px;
+    background-color: @color-white;
     .button-wrapper,.action {
         display: inline-block;
         .santd-btn:not(.santd-btn-circle):not(.santd-btn-circle-outline).santd-btn-icon-only {
             padding: 2px 4px;
         }
         .santd-btn {
-            background-color: @bg-color-santd-btn;
+            background-color: @color-blue-l3;
             border: 0;
-            height: 22px;
+            border-radius: 10px;
+            height: 20px;
             line-height: 1;
+            font-size: 12px;
+        }
+        .santd-btn-primary {
+            border: 0;
         }
     }
     .event-name {
-        color: @font-color-event;
+        color: @button-color;
     }
     .toolbar {
-        padding-left: 20px;
-        height: 28px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 20px;
         user-select: none;
         cursor: pointer;
         &-icon {
-            height: 28px;
-            display: inline-flex;
-            flex-direction: column;
-            justify-content: center;
+            font-size: 24px;
+            display: flex;
+            padding: 0 11px;
+            .Icon {
+                border: 1px solid transparent;
+            }
+            .Icon:hover {
+                border-radius: 50%;
+                background-color: @icon-hover-bg-color;
+                border: 1px solid @icon-hover-border-color;
+            }
         }
         .start-record {
-            color: #ec3b11;
+            color: @start-record-color;
         }
         .filter {
-            display: inline-block;
-            height: 24px;
-            .santd-input-affix-wrapper .santd-input:not(:first-child) {
-                padding-left: 40px;
+            flex: 1.5;
+        }
+        .action {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+    }
+    .santd-table {
+        padding: 0 8px;
+        .santd-table-thead > tr > th {
+            background: @color-white;
+        }
+        .santd-table-placeholder {
+            border: 0;
+        }
+        .santd-table-scroll {
+            border-radius: 18px;
+        }
+        .santd-table-tbody > tr {
+            box-shadow: 0 1px 1px 0 @color-white-e;
+        }
+        .santd-table-tbody > tr > td {
+            border: 0;
+        }
+        .santd-table-tbody > tr:hover:not(.santd-table-expanded-row):not(.santd-table-row-selected) > td {
+            background: @color-blue-l2;
+            &:first-child {
+                border-top-left-radius: 8px;
+                border-bottom-left-radius: 8px;
             }
-            .santd-input {
-                height: 24px;
-                padding-top: 0;
-                padding-bottom: 0;
-                border: 0;
-                border-radius: 0;
-                background-color: rgba(0,0,0,0);
+            &:last-child {
+                border-top-right-radius: 8px;
+                border-bottom-right-radius: 8px;
             }
-            overflow: hidden;
-            position: relative;
+        }
+    }
+}
+.dark {
+    .sd-list {
+        background-color: #272B2E;
+        .button-wrapper,.action {
+            .santd-btn {
+                background-color: #50555A;
+            }
+        }
+        .event-name {
+            color: @button-color;
+        }
+        .toolbar {
+            &-icon {
+                .Icon {
+                    border: 1px solid transparent;
+                }
+                .Icon:hover {
+                    background-color: @dark-icon-hover-bg-color;
+                    border: 1px solid @dark-icon-hover-border-color;
+                }
+            }
+            .start-record {
+                color: @start-record-color;
+            }
+        }
+        .santd-table {
+            .santd-table-header,
+            .santd-table-body,
+            .santd-table-placeholder,
+            .santd-table-thead > tr > th {
+                background-color: #272B2E !important;
+                color: @color-white;
+            }
+            .santd-empty-description {
+                color: @color-white;
+            }
+            .santd-table-tbody > tr {
+                box-shadow: 0 1px 1px 0 rgba(238, 238, 238, 0.1);
+            }         
+            .santd-table-tbody > tr:hover:not(.santd-table-expanded-row):not(.santd-table-row-selected) > td {
+                background: @color-blue-l2;
+            }
         }
     }
 }

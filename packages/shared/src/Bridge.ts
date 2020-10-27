@@ -1,5 +1,5 @@
 import EventEmitter from './EventEmitter';
-import {Message} from 'types';
+import {Message} from '../types';
 
 const BATCH_DURATION = 100;
 
