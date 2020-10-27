@@ -6,31 +6,31 @@
 </template>
 
 <script>
-import san, {DataTypes} from 'san';
-import Split from 'split.js';
+    import san, { DataTypes } from 'san';
+    import Split from 'split.js';
 
-import BasicLayout from '@frontend/components/layout/basicLayout.san';
-import MutationTree from './mutationTree/mutationTree.san';
-import StoreInfo from './storeInfo/storeInfo.san';
+    import BasicLayout from '@frontend/components/layout/basicLayout.san';
+    import MutationTree from './mutationTree/mutationTree.san';
+    import StoreInfo from './storeInfo/storeInfo.san';
 
-export default {
+    export default {
 
-    components: {
-        'sandevtool-mutation-tree': MutationTree,
-        'sandevtool-store-info': StoreInfo,
-        'sd-basic-layout': BasicLayout
-    },
+        components: {
+            'sandevtool-mutation-tree': MutationTree,
+            'sandevtool-store-info': StoreInfo,
+            'sd-basic-layout': BasicLayout
+        },
 
-    initData() {
-        return {
-            index: -1
-        };
-    },
+        initData() {
+            return {
+                index: -1
+            };
+        },
 
-    dataTypes: {
-        index: DataTypes.number
+        dataTypes: {
+            index: DataTypes.number
+        }
     }
-}
 </script>
 
 <style lang="less">

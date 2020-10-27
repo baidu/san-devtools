@@ -1,13 +1,12 @@
-
 @import '@frontend/views/style/variables.less';
 .custom .sm-tree-view-item > .pad > .sm-touch-ripple {
     height: 31px !important;
 }
 .custom .sm-tree-view-item > .pad > .sm-touch-ripple.selected {
-    background-color: @ripple-bg-color-selected !important;
+    background-color: @ripple-selected-bg-color !important;
 }
 .custom .sm-tree-view-item > .pad > .sm-touch-ripple:hover {
-    background-color: @ripple-bg-color-hover !important;
+    background-color: @ripple-hover-bg-color !important;
 }
 .custom .sm-tree-view-item > .pad.selected:hover > .sm-tree-view-item-content > .sm-tree-view-item-secondary-text,
 .custom .sm-tree-view-item > .pad > .sm-tree-view-item-content > .sm-tree-view-item-secondary-text {
@@ -28,10 +27,10 @@
 
 .dark {
     .custom .sm-tree-view-item > .pad > .sm-touch-ripple.selected {
-        background-color: @dark-ripple-bg-color-selected !important;
+        background-color: @dark-ripple-selected-bg-color !important;
     }
     .custom .sm-tree-view-item > .pad > .sm-touch-ripple:hover {
-        background-color: @dark-ripple-bg-color-hover !important;
+        background-color: @dark-ripple-hover-bg-color !important;
     }
     .custom .sm-tree-view-item > .pad.selected:hover > .sm-tree-view-item-content > .sm-tree-view-item-secondary-text,
     .custom .sm-tree-view-item > .pad > .sm-tree-view-item-content > .sm-tree-view-item-secondary-text {

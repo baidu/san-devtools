@@ -6,31 +6,31 @@
 </template>
 
 <script>
-import san, {DataTypes} from 'san';
-import {connectStore} from '@frontend/store/index';
+    import san, { DataTypes } from 'san';
+    import { connectStore } from '@frontend/store/index';
 
-import BasicLayout from '@frontend/components/layout/basicLayout.san';
-import ComponentTree from './componentTree/componentTree.san';
-import ComponentInfo from './componentInfo/componentInfo.san';
+    import BasicLayout from '@frontend/components/layout/basicLayout.san';
+    import ComponentTree from './componentTree/componentTree.san';
+    import ComponentInfo from './componentInfo/componentInfo.san';
 
-export default connectStore({
-    bridge: 'bridge'
-})(
-    {
-        components: {
-            'sandevtool-component-tree': ComponentTree,
-            'sandevtool-component-info': ComponentInfo,
-            'sd-basic-layout': BasicLayout
-        },
+    export default connectStore({
+        bridge: 'bridge'
+    })(
+        {
+            components: {
+                'sandevtool-component-tree': ComponentTree,
+                'sandevtool-component-info': ComponentInfo,
+                'sd-basic-layout': BasicLayout
+            },
 
-        attached() {
-            this.data.get('bridge').send('Component.getTreeData','');
-            this.watch('bridge', bridge => {
-                bridge.send('Component.getTreeData','');
-            });
+            attached() {
+                this.data.get('bridge').send('Component.getTreeData', '');
+                this.watch('bridge', bridge => {
+                    bridge.send('Component.getTreeData', '');
+                });
+            }
         }
-    }
-)
+    )
 </script>
 
 <style lang="less">

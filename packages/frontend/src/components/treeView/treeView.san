@@ -35,217 +35,215 @@
     </div>
 </template>
 <script>
-import san, {DataTypes} from 'san';
-import {Icon} from 'santd';
-import TreeViewItem from './treeViewItem.san';
-import SdInput from '@frontend/components/input/input.san';
-import SdLoading from '@frontend/components/loading/loading.san';
-export default {
-    dataTypes: {
-        compact: DataTypes.bool,
-        wholeLineSelected: DataTypes.bool,
-        keepingSelected: DataTypes.bool,
-        defaultSelectedIdentity: DataTypes.string,
-        filterBar: DataTypes.bool,
-        filterBarHintText: DataTypes.string,
-        dataSource: DataTypes.oneOf(['ATTRIBUTE', 'JSON']),
-        highlighted: DataTypes.bool,
-        treeData: DataTypes.arrayOf(DataTypes.object),
-        loading: DataTypes.bool,
-        loadingToast: DataTypes.string,
-        progress: DataTypes.number
-    },
+    import san, { DataTypes } from 'san';
+    import { Icon } from 'santd';
+    import TreeViewItem from './treeViewItem.san';
+    import SdInput from '@frontend/components/input/input.san';
+    import SdLoading from '@frontend/components/loading/loading.san';
+    export default {
+        dataTypes: {
+            compact: DataTypes.bool,
+            wholeLineSelected: DataTypes.bool,
+            keepingSelected: DataTypes.bool,
+            defaultSelectedIdentity: DataTypes.string,
+            filterBar: DataTypes.bool,
+            filterBarHintText: DataTypes.string,
+            dataSource: DataTypes.oneOf(['ATTRIBUTE', 'JSON']),
+            highlighted: DataTypes.bool,
+            treeData: DataTypes.arrayOf(DataTypes.object),
+            loading: DataTypes.bool,
+            loadingToast: DataTypes.string,
+            progress: DataTypes.number
+        },
 
-    components: {
-        'san-icon': Icon,
-        'san-tree-view-item': TreeViewItem,
-        'sand-input': SdInput,
-        'sand-loading': SdLoading
-    },
+        components: {
+            'san-icon': Icon,
+            'san-tree-view-item': TreeViewItem,
+            'sand-input': SdInput,
+            'sand-loading': SdLoading
+        },
 
-    inited() {
-    },
+        inited() {
+        },
 
-    initData() {
-        return {
-            compact: false,
-            wholeLineSelected: false,
-            keepingSelected: false,
-            filterBar: false,
-            filterBarHintText: '',
-            dataSource: 'ATTRIBUTE',
-            highlighted: false,
-            loading: true,
-            loadingToast: '',
-            loadingToastContentFromColor: 'rgba(0, 175, 255, 1)',
-            loadingToastContentToColor: '#fff',
-            progress: 0,
-            rootTreeView: true,
-            filterText: '',
-            totalNumsChange: false
-        };
-    },
+        initData() {
+            return {
+                compact: false,
+                wholeLineSelected: false,
+                keepingSelected: false,
+                filterBar: false,
+                filterBarHintText: '',
+                dataSource: 'ATTRIBUTE',
+                highlighted: false,
+                loading: true,
+                loadingToast: '',
+                loadingToastContentFromColor: 'rgba(0, 175, 255, 1)',
+                loadingToastContentToColor: '#fff',
+                progress: 0,
+                rootTreeView: true,
+                filterText: '',
+                totalNumsChange: false
+            };
+        },
 
-    updated() {
-        if (this.data.get('totalNumsChange') || true) {
-            setTimeout(() => {
-                let totalNums = this.data.get('totalNums');
-                let type = this.data.get('type');
-                let curNums = document.querySelectorAll(`.tree-view-type-${type}`).length;
-                if (totalNums <= 0 || !curNums) {
-                    return;
+        updated() {
+            if (this.data.get('totalNumsChange') || true) {
+                setTimeout(() => {
+                    let totalNums = this.data.get('totalNums');
+                    let type = this.data.get('type');
+                    let curNums = document.querySelectorAll(`.tree-view-type-${type}`).length;
+                    if (totalNums <= 0 || !curNums) {
+                        return;
+                    }
+                    let progress = curNums / totalNums * 100;
+                    this.data.set('progress', progress);
+                }, 60);
+            }
+        },
+
+        attached() {
+
+        },
+
+        created() {
+            if (!this.data.get('loadingToast')) {
+                this.data.set('loading', false);
+            }
+            this.watch('progress', value => {
+                this.data.set('loading', value < 100);
+                value === 100 && this.data.set('totalNumsChange', false);
+            });
+            this.watch('totalNums', value => {
+                this.data.set('totalNumsChange', true);
+            })
+        },
+
+        messages: {
+            'UI:query-compact-attribute'(arg) {
+                let compact = this.data.get('compact');
+                let target = arg.target;
+                target && target.data.set('compact', compact);
+                target && target.data.set('rippleMarginLeft', compact ? 16 : 32);
+                target && target.data.set('contentMarginLeft', compact ? 22 : 48);
+            },
+            'UI:query-whole-line-selected-attribute'(arg) {
+                arg.target && arg.target.data && arg.target.data.set(
+                    'wholeLineSelected', this.data.get('wholeLineSelected'));
+            },
+            'UI:query-keeping-selected-attribute'(arg) {
+                arg.target && arg.target.data && arg.target.data.set(
+                    'keepingSelected', this.data.get('keepingSelected'));
+            },
+            'UI:record-selected-item'(arg) {
+                this.data.set('selectedItem', arg.target);
+            },
+            'UI:clear-selected-item'(arg) {
+                let selectedItem = this.data.get('selectedItem');
+                selectedItem && selectedItem.data
+                    && selectedItem.clearSelectedClass(false);
+            },
+            'UI:query-data-source-attribute'(arg) {
+                let target = arg.target;
+                if (target.data.get('dataSource') === undefined) {
+                    target.data.set('dataSource', this.data.get('dataSource'));
                 }
-                let progress = curNums / totalNums * 100;
-                this.data.set('progress', progress);
-            }, 60);
-        }
-    },
+            }
+        },
 
-    attached() {
-
-    },
-
-    created() {
-        if (!this.data.get('loadingToast')) {
-            this.data.set('loading', false);
-        }
-        this.watch('progress', value => {
-            this.data.set('loading', value < 100);
-            value === 100 && this.data.set('totalNumsChange', false);
-        });
-        this.watch('totalNums', value => {
-            this.data.set('totalNumsChange', true);
-        })
-    },
-
-    messages: {
-        'UI:query-compact-attribute'(arg) {
-            let compact = this.data.get('compact');
-            let target = arg.target;
-            target && target.data.set('compact', compact);
-            target && target.data.set('rippleMarginLeft', compact ? 16 : 32);
-            target && target.data.set('contentMarginLeft', compact ? 22 : 48);
-        },
-        'UI:query-whole-line-selected-attribute'(arg) {
-            arg.target && arg.target.data && arg.target.data.set(
-                'wholeLineSelected', this.data.get('wholeLineSelected'));
-        },
-        'UI:query-keeping-selected-attribute'(arg) {
-            arg.target && arg.target.data && arg.target.data.set(
-                'keepingSelected', this.data.get('keepingSelected'));
-        },
-        'UI:record-selected-item'(arg) {
-            this.data.set('selectedItem', arg.target);
-        },
-        'UI:clear-selected-item'(arg) {
-            let selectedItem = this.data.get('selectedItem');
-            selectedItem && selectedItem.data
-                && selectedItem.clearSelectedClass(false);
-        },
-        'UI:query-data-source-attribute'(arg) {
-            let target = arg.target;
-            if (target.data.get('dataSource') === undefined) {
-                target.data.set('dataSource', this.data.get('dataSource'));
+        computed: {
+            placeholder() {
+                let totalNums = this.data.get('totalNums');
+                let filterPlaceholder = this.data.get('filterPlaceholder');
+                let componentsPlaceholder = typeof totalNums !== 'undefined' ? `,${totalNums} components` : ''
+                return `${filterPlaceholder}${componentsPlaceholder}`;
+            },
+            treeViewClass() {
+                return this.data.get('compact') ? 'compact ' : '';
             }
         }
-    },
-
-    computed: {
-        placeholder() {
-            let totalNums = this.data.get('totalNums');
-            let filterPlaceholder = this.data.get('filterPlaceholder');
-            let componentsPlaceholder = typeof totalNums !== 'undefined' ? `,${totalNums} components` : ''
-            return `${filterPlaceholder}${componentsPlaceholder}`;
-        },
-        treeViewClass() {
-            return this.data.get('compact') ? 'compact ' : '';
-        }
     }
-}
 </script>
 <style lang="less">
-@import '@frontend/views/style/variables.less';
-@sand-input-height: 32px;
-@sand-input-margin-bottom: 12px;
-.sm-tree-view {
-    height: 100%;
-    position: relative;
-    .san-devtool-input .santd-input-affix-wrapper {
-        height: @sand-input-height;
-        margin-bottom: @sand-input-margin-bottom;
-    }
-    .compact {
-        padding: 0;
-        line-height: normal;
-    }
-    .sm-tree-view-item-wrapper {
-        position: relative;
-        height: calc(100% - @sand-input-height - @sand-input-margin-bottom);
-        overflow: auto;
-        .sm-tree-view-item {
-            .sm-touch-ripple.selected:hover {
-                & ~ .sm-tree-view-item-content.selected {
-                    .sm-tree-view-item-primary-text {
-                        background-image: linear-gradient(
-                            to right,
-                            @bg-color-primary-text-selected calc(100% - @nav-height),
-                            transparent
-                        );
-                    }
-                }
-            }
-            .sm-tree-view-item-content {
-                .sm-tree-view-item-primary-text, &:hover {
-                    font-family: "Consolas";
-                    font-size: 14px;
-                    color: #ffa318;
-                    width: 100%;
-                    text-decoration: none;
-                    background-image: linear-gradient(
-                        to right,
-                        @bg-color-primary-text calc(100% - 44px),
-                        transparent
-                    );
-                    -webkit-background-clip: text;
-                    -webkit-text-fill-color: transparent;
-                    background-size: calc(100% - 80px) auto;
-                    background-repeat-x: no-repeat;
-                }
-                .sm-tree-view-item-extras {
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                }
-            }
-        }
-    }
-}
-.dark {
+    @import '@frontend/views/style/variables.less';
+    @sand-input-height: 32px;
+    @sand-input-margin-bottom: 12px;
     .sm-tree-view {
+        height: 100%;
+        position: relative;
+        .san-devtool-input .santd-input-affix-wrapper {
+            height: @sand-input-height;
+            margin-bottom: @sand-input-margin-bottom;
+        }
+        .compact {
+            padding: 0;
+            line-height: normal;
+        }
         .sm-tree-view-item-wrapper {
+            position: relative;
+            height: calc(100% - @sand-input-height - @sand-input-margin-bottom);
+            overflow: auto;
             .sm-tree-view-item {
                 .sm-touch-ripple.selected:hover {
                     & ~ .sm-tree-view-item-content.selected {
                         .sm-tree-view-item-primary-text {
                             background-image: linear-gradient(
                                 to right,
-                                @dark-bg-color-primary-text-selected calc(100% - @nav-height),
+                                @primary-text-selected-bg-color calc(100% - @nav-height),
                                 transparent
                             );
                         }
                     }
                 }
                 .sm-tree-view-item-content {
-                    .sm-tree-view-item-primary-text, &:hover {
-                        background-image: linear-gradient(
-                            to right,
-                            @dark-bg-color-primary-text calc(100% - 44px),
-                            transparent
-                        );
+                    .sm-tree-view-item-primary-text,
+                    &:hover {
+                        font-family: 'Consolas';
+                        font-size: 14px;
+                        color: #ffa318;
+                        width: 100%;
+                        text-decoration: none;
+                        background-image: linear-gradient(to right, @primary-text-bg-color calc(100% - 44px), transparent);
+                        -webkit-background-clip: text;
+                        -webkit-text-fill-color: transparent;
+                        background-size: calc(100% - 80px) auto;
+                        background-repeat-x: no-repeat;
+                    }
+                    .sm-tree-view-item-extras {
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
                     }
                 }
             }
         }
     }
-}
+    .dark {
+        .sm-tree-view {
+            .sm-tree-view-item-wrapper {
+                .sm-tree-view-item {
+                    .sm-touch-ripple.selected:hover {
+                        & ~ .sm-tree-view-item-content.selected {
+                            .sm-tree-view-item-primary-text {
+                                background-image: linear-gradient(
+                                    to right,
+                                    @dark-primary-text-selected-bg-color calc(100% - @nav-height),
+                                    transparent
+                                );
+                            }
+                        }
+                    }
+                    .sm-tree-view-item-content {
+                        .sm-tree-view-item-primary-text,
+                        &:hover {
+                            background-image: linear-gradient(
+                                to right,
+                                @dark-primary-text-bg-color calc(100% - 44px),
+                                transparent
+                            );
+                        }
+                    }
+                }
+            }
+        }
+    }
 </style>

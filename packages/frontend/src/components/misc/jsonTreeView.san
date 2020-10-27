@@ -118,13 +118,14 @@
     @action-font-color: #4768fa;
     .s-json-tree-view {
         div:focus {
-            outline: #E4E4E4 auto 1px;
+            outline: #e4e4e4 auto 1px;
         }
         .jsonView {
             & > .name {
                 color: @json-font-color-yellow;
             }
-            .boolean, .number {
+            .boolean,
+            .number {
                 color: @json-font-color-blue;
             }
             .string {
@@ -134,7 +135,8 @@
             .collapse:before {
                 color: @expand-icon-color;
             }
-            .delete:before, .insert:before {
+            .delete:before,
+            .insert:before {
                 width: 16px;
                 height: 16px;
                 border-radius: 4px;
@@ -155,7 +157,8 @@
             .insert {
                 margin-left: 30px;
             }
-            .insert:hover, .delete:hover {
+            .insert:hover,
+            .delete:hover {
                 background-color: #fff;
             }
             .insert:before {
@@ -177,14 +180,15 @@
     .dark {
         .s-json-tree-view {
             div:focus {
-                outline: #E4E4E4 auto 1px;
+                outline: #e4e4e4 auto 1px;
             }
             .jsonView {
                 & > .value {
                     color: @color-white;
                 }
             }
-            .insert:hover, .delete:hover {
+            .insert:hover,
+            .delete:hover {
                 background-color: transparent;
             }
         }

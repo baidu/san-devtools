@@ -28,80 +28,80 @@
 </template>
 
 <script>
-import san, {DataTypes} from 'san';
-import {connectStore, store} from '@frontend/store/index';
-import TreeView from '@frontend/components/treeView/treeView.san';
+    import san, { DataTypes } from 'san';
+    import { connectStore, store } from '@frontend/store/index';
+    import TreeView from '@frontend/components/treeView/treeView.san';
 
-import '@frontend/components/treeView/custom.less';
+    import '@frontend/components/treeView/custom.less';
 
-export default connectStore({
-    treeData: 'treeData',
-    totalCompNums: 'totalCompNums',
-    bridge: 'bridge',
-    defaultSelectedIdPath: 'inspectedIdPathStr'
-})( {
-    messages: {
-        'UI:tree-view-item-click'({value}) {
-            this.getComponentInfo(value);
-            this.setSelectedComponentBaseInfo(value);
-            this.highlightNativeNode(value);
-            this.setInspectedId(value);
-        }
-    },
-    components: {
-        'san-tree-view': TreeView,
-    },
+    export default connectStore({
+        treeData: 'treeData',
+        totalCompNums: 'totalCompNums',
+        bridge: 'bridge',
+        defaultSelectedIdPath: 'inspectedIdPathStr'
+    })({
+        messages: {
+            'UI:tree-view-item-click'({ value }) {
+                this.getComponentInfo(value);
+                this.setSelectedComponentBaseInfo(value);
+                this.highlightNativeNode(value);
+                this.setInspectedId(value);
+            }
+        },
+        components: {
+            'san-tree-view': TreeView,
+        },
 
-    setInspectedId({idPath}) {
-        store.dispatch('setInspectId', idPath);
-    },
+        setInspectedId({ idPath }) {
+            store.dispatch('setInspectId', idPath);
+        },
 
-    setSelectedComponentBaseInfo(treeData) {
-        let info = {
-            id: treeData.id + '',
-            parentId: treeData.parentId + '',
-            ownerId: treeData.ownerId + '',
-            tagName: treeData.tagName,
-            displayName: treeData.displayName,
-            idPath: treeData.idPath,
-        }
-        treeData.storeName && (info.storeName = treeData.storeName);
-        treeData.mapStates && (info.mapStates = treeData.mapStates);
-        treeData.mapActionsKeys && (info.mapActionsKeys = treeData.mapActionsKeys);
-        store.dispatch('setSelectedComponentBaseInfo', info);
-    },
+        setSelectedComponentBaseInfo(treeData) {
+            let info = {
+                id: treeData.id + '',
+                parentId: treeData.parentId + '',
+                ownerId: treeData.ownerId + '',
+                tagName: treeData.tagName,
+                displayName: treeData.displayName,
+                idPath: treeData.idPath,
+            }
+            treeData.storeName && (info.storeName = treeData.storeName);
+            treeData.mapStates && (info.mapStates = treeData.mapStates);
+            treeData.mapActionsKeys && (info.mapActionsKeys = treeData.mapActionsKeys);
+            store.dispatch('setSelectedComponentBaseInfo', info);
+        },
 
-    getComponentInfo({id: componentId}) {
-        this.data.get('bridge') && this.data.get('bridge').send('Component.getComponentInfo', componentId);
-    },
+        getComponentInfo({ id: componentId }) {
+            this.data.get('bridge') && this.data.get('bridge').send('Component.getComponentInfo', componentId);
+        },
 
-    highlightNativeNode({id: componentId}) {
-        this.data.get('bridge') && this.data.get('bridge').send('Inspect.highlight', componentId);
-    },
+        highlightNativeNode({ id: componentId }) {
+            this.data.get('bridge') && this.data.get('bridge').send('Inspect.highlight', componentId);
+        },
 
-    initData() {
-        return {
-            // 默认不对执行代码进行合并处理
-            maxLengthOfExecutionCodeQueue: 10,
-            loadingToast: 'Building component tree... ',
-            loading: true,
-            processingComponentInfo: ''
-        };
-    },
+        initData() {
+            return {
+                // 默认不对执行代码进行合并处理
+                maxLengthOfExecutionCodeQueue: 10,
+                loadingToast: 'Building component tree... ',
+                loading: true,
+                processingComponentInfo: ''
+            };
+        },
 
-    dataTypes: {
-        maxLengthOfExecutionCodeQueue: DataTypes.number,
-        loadingToast: DataTypes.string,
-        loading: DataTypes.bool,
-        processingComponentInfo: DataTypes.string
-    },
-})
+        dataTypes: {
+            maxLengthOfExecutionCodeQueue: DataTypes.number,
+            loadingToast: DataTypes.string,
+            loading: DataTypes.bool,
+            processingComponentInfo: DataTypes.string
+        },
+    })
 </script>
 
 <style lang="less">
-.sm-tree-view-wrapper {
-    width: 100%;
-    height: 100%;
-    user-select: none;
-}
+    .sm-tree-view-wrapper {
+        width: 100%;
+        height: 100%;
+        user-select: none;
+    }
 </style>

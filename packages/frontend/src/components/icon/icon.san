@@ -12,28 +12,28 @@
     </svg>
 </template>
 <script>
-import san from 'san';
-import icons from './icon.ts';
-export default {
-    initData() {
-        return {
-            className: '',
-        }
-    },
+    import san from 'san';
+    import icons from './icon.ts';
+    export default {
+        initData() {
+            return {
+                className: '',
+            }
+        },
 
-    computed: {
-        pathData() {
-            let type = this.data.get('type');
-            return icons[type] || null;
+        computed: {
+            pathData() {
+                let type = this.data.get('type');
+                return icons[type] || null;
+            }
         }
+
     }
-
-}
 </script>
 <style lang="less">
-.Icon {
-    width: 1em;
-    height: 1em;
-    fill: currentColor;
-}
+    .Icon {
+        width: 1em;
+        height: 1em;
+        fill: currentColor;
+    }
 </style>

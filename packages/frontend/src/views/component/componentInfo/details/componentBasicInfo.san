@@ -22,38 +22,38 @@
 
 <script>
 
-import {Grid} from 'santd';
+    import { Grid } from 'santd';
 
-import InspectableButton from '@frontend/components/misc/inspectableButton.san';
+    import InspectableButton from '@frontend/components/misc/inspectableButton.san';
 
-export default {
+    export default {
 
-    components: {
-        'san-row': Grid.Row,
-        'san-col': Grid.Col,
-        'san-inspectable-button': InspectableButton
-    },
+        components: {
+            'san-row': Grid.Row,
+            'san-col': Grid.Col,
+            'san-inspectable-button': InspectableButton
+        },
 
-    computed: {
-        data(){
-            let infoList = this.data.get('infoList') || [{key: 'No data', value: 'Please choose a component.'}];
-            let filterText = this.data.get('filterText');
-            filterText = filterText ? filterText.trim() : '';
-            let newData;
-            if (!filterText) {
-                newData = infoList;
-            } else {
-                newData = infoList.filter(item => JSON.stringify(item).indexOf(filterText) > -1);
+        computed: {
+            data() {
+                let infoList = this.data.get('infoList') || [{ key: 'No data', value: 'Please choose a component.' }];
+                let filterText = this.data.get('filterText');
+                filterText = filterText ? filterText.trim() : '';
+                let newData;
+                if (!filterText) {
+                    newData = infoList;
+                } else {
+                    newData = infoList.filter(item => JSON.stringify(item).indexOf(filterText) > -1);
+                }
+                return newData;
             }
-            return newData;
         }
     }
-}
 </script>
 
 <style lang="less">
-.arr-item {
-    display: inline-block;
-    margin-right: 10px;
-}
+    .arr-item {
+        display: inline-block;
+        margin-right: 10px;
+    }
 </style>

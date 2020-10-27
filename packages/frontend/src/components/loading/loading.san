@@ -11,60 +11,60 @@
     </div>
 </template>
 <script>
-import san, {DataTypes} from 'san';
-import {Input, Icon} from 'santd';
-import SdInput from '@frontend/components/input/input.san';
-export default {
-    computed: {
-        loadingToastContentStyle() {
-            let fromColor = this.data.get('loadingToastContentFromColor');
-            let toColor = this.data.get('loadingToastContentToColor');
-            let progress = this.data.get('progress');
-            let leftBound = Math.max(0, progress - 3);
-            let rightBound = Math.min(100, progress + 3);
-            return {
-                'background-image':
-                    `linear-gradient(to right, ${fromColor} ${leftBound}%,
+    import san, { DataTypes } from 'san';
+    import { Input, Icon } from 'santd';
+    import SdInput from '@frontend/components/input/input.san';
+    export default {
+        computed: {
+            loadingToastContentStyle() {
+                let fromColor = this.data.get('loadingToastContentFromColor');
+                let toColor = this.data.get('loadingToastContentToColor');
+                let progress = this.data.get('progress');
+                let leftBound = Math.max(0, progress - 3);
+                let rightBound = Math.min(100, progress + 3);
+                return {
+                    'background-image':
+                        `linear-gradient(to right, ${fromColor} ${leftBound}%,
                         ${toColor} ${rightBound}%, ${toColor})`
-            };
+                };
+            }
         }
     }
-}
 </script>
 <style lang="less">
-@bg-color-black: rgba(31,31,31,0.95);
-.san-devtool-loading-toast {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    max-width: 80%;
-    height: 56px;
-    text-align: center;
-    overflow: hidden;
-    background-color: @bg-color-black;
-    pointer-events: none;
-    transition: all 0.5s;
-    z-index: 1000;
-    padding: 18px;
-    border-radius: 12px;
-    &-content {
+    @bg-color-black: rgba(31, 31, 31, 0.95);
+    .san-devtool-loading-toast {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        max-width: 80%;
+        height: 56px;
+        text-align: center;
         overflow: hidden;
-        text-overflow:ellipsis;
-        white-space: nowrap;
-        font-size: 16px;
-        text-align: left;
-        line-height: 20px;
-        word-wrap: none;
-        -webkit-text-fill-color: transparent;
-        -webkit-background-clip: text;
-        background-image: linear-gradient(to right, #fff, #fff);
+        background-color: @bg-color-black;
+        pointer-events: none;
+        transition: all 0.5s;
+        z-index: 1000;
+        padding: 18px;
+        border-radius: 12px;
+        &-content {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 16px;
+            text-align: left;
+            line-height: 20px;
+            word-wrap: none;
+            -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text;
+            background-image: linear-gradient(to right, #fff, #fff);
+        }
+        &.show {
+            opacity: 1;
+        }
+        &.hide {
+            opacity: 0;
+        }
     }
-    &.show {
-        opacity: 1;
-    }
-    &.hide {
-        opacity: 0;
-    }
-}
 </style>

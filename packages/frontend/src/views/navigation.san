@@ -128,7 +128,7 @@
                     window.localStorage['_san_devtool_theme'] = LIGHT_MODE;
                     theme = LIGHT_MODE;
                 }
-                switch(theme) {
+                switch (theme) {
                     case LIGHT_MODE: {
                         document.body.classList.remove('dark');
                         break;
@@ -342,7 +342,7 @@
             }
             padding: 12px 16px;
             &:hover {
-                background-color: @setting-bg-color;
+                background-color: @setting-hover-bg-color;
             }
             &:first-child {
                 border-top-left-radius: 9px;
@@ -353,8 +353,8 @@
                 border-bottom-left-radius: 9px;
             }
             .santd-checkbox-checked .santd-checkbox-inner {
-                background-color: @checkbox-bg-color;
-                border: 1px solid @checkbox-border-color;
+                background-color: @setting-checkbox-bg-color;
+                border: 1px solid @setting-checkbox-border-color;
             }
             .santd-checkbox-wrapper {
                 color: @setting-font-color;
@@ -369,16 +369,16 @@
             }
         }
         .santd-popover-arrow {
-            border-top-color: @popover-bg-color !important;
-            border-left-color: @popover-bg-color !important;
+            border-top-color: @setting-bg-color !important;
+            border-left-color: @setting-bg-color !important;
         }
         .navigation-checkbox-wrap:not(:first-child) {
-            border-top: 1px solid @popover-border-top-color;
+            border-top: 1px solid @setting-border-top-color;
         }
         .santd-popover-inner {
             border-radius: 9px;
-            background: @popover-bg-color;
-            box-shadow: 0 2px 8px 0 @popover-shadow-color;
+            background: @setting-bg-color;
+            box-shadow: 0 2px 8px 0 @setting-shadow-color;
         }
     }
 
@@ -408,26 +408,26 @@
                     color: @dark-setting-font-color;
                 }
                 &:hover {
-                    background-color: @dark-setting-bg-color;
+                    background-color: @dark-setting-hover-bg-color;
                 }
                 .santd-checkbox-checked .santd-checkbox-inner {
-                    background-color: @dark-checkbox-bg-color;
-                    border: 1px solid @dark-checkbox-border-color;
+                    background-color: @dark-setting-checkbox-bg-color;
+                    border: 1px solid @dark-setting-checkbox-border-color;
                 }
                 .santd-checkbox-wrapper {
                     color: @dark-setting-font-color;
                 }
             }
             .santd-popover-arrow {
-                border-top-color: @dark-popover-bg-color !important;
-                border-left-color: @dark-popover-bg-color !important;
+                border-top-color: @dark-setting-bg-color !important;
+                border-left-color: @dark-setting-bg-color !important;
             }
             .navigation-checkbox-wrap:not(:first-child) {
-                border-top: 1px solid @dark-popover-border-top-color;
+                border-top: 1px solid @dark-setting-border-top-color;
             }
             .santd-popover-inner {
-                background: @dark-popover-bg-color;
-                box-shadow: 0 2px 8px 0 @dark-popover-shadow-color;
+                background: @dark-setting-bg-color;
+                box-shadow: 0 2px 8px 0 @dark-setting-shadow-color;
             }
         }
     }

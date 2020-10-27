@@ -12,101 +12,101 @@
 </template>
 
 <script>
-import san, {DataTypes} from 'san';
-import {connectStore, store} from '@frontend/store/index';
-import DevtoolsTable from '@frontend/components/misc/devtoolsTable.san';
+    import san, { DataTypes } from 'san';
+    import { connectStore, store } from '@frontend/store/index';
+    import DevtoolsTable from '@frontend/components/misc/devtoolsTable.san';
 
-function filterData(filterText, data) {
-    filterText = filterText.trim();
-    if (!filterText) {
-        return data;
+    function filterData(filterText, data) {
+        filterText = filterText.trim();
+        if (!filterText) {
+            return data;
+        }
+        let filterKeys = filterText.split('.');
+        let newData = data.filter(item => {
+            let { sender = {}, receiver = {}, event } = item;
+            let testStr = `${sender.componentName}.${receiver.componentName}.${event}`;
+            let match = false;
+            return filterKeys.every(str => testStr.includes(str));
+        });
+        return newData;
     }
-    let filterKeys = filterText.split('.');
-    let newData = data.filter(item => {
-        let {sender = {}, receiver = {}, event} = item;
-        let testStr = `${sender.componentName}.${receiver.componentName}.${event}`;
-        let match = false;
-        return filterKeys.every(str => testStr.includes(str));
-    });
-    return newData;
-}
 
-export default connectStore({
-    bridge: 'bridge',
-    messageInfoList: 'messageInfoList',
-    readonly: 'settings.messagesReadOnly'
-})(
-    {
-        components: {
-            'san-devtools-table': DevtoolsTable
-        },
-        clearHandler() {
-            store.dispatch('clearMessage');
-        },
-        doFilter(filterText) {
-            this.data.set('filterText', filterText);
-            let data = this.data.get('data');
-            let newData = filterData(filterText, data);
-            this.data.set('data', newData);
-        },
-        computed: {
-            data() {
-                let messageInfoList = this.data.get('messageInfoList');
-                let filterText = this.data.get('filterText');
-                return filterData(filterText, messageInfoList)
-            }
-        },
-        initData() {
-            return {
-                filterText: '',
-                bridgeOptions: {
-                    targetName: 'sender',
-                    bridgeName: 'Message',
-                    bridgeActionName: 'dispatch',
-                    bridgeRecording: 'messageRecording'
-                },
-                columns: [
-                    {
-                        title: 'Timestamp',
-                        dataIndex: 'time',
-                        width:  '10%'
+    export default connectStore({
+        bridge: 'bridge',
+        messageInfoList: 'messageInfoList',
+        readonly: 'settings.messagesReadOnly'
+    })(
+        {
+            components: {
+                'san-devtools-table': DevtoolsTable
+            },
+            clearHandler() {
+                store.dispatch('clearMessage');
+            },
+            doFilter(filterText) {
+                this.data.set('filterText', filterText);
+                let data = this.data.get('data');
+                let newData = filterData(filterText, data);
+                this.data.set('data', newData);
+            },
+            computed: {
+                data() {
+                    let messageInfoList = this.data.get('messageInfoList');
+                    let filterText = this.data.get('filterText');
+                    return filterData(filterText, messageInfoList)
+                }
+            },
+            initData() {
+                return {
+                    filterText: '',
+                    bridgeOptions: {
+                        targetName: 'sender',
+                        bridgeName: 'Message',
+                        bridgeActionName: 'dispatch',
+                        bridgeRecording: 'messageRecording'
                     },
-                    {
-                        title: 'Message',
-                        dataIndex: 'event',
-                        scopedSlots: {render: 'event'},
-                        width:  '10%'
-                    },
-                    {
-                        title: 'Sender',
-                        dataIndex: 'sender',
-                        scopedSlots: {render: 'sender'},
-                        width:  '20%'
-                    },
-                    {
-                        title: 'Receiver',
-                        dataIndex: 'receiver',
-                        scopedSlots: {render: 'receiver'},
-                        width:  '20%'
-                    },
-                    {
-                        title: 'Action',
-                        dataIndex: 'action',
-                        scopedSlots: {render: 'action'},
-                        width:  '10%'
-                    },
-                    {
-                        title: 'Payload',
-                        dataIndex: 'payload',
-                        scopedSlots: {render: 'payload'},
-                        width:  '30%'
-                    }
-                ],
-                tableHeight: 0
+                    columns: [
+                        {
+                            title: 'Timestamp',
+                            dataIndex: 'time',
+                            width: '10%'
+                        },
+                        {
+                            title: 'Message',
+                            dataIndex: 'event',
+                            scopedSlots: { render: 'event' },
+                            width: '10%'
+                        },
+                        {
+                            title: 'Sender',
+                            dataIndex: 'sender',
+                            scopedSlots: { render: 'sender' },
+                            width: '20%'
+                        },
+                        {
+                            title: 'Receiver',
+                            dataIndex: 'receiver',
+                            scopedSlots: { render: 'receiver' },
+                            width: '20%'
+                        },
+                        {
+                            title: 'Action',
+                            dataIndex: 'action',
+                            scopedSlots: { render: 'action' },
+                            width: '10%'
+                        },
+                        {
+                            title: 'Payload',
+                            dataIndex: 'payload',
+                            scopedSlots: { render: 'payload' },
+                            width: '30%'
+                        }
+                    ],
+                    tableHeight: 0
+                }
             }
         }
-    }
-)
+    )
 
 </script>
 

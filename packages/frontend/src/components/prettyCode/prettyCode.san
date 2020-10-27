@@ -45,7 +45,8 @@
             padding: 0.5em;
             border-radius: 12px;
             background: @func-bg-color!important;
-            .hljs-title, .hljs-string {
+            .hljs-title,
+            .hljs-string {
                 color: @hljs-title-color;
             }
         }
@@ -55,10 +56,13 @@
             .language-js {
                 color: #ffffff;
                 background: @dark-func-bg-color !important;
-                .hljs-title, .hljs-string {
+                .hljs-title,
+                .hljs-string {
                     color: @hljs-title-color;
                 }
-                .hljs-keyword, .hljs-selector-tag, .hljs-subst {
+                .hljs-keyword,
+                .hljs-selector-tag,
+                .hljs-subst {
                     color: #ffffff;
                 }
             }

@@ -117,7 +117,7 @@
                 .santd-collapse-item-active {
                     .santd-icon-left {
                         svg {
-                            msTransform: rotate(-90deg) !important;
+                            mstransform: rotate(-90deg) !important;
                             transform: rotate(-90deg) !important;
                         }
                     }
@@ -175,7 +175,7 @@
     .dark {
         .sd-store-info {
             .sd-none-wrapper {
-                background-color: #272B2E;
+                background-color: #272b2e;
                 .guide {
                     color: @color-white;
                 }
@@ -186,7 +186,7 @@
                         background-color: @dark-collapse-bg-color;
                     }
                     .santd-collapse-item:last-child > .santd-collapse-content {
-                        border-top: 1px solid rgba(238, 238, 238, .1);
+                        border-top: 1px solid rgba(238, 238, 238, 0.1);
                     }
                     .santd-collapse > .santd-collapse-item > .santd-collapse-header {
                         color: @color-white;

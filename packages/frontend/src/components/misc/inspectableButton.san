@@ -15,40 +15,40 @@
     </div>
 </template>
 <script>
-import {Component, DataTypes} from 'san';
+    import { Component, DataTypes } from 'san';
 
-import {Button, Icon} from 'santd';
+    import { Button, Icon } from 'santd';
 
-export default {
-    dataTypes: {
-        cid: DataTypes.oneOfType([DataTypes.string, DataTypes.number]),
-        type: DataTypes.string,
-        hasIcon: DataTypes.bool,
-        iconName: DataTypes.string,
-        spacing: DataTypes.string,
-        text: DataTypes.oneOfType([DataTypes.string, DataTypes.number])
-    },
+    export default {
+        dataTypes: {
+            cid: DataTypes.oneOfType([DataTypes.string, DataTypes.number]),
+            type: DataTypes.string,
+            hasIcon: DataTypes.bool,
+            iconName: DataTypes.string,
+            spacing: DataTypes.string,
+            text: DataTypes.oneOfType([DataTypes.string, DataTypes.number])
+        },
 
-    components: {
-        'san-button': Button,
-        'san-icon': Icon
-    },
-    initData() {
-        return {
-            cid: '',
-            type: 'primary',
-            hasIcon: false,
-            iconName: '',
-            spacing: '0',
-            text: 'Inspect'
-        };
-    },
-    created() {
-    },
+        components: {
+            'san-button': Button,
+            'san-icon': Icon
+        },
+        initData() {
+            return {
+                cid: '',
+                type: 'primary',
+                hasIcon: false,
+                iconName: '',
+                spacing: '0',
+                text: 'Inspect'
+            };
+        },
+        created() {
+        },
 
-    inspectId() {
-        let selectedComponentId = this.data.get('selectedComponentId');
-        let inspectCode = `
+        inspectId() {
+            let selectedComponentId = this.data.get('selectedComponentId');
+            let inspectCode = `
             (function() {
                 let component = window.__san_devtool__ && window.__san_devtool__.componentMap.get("${selectedComponentId}");
                 if (component && component.el) {
@@ -56,25 +56,25 @@ export default {
                 }
             })()
         `;
-        chrome.devtools.inspectedWindow.eval(inspectCode);// eslint-disable-line        
-    },
+            chrome.devtools.inspectedWindow.eval(inspectCode);// eslint-disable-line        
+        },
 
-    highlight() {
-    },
+        highlight() {
+        },
 
-    unhighlight() {
+        unhighlight() {
+        }
     }
-}
 </script>
 <style lang="less">
-.inspectable-button-wrapper {
-    margin: 5px;
-    .santd-btn {
-        height: 26px;
-        border-radius: 12px;
+    .inspectable-button-wrapper {
+        margin: 5px;
+        .santd-btn {
+            height: 26px;
+            border-radius: 12px;
+        }
+        .santd-btn-primary {
+            border: 0;
+        }
     }
-    .santd-btn-primary {
-        border: 0;
-    }
-}
 </style>

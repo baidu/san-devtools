@@ -1,5 +1,5 @@
 // 命名：【属性】-【属性值】-【级别】
-@color-blue-l1: rgba(25, 104, 250, .1);
+@color-blue-l1: rgba(25, 104, 250, 0.1);
 @color-blue-l2: rgba(25, 104, 250, 0.2);
 @color-blue-l3: rgba(25, 104, 250, 0.3);
 @color-blue-l5: rgba(25, 104, 250, 0.5);
@@ -12,126 +12,101 @@
 @button-color: @color-blue-l10;
 @color-sd-grey: @color-grey;
 
-/* ============================== navigation Light ================================ */
-// 字体颜色
-@nav-font-color:@color-blue-l10;
-@nav-version-font-color: @color-grey;
-
-// height
+// nav height，treeView related
 @nav-height: 60px;
 
-// 背景颜色
-@nav-bg-color: @color-white;
-@setting-bg-color: @color-blue-l3;
-@setting-font-color: @color-black-3;
-@ink-bar-bg-color: @color-blue-l10;
-@popover-bg-color: rgba(255, 255, 255, 1);
+/* icon hover Light */
 @icon-hover-bg-color: #e5e5e5;
 @icon-hover-border-color: #dedede;
 
-// 阴影颜色
-@popover-shadow-color: rgba(189, 189, 189, 0.3);
+/* navigation Light */
+@nav-font-color: @color-blue-l10; // san 字体颜色
+@nav-version-font-color: @color-grey; // 版本字体颜色
+@nav-bg-color: @color-white; // nav 背景颜色
 
-// border 颜色
-@popover-border-top-color: @color-white-e;
+@ink-bar-bg-color: @color-blue-l10; // tab ink 背景色
 
-// checkbox 颜色
-@checkbox-border-color: @color-grey;
-@checkbox-bg-color: #1890ff;
+@setting-hover-bg-color: @color-blue-l3; // 设置 hover 之后背景色
+@setting-bg-color: rgba(255, 255, 255, 1); // 设置 背景色
+@setting-font-color: @color-black-3; // 设置 字体颜色
+@setting-shadow-color: rgba(189, 189, 189, 0.3); // 阴影颜色
+@setting-border-top-color: @color-white-e;
+@setting-checkbox-border-color: @color-grey;
+@setting-checkbox-bg-color: #1890ff;
 
-/* ============================== treeView Light ================================ */
-// touch-ripple bg
-@ripple-bg-color-selected: rgba(35, 110, 255, 0.2); // 
-@ripple-bg-color-hover: rgba(35, 110, 255, 0.08);
+/* treeView Light */
+@expand-icon-color: rgba(154, 154, 154, 1); // 收起icon颜色
 
-// 标签
-@secondary-text-bg-color: rgba(25, 104, 250, 0.3);
-@extra-bg-color: rgba(25, 104, 250, 0.3);
+@primary-text-bg-color: #1f1f1f; // 组件名称颜色
+@primary-text-selected-bg-color: #ff6500; // 选中再 hover 后的颜色
+@secondary-text-font-color: @color-white; // 组件 id 字体颜色
+@secondary-text-bg-color: @color-blue-l3;
 @extra-font-color: @color-white;
+@extra-bg-color: @color-blue-l3;
 
-// treeview front bg
-@secondary-text-font-color: @color-white;
-@bg-color-primary-text: #1F1F1F; // 组件名称颜色
-@bg-color-primary-text-selected: #FF6500; // 选中再 hover 后的颜色
+@ripple-selected-bg-color: rgba(35, 110, 255, 0.2); //
+@ripple-hover-bg-color: rgba(35, 110, 255, 0.08);
 
-// expend icon color
-@expand-icon-color: rgba(154, 154, 154, 1);
-
-/* ============================== 卡片 Light ================================ */
-// info
+/* 卡片 Light */
 @collapse-bg-color: @color-white;
 @title-font-color: @color-blue-l10;
 
-/* ============================== JSON Light ================================ */
-@json-font-color-yellow: #FF933A;
+/* JSON Light */
+@json-font-color-yellow: #ff933a;
 @json-font-color-red: #ff5050;
 @json-font-color-blue: @color-blue-l10;
 
-/* ============================== 函数 ================================ */
+/* 函数 */
 @func-bg-color: @color-blue-l1;
 @func-font-color: @color-blue-l10;
-@tag-color: #FF933A;
-@target-color: #FF933A;
+@tag-color: #ff933a;
+@target-color: #ff933a;
 
+/* ************************************************************************************************************** */
+/* **************************************************** Dark **************************************************** */
+/* icon hover Dark */
+@dark-icon-hover-bg-color: rgba(229, 229, 229, 0.2);
+@dark-icon-hover-border-color: rgba(0, 0, 0, 0);
 
-
-/* ============================== navigation Dark ================================ */
-// 字体颜色
+/*  navigation Dark */
 @dark-nav-font-color: @color-white;
 @dark-nav-version-font-color: @color-grey;
+@dark-nav-bg-color: #23272c;
 
-// 背景颜色
-@dark-nav-bg-color: #23272C;
-@dark-setting-bg-color: @color-blue-l3;
-@dark-setting-font-color: @color-white;
 @dark-ink-bar-bg-color: @color-blue-l10;
-@dark-popover-bg-color: #50555A;
-@dark-icon-hover-bg-color: rgba(229, 229, 229, 0.2);
-@dark-icon-hover-border-color: rgba(0,0,0,0);
 
-// 阴影颜色
-@dark-popover-shadow-color: transparent;
+@dark-setting-hover-bg-color: @color-blue-l3;
+@dark-setting-bg-color: #50555a;
+@dark-setting-font-color: @color-white;
+@dark-setting-shadow-color: transparent;
+@dark-setting-border-top-color: rgba(255, 255, 255, 0.2);
+@dark-setting-checkbox-border-color: @color-grey;
+@dark-setting-checkbox-bg-color: #1890ff;
 
-// border 颜色
-@dark-popover-border-top-color: rgba(255, 255, 255, .2);
-
-// checkbox 颜色
-@dark-checkbox-border-color: @color-grey;
-@dark-checkbox-bg-color: #1890ff;
-
-/* ============================== treeView Dark ================================ */
-// touch-ripple bg
-@dark-ripple-bg-color-selected: rgba(35, 110, 255, 0.2); // 
-@dark-ripple-bg-color-hover: rgba(35, 110, 255, 0.08);
-
-// 标签
-@dark-secondary-text-bg-color: #50555A;
-@dark-extra-bg-color: #50555A;
-@dark-extra-font-color: #B0B0B0;
-
-// treeview front bg
-@dark-secondary-text-font-color: #B0B0B0;
-@dark-bg-color-primary-text: @color-white; // 组件名称颜色
-@dark-bg-color-primary-text-selected: #FF6500; // 选中再 hover 后的颜色
-
-// expend icon color
+/*  treeView Dark */
 @dark-expand-icon-color: @color-white;
 
-/* ============================== 卡片 Dark ================================ */
-// info
+@dark-primary-text-bg-color: @color-white; // 组件名称颜色
+@dark-primary-text-selected-bg-color: #ff6500; // 选中再 hover 后的颜色
+@dark-secondary-text-font-color: #b0b0b0;
+@dark-secondary-text-bg-color: #50555a;
+@dark-extra-font-color: #b0b0b0;
+@dark-extra-bg-color: #50555a;
+
+@dark-ripple-selected-bg-color: rgba(35, 110, 255, 0.2);
+@dark-ripple-hover-bg-color: rgba(35, 110, 255, 0.08);
+
+/*  卡片 Dark */
 @dark-collapse-bg-color: #272b2e;
 @dark-title-font-color: @color-blue-l10;
 
-/* ============================== JSON Dark ================================ */
-@dark-json-font-color-yellow: #FF933A;
+/* JSON Dark */
+@dark-json-font-color-yellow: #ff933a;
 @dark-json-font-color-red: #ff5050;
 @dark-json-font-color-blue: @color-blue-l10;
 
-/* ============================== 函数 ================================ */
-@dark-func-bg-color: 	rgba(165,165,165,.1);
+/* 函数 */
+@dark-func-bg-color: rgba(165, 165, 165, 0.1);
 @dark-func-font-color: @color-white;
-@dark-tag-color: #FF933A;
-@dark-target-color: #FF933A;
-
-
-
+@dark-tag-color: #ff933a;
+@dark-target-color: #ff933a;
