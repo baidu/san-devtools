@@ -42,8 +42,8 @@
                         <san-checkbox checked="{{item.checked}}" value="{{item.value}}">{{item.label}}</san-checkbox>
                     </div>
                     <div class="navigation-checkbox-wrap" on-click="handleClick">
-                        <span class="theme">{{theme}}</span>
-                        <san-switch on-change='onThemeChange' defaultChecked="{{true}}" />
+                        <span class="theme">Dark Mode</span>
+                        <san-switch on-change='onThemeChange' defaultChecked="{{theme === 'Dark Mode'}}" />
                     </div>
                 </san-checkboxgroup>
                 <span class="setting"></span>
@@ -94,7 +94,7 @@
 
             initData() {
                 return {
-                    theme: 'Light Mode',
+                    theme: this.initTheme(),
                     defaultValue: [], // checkboxgroup 无法与 slot 的 checkbox 同步
                     options: [
                         { label: 'Readonly for component data.', value: 'Setting:component', checked: false },
@@ -123,13 +123,33 @@
                 }
             },
 
+            initTheme() {
+                let theme = window.localStorage['_san_devtool_theme'];
+                if (!theme) {
+                    window.localStorage['_san_devtool_theme'] = LIGHT_MODE;
+                    theme = LIGHT_MODE;
+                }
+                switch(theme) {
+                    case LIGHT_MODE: {
+                        document.body.classList.remove('dark');
+                        break;
+                    }
+                    case DARK_MODE: {
+                        document.body.classList.add('dark');
+                        break;
+                    }
+                    default: break;
+                }
+                return theme;
+            },
+
             onThemeChange(value) {
-                if (!value) {
+                if (value) {
                     document.body.classList.add('dark');
-                    this.data.set('theme', DARK_MODE);
+                    window.localStorage['_san_devtool_theme'] = DARK_MODE;
                 } else {
                     document.body.classList.remove('dark');
-                    this.data.set('theme', LIGHT_MODE);
+                    window.localStorage['_san_devtool_theme'] = LIGHT_MODE;
                 }
             },
 
@@ -324,10 +344,6 @@
             padding: 12px 16px;
             &:hover {
                 background-color: @setting-bg-color;
-            }
-            .santd-checkbox {
-                // 避免 icon 被挤压
-                top: -1px;
             }
             &:first-child {
                 border-top-left-radius: 9px;

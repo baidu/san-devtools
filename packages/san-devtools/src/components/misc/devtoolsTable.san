@@ -68,8 +68,7 @@
             <div slot="component">
                 <div
                     class="button-wrapper"
-                    on-mouseover="highlightNativeNode(text.id)"
-                    on-mouseout="unhighlightNativeNode()"
+                    on-click="highlightNativeNode(text.id)"
                 >
                     <san-button
                         type="primary"
@@ -81,8 +80,7 @@
             <div slot="sender">
                 <div
                     class="button-wrapper"
-                    on-mouseover="highlightNativeNode(text.id)"
-                    on-mouseout="unhighlightNativeNode()"
+                    on-click="highlightNativeNode(text.id)"
                 >
                     <san-button
                         type="primary"
@@ -94,8 +92,7 @@
             <div slot="receiver">
                 <div
                     class="button-wrapper"
-                    on-mouseover="highlightNativeNode(text.id)"
-                    on-mouseout="unhighlightNativeNode()"
+                    on-click="highlightNativeNode(text.id)"
                 >
                     <san-button
                         type="primary"
@@ -199,9 +196,6 @@ export default connectStore({
         },
         highlightNativeNode(componentId) {
             this.data.get('bridge') && this.data.get('bridge').send('Inspect.highlight', componentId);
-        },
-        unhighlightNativeNode() {
-            this.data.get('bridge') && this.data.get('bridge').send('Inspect.unhighlight', '');
         }
     }
 )

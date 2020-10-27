@@ -39,7 +39,7 @@
     }
     pre {
         .language-js {
-            color: #ffffff;
+            color: @language-js-color;
             display: block;
             overflow-x: auto;
             padding: 0.5em;
