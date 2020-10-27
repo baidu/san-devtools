@@ -103,6 +103,9 @@ export default {
             box-shadow: 0 0 0 1.5px @dark-input-shadow-color;
             background-color: @dark-input-bg-color;
         }
+        .santd-input {
+            color: #fff;
+        }
     }
 }
 </style>

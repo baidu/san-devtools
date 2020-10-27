@@ -10,7 +10,7 @@
         "zip": "bestzip chrome.zip dist/*"
     },
     "dependencies": {
-        "san-devtools": "1.0.6",
+        "san-devtools": "3.0.0",
         "shared": "^0.0.0",
         "backend": "^0.0.0",
         "opener":"^1.5.2",

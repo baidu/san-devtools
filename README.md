@@ -59,7 +59,7 @@ Open the debugging page and san-devtools plugin will show the San version, then 
 
 ![](https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/san-detected.png)
 
-![](https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/san-panel.png)
+![](https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/main.png)
 
 #### sand options
 

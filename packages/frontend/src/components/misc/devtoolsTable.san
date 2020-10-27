@@ -3,7 +3,7 @@
         <div class="toolbar">
             <div class="filter">
                 <san-tooltip
-                    placement="bottomRight"
+                    placement="bottomLeft"
                     title="{{searchTip}}"
                 >
                     <sand-input

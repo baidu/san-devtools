@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', update);
 function update() {
     let queryArr: Record<string, any>  = getQuery(location.search);
     let version = queryArr.version || '';
-    if (typeof version !== 'string') {
+    if (typeof version !== 'string' || !version) {
         return false;
     }
     let $v = document.getElementById('version');

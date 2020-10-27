@@ -12,7 +12,7 @@
                 <san-avatar
                     shape="square"
                     size="{{40}}"
-                    src="../icons/san_logo_white.svg"
+                    src="../icons/logo.svg"
                 >
                 </san-avatar>
                 <span class="title">San</span>
@@ -256,6 +256,9 @@
             align-items: center;
             padding: 0 20px;
             font-size: 18px;
+            .santd-btn-primary:hover {
+                background: transparent !important;
+            }
             .logo {
                 padding: 0;
                 > span {

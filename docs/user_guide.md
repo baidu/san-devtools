@@ -202,15 +202,6 @@ History tab 为一张表格，表格中的每一行包含了：
 
 当点击 *Load all history records* 按钮后，才会加载从页面加载至今的所有事件。只有当顶端工具栏中的 ▶ 被点击且显示为 *Recording* 时，当前发生的所有事件才会实时的记录在历史记录列表内。
 
-### Routes
-![route_list](https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/route_list.png)
-
-Routes tab 中按照由新至旧的顺序列出了页面路由变化。每一条包括了：
-
- - 组件 ID：点击会跳转并且 inspect 至浏览器开发者工具 *Element* 面板。
- - 时间戳：路由跳转时的时间戳，包括日期及时间，精确到秒。
- - 路由信息：包括了路径，hash（若有），query string（若有），referer（若有）。
-
 ## 控制台直接调试
 ![sandevtool_property](https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/sandevtool_property.png)
 

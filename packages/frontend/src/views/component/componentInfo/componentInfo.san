@@ -3,7 +3,7 @@
         <div class="sd-none-wrapper" style="display:{{selectedComponentId?'none':'block'}}">
             <div class="devtool-info">
                 <div class="logo" style="display:{{logoVisibility?'block':'none'}}">
-                    <img src="../../../icons/san_devtool_logo.svg" />
+                    <img src="../../../icons/logo.svg" />
                 </div>
                 <div class="version">San DevTools</div>
             </div>

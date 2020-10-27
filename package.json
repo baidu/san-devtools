@@ -5,7 +5,7 @@
     "private": true,
     "scripts": {
         "start:ext": "yarn workspace extensions start",
-        "start": "concurrently \"yarn dev:todo\" \"yarn dev:standalone\"",
+        "start": "concurrently -p \"yarn dev:standalone\" \"yarn dev:todo\"",
         "dev:standalone": "yarn workspace san-devtools start",
         "build:standalone": "yarn workspace san-devtools build",
         "build:extensions": "yarn workspace extensions build",
