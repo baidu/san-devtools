@@ -1,0 +1,14 @@
+{
+    "private": true,
+    "name": "frontend",
+    "version": "0.0.0",
+    "dependencies": {
+        "shared":"^0.0.0"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/baidu/san-devtools"
+    },
+    "author": "ksky521 <ksky521@gmail.com>",
+    "license": "MIT"
+}

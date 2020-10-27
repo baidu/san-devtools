@@ -1,68 +1,90 @@
 <h1 align="center">San DevTools</h1>
 
 <div align="center">
-San DevTools 用于调试 [San.js](https://github.com/baidu/san) 页面的工具
-
+Development tool for debugging [San.js](https://github.com/baidu/san) applications.
 </div>
 
-## 🎉 特性
+It is exists both as a browser extension and as a common line tool(works with other environments including Safari, IE, San Native and Electron.)
 
--   提供本地 Server 命令，可支持远程调试。
--   内置 Chrome DevTools，满足手机页面远程调控需求。
--   提供Chrome extensions。
--   支持 San Native 版本调试（开发中）。
+## 🎉 Features
 
-## 📦 安装
+- Provide local server command, support remote debugging.
+- Built in Chrome Devtools for remote debug mobile page.
+- Provide Chrome Extension.
+- Support `San Native` debugging (waiting for release).
 
-> San DevTools 的 Node.js 版本要求 >= 8.16.0。
+## 📦 Installation
 
-```bash
-# use npm
-npm install -g san-devtools
-# or use yarn
+### standalone
+The standalone version exists as a command line tool, and install from NPM or Yarn.
+```shell
+npm i -g san-devtools 
+# OR
 yarn global add san-devtools
 ```
 
-安装之后，你可以通过下面命令查看帮助：
+### chrome extension
 
-```bash
-sand -h
-# or
-san-devtools -h
+[Get the Chrome Extension](https://chrome.google.com/webstore/detail/san-devtools/pjnngoafflflkagpebgfifjejlnfhahc)
+
+OR
+
+Navigate to chrome://extensions in Chrome/Chromium to load the unpacked extension from dist directory.
+
+## 🤝 Quick Start
+
+### standalone
+
+**First:** Start debugging server, and will auto open the remote inspector.
+
+```shell
+sand # short for san-devtools
+# OR
+san-devtools
 ```
-## 使用
 
-1. 启动本地Server
+![](https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/sand-command.png)
 
-```bash
-# 启动本地server，自带WebSocket服务
-san-devtools --port 8080
-```
+![](https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/inspector.png)
 
-2. 根据提示将`ws-backend.js`添加到要调试页面的San.js之前
-3. 打开要调试的页面
-4. 进入 `localhost:8080` 页面选择需要debug的页面，然后开始San DevTools debug之旅！
+**Second:** Add `ws-backend.js` to the top of the debugging page（before san.js).
 
-## 🤝 如何贡献
+**Third:** Open the debugging page, and inspector page will auto connected.
 
-贡献代码，可以参考该项目的[开发文档](https://github.com/baidu/san-devtools)
+![](https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/inspector-connected.png)
 
-## 🍻 Companions
+### chrome extension
 
--   [san-devtools](https://github.com/baidu/san-devtools) - San DevTools
--   [san-router](https://github.com/baidu/san-router) - SPA Router
--   [san-store](https://github.com/baidu/san-store) - Application States Management
--   [san-update](https://github.com/baidu/san-update) - Immutable Data Update
--   [san-factory](https://github.com/baidu/san-factory) - Component register and instantiation
--   [santd](https://ecomfe.github.io/santd/) - Components Library following the [Ant Design](https://ant.design/) specification
--   [san-mui](https://ecomfe.github.io/san-mui/) - [Material Design](https://www.material.io/) Components Library
--   [san-xui](https://ecomfe.github.io/san-xui/) - A Set of SAN UI Components that widely used on Baidu Cloud Console
--   [drei](https://github.com/ssddi456/drei/) - VSCode extension for SAN
--   [san-cli](https://github.com/ecomfe/san-cli) - A CLI tooling based on SAN for rapid development
--   [san-test-utils](https://github.com/ecomfe/san-test-utils) - The unit testing utility library for SAN
--   [san-loader](https://github.com/ecomfe/san-cli/tree/master/packages/san-loader) - Webpack loader for single-file SAN components
+Open the debugging page and san-devtools plugin will show the San version, then open the chrome devtool and will see the San tab.
 
+![](https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/san-detected.png)
 
-## ☀️ License
+![](https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/san-panel.png)
 
-MIT
+#### sand options
+
+ - --open, -o: Open browser when server start(default: true)
+ - --port, -p: Port to use (default: 8899)
+ - --address, -a: Address to use
+ - --version, -v: Show version number
+ - --help, -h: Show help
+
+- ## 🍻 Companions
+
+  -   [san-devtools](https://github.com/baidu/san-devtools/blob/master/docs/user_guide.md) - Chrome DevTools extension
+  -   [san-router](https://github.com/baidu/san-router) - SPA Router
+  -   [san-store](https://github.com/baidu/san-store) - Application States Management
+  -   [san-update](https://github.com/baidu/san-update) - Immutable Data Update
+  -   [san-factory](https://github.com/baidu/san-factory) - Component register and instantiation
+  -   [santd](https://ecomfe.github.io/santd/) - Components Library following the [Ant Design](https://ant.design/) specification
+  -   [san-mui](https://ecomfe.github.io/san-mui/) - [Material Design](https://www.material.io/) Components Library
+  -   [san-xui](https://ecomfe.github.io/san-xui/) - A Set of SAN UI Components that widely used on Baidu Cloud Console
+  -   [drei](https://github.com/ssddi456/drei/) - VSCode extension for SAN
+  -   [san-cli](https://github.com/ecomfe/san-cli) - A CLI tooling based on SAN for rapid development
+  -   [san-test-utils](https://github.com/ecomfe/san-test-utils) - The unit testing utility library for SAN
+  -   [san-loader](https://github.com/ecomfe/san-loader) - Webpack loader for single-file SAN components
+  -   [san-hot-loader](https://github.com/ecomfe/san-hot-loader) - Webpack loader for SAN components HMR
+
+  ## ☀️ License
+
+  MIT

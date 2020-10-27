@@ -1,12 +1,14 @@
+/* global chrome */
+
 import san from 'san';
 import Bridge from '@shared/Bridge';
 
-// import {DevTools} from '@san-devtools/index';
+// import {DevTools} from '@frontend/index';
 // import 'santd/dist/santd.less';
 
-import DevTools from '@san-devtools/DevTools.san';
+import DevTools from '@frontend/DevTools.san';
 
-import {initFrontend} from '@san-devtools/initFrontend';
+import {initFrontend} from '@frontend/initFrontend';
 
 
 let tabId = chrome.devtools.inspectedWindow.tabId;

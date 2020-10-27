@@ -35,7 +35,7 @@ const baseConfig = {
         alias: {
             '@backend': resolve('packages/backend/src/'),
             '@shared': resolve('packages/shared/src/'),
-            '@san-devtools': resolve('packages/san-devtools/src/')
+            '@frontend': resolve('packages/frontend/src/')
         }
     },
     devServer: {

@@ -1,0 +1,67 @@
+<template>
+    <pre class="pre-wrapper"><code class="language-js">{{fnStr | prettyCode | raw}}</code></pre>
+</template>
+<script>
+    import 'highlight.js/styles/github.css';
+
+    import san, { DataTypes } from 'san';
+    import hljs from 'highlight.js/lib/core';
+    import javascript from 'highlight.js/lib/languages/javascript';
+    hljs.registerLanguage('javascript', javascript);
+
+    export default {
+        dataTypes: {
+            fnStr: DataTypes.string
+        },
+        initData() {
+            return {
+                fnStr: 'loading...'
+            }
+        },
+        filters: {
+            prettyCode(code) {
+                return hljs.highlight('javascript', code).value
+                // return Prism.highlight(fnStr, Prism.languages.javascript, 'javascript');
+            }
+        }
+    }
+</script>
+<style lang="less">
+    @import '@frontend/views/style/variables.less';
+    @hljs-title-color: #ff5050;
+    @language-js-color: #444444;
+    .deps-wrapper {
+        margin-bottom: 10px;
+    }
+    .pre-wrapper {
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+    pre {
+        .language-js {
+            color: @language-js-color;
+            display: block;
+            overflow-x: auto;
+            padding: 0.5em;
+            border-radius: 12px;
+            background: @func-bg-color!important;
+            .hljs-title, .hljs-string {
+                color: @hljs-title-color;
+            }
+        }
+    }
+    .dark {
+        pre {
+            .language-js {
+                color: #ffffff;
+                background: @dark-func-bg-color !important;
+                .hljs-title, .hljs-string {
+                    color: @hljs-title-color;
+                }
+                .hljs-keyword, .hljs-selector-tag, .hljs-subst {
+                    color: #ffffff;
+                }
+            }
+        }
+    }
+</style>

@@ -1,6 +1,8 @@
-# **San DevTools**
+<h1 align="center">San DevTools</h1>
 
-Development tool for debugging `San.js` applications.
+<div align="center">
+Development tool for debugging [San.js](https://github.com/baidu/san) applications.
+</div>
 
 It is exists both as a browser extension and as a common line tool(works with other environments including Safari, IE, San Native and Electron.)
 

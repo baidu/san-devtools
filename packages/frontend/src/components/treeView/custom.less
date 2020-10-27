@@ -1,0 +1,41 @@
+
+@import '@frontend/views/style/variables.less';
+.custom .sm-tree-view-item > .pad > .sm-touch-ripple {
+    height: 31px !important;
+}
+.custom .sm-tree-view-item > .pad > .sm-touch-ripple.selected {
+    background-color: @ripple-bg-color-selected !important;
+}
+.custom .sm-tree-view-item > .pad > .sm-touch-ripple:hover {
+    background-color: @ripple-bg-color-hover !important;
+}
+.custom .sm-tree-view-item > .pad.selected:hover > .sm-tree-view-item-content > .sm-tree-view-item-secondary-text,
+.custom .sm-tree-view-item > .pad > .sm-tree-view-item-content > .sm-tree-view-item-secondary-text {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 2px 4px;
+    border-radius: 9px;
+    color: @secondary-text-font-color;
+    background-color: @secondary-text-bg-color;
+    max-width: 100px;
+    max-height: 18px;
+    font-size: 12px;
+    font-weight: 100;
+    height: 16px;
+}
+
+.dark {
+    .custom .sm-tree-view-item > .pad > .sm-touch-ripple.selected {
+        background-color: @dark-ripple-bg-color-selected !important;
+    }
+    .custom .sm-tree-view-item > .pad > .sm-touch-ripple:hover {
+        background-color: @dark-ripple-bg-color-hover !important;
+    }
+    .custom .sm-tree-view-item > .pad.selected:hover > .sm-tree-view-item-content > .sm-tree-view-item-secondary-text,
+    .custom .sm-tree-view-item > .pad > .sm-tree-view-item-content > .sm-tree-view-item-secondary-text {
+        color: @dark-secondary-text-font-color;
+        background-color: @dark-secondary-text-bg-color;
+    }
+}

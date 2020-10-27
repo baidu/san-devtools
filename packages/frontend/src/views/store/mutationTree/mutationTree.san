@@ -1,0 +1,66 @@
+<template>
+    <div class="state-list-wrapper custom">
+        <san-tree-view
+            s-ref="tv"
+            ref="tv"
+            treeData="{=mutationTreeData=}"
+            compact="{{!0}}"
+            wholeLineSelected="{{!0}}"
+            keepingSelected="{{!0}}"
+            filterBar="{{!0}}"
+            filterIcon="search"
+            filterPlaceholder="Find mutation"
+            filterText="{=filterText=}"
+            initiallyOpen="{{!0}}"
+            primaryTogglesNestedTreeView="{{!0}}"
+            dataSource="JSON"
+        >
+        </san-tree-view>
+    </div>
+</template>
+<script>
+import san, {DataTypes} from 'san';
+import {connectStore, store} from '@frontend/store/index';
+import TreeView from '@frontend/components/treeView/treeView.san';
+export default connectStore({
+    mutationTreeData: 'mutationTreeData',
+    bridge: 'bridge'
+}) (
+  {
+    messages: {
+        'UI:tree-view-item-click'({value}) {
+            this.setSelectedMutationInfo(value);
+            this.setSelectedStoreData(value);
+        }
+    },
+    setSelectedMutationInfo(value) {
+        if(!value.id) {
+          return;
+        }
+        let info = {
+            storeName: value.storeName + '',
+            actionName: value.displayName,
+            timeRange: value.timeRange,
+            status: value.status,
+            actionId: value.id + '',
+            parentActionId: value.parentId + '',
+            childsId: value.childs,
+            payload: value.payload,
+            diff: value.diff
+        }
+        store.dispatch('setSelectedMutationInfo', info);
+    },
+    setSelectedStoreData(value) {
+        store.dispatch('setStoreDataOnClickMutation', value.storeName);
+    },
+    components: {
+        'san-tree-view': TreeView,
+    }
+  }
+)
+</script>
+<style lang="less">
+.state-list-wrapper {
+    height: 100%;
+}
+</style>

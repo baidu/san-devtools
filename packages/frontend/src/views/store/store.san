@@ -1,0 +1,37 @@
+<template>
+    <sd-basic-layout prefix="store">
+        <sandevtool-mutation-tree slot="left"/>
+        <sandevtool-store-info slot="right"/>
+    </sd-basic-layout>
+</template>
+
+<script>
+import san, {DataTypes} from 'san';
+import Split from 'split.js';
+
+import BasicLayout from '@frontend/components/layout/basicLayout.san';
+import MutationTree from './mutationTree/mutationTree.san';
+import StoreInfo from './storeInfo/storeInfo.san';
+
+export default {
+
+    components: {
+        'sandevtool-mutation-tree': MutationTree,
+        'sandevtool-store-info': StoreInfo,
+        'sd-basic-layout': BasicLayout
+    },
+
+    initData() {
+        return {
+            index: -1
+        };
+    },
+
+    dataTypes: {
+        index: DataTypes.number
+    }
+}
+</script>
+
+<style lang="less">
+</style>

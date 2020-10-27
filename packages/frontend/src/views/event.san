@@ -1,0 +1,106 @@
+<template>
+    <san-devtools-table
+        data="{{data}}"
+        readonly="{{readonly}}"
+        columns="{{columns}}"
+        bridgeOptions="{{bridgeOptions}}"
+        on-clear="clearHandler"
+        on-filter="doFilter"
+        filterPlaceholder="eg: A.click"
+        searchTip="Use '.' as separator for search, like: [componentName].[eventName]"
+    ></san-devtools-table>
+</template>
+
+<script>
+import san, {DataTypes} from 'san';
+import {connectStore, store} from '@frontend/store/index';
+import DevtoolsTable from '@frontend/components/misc/devtoolsTable.san';
+import {Message} from 'santd';
+function filterData(filterText, data) {
+    filterText = filterText.trim();
+    if (!filterText) {
+        return data;
+    }
+    let filterKeys = filterText.split('.');
+    let newData = data.filter(item => {
+        let {component = {}, event} = item;
+        let testStr = `${component.componentName}.${event}`;
+        let match = false;
+        return filterKeys.every(str => testStr.includes(str));
+    });
+    return newData;
+}
+export default connectStore({
+    bridge: 'bridge',
+    eventInfoList: 'eventInfoList',
+    readonly: 'settings.eventReadOnly'
+})(
+    {
+        components: {
+            'san-devtools-table': DevtoolsTable
+        },
+        clearHandler() {
+            store.dispatch('clearEvent');
+        },
+        doFilter(filterText) {
+            this.data.set('filterText', filterText);
+            let data = this.data.get('eventInfoList');
+            let newData = filterData(filterText, data);
+            this.data.set('data', newData);
+        },
+        computed: {
+            data() {
+                let eventInfoList = this.data.get('eventInfoList');
+                let filterText = this.data.get('filterText');
+                return filterData(filterText, eventInfoList)
+            }
+        },
+        initData() {
+            return {
+                filterText: '',
+                bridgeOptions: {
+                    targetName: 'component',
+                    bridgeName: 'Event',
+                    bridgeActionName: 'fire',
+                    bridgeRecording: 'eventRecording'
+                },
+                columns: [
+                    {
+                        title: 'Timestamp',
+                        dataIndex: 'time',
+                        width:  '10%'
+                    },
+                    {
+                        title: 'Event',
+                        dataIndex: 'event',
+                        scopedSlots: {render: 'event'},
+                        width:  '10%'
+                    },
+                    {
+                        title: 'Component',
+                        dataIndex: 'component',
+                        scopedSlots: {render: 'component'},
+                        width:  '20%'
+                    },
+                    {
+                        title: 'Action',
+                        dataIndex: 'action',
+                        scopedSlots: {render: 'action'},
+                        width:  '10%'
+                    },
+                    {
+                        title: 'Payload',
+                        dataIndex: 'payload',
+                        scopedSlots: {render: 'payload'},
+                        width:  '50%'
+                    }
+                ],
+                tableHeight: 0
+            }
+        }
+    }
+)
+</script>
+
+<style lang="less">
+</style>

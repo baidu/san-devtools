@@ -16,8 +16,7 @@
         "paths": {
             "@backend/*": ["packages/backend/src/*"],
             "@frontend/*": ["packages/frontend/src/*"],
-            "@shared/*": ["packages/shared/src/*"],
-            "@san-devtools/*": ["packages/san-devtools/src/*"]
+            "@shared/*": ["packages/shared/src/*"]
         }
     },
     "exclude": ["node_modules", "dist", "docs", "__tests__", "**/*.test*", "**/*.spec*", "**/mock"],
