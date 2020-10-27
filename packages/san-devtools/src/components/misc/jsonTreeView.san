@@ -20,7 +20,7 @@
         },
         initData() {
             return {
-                expand: true,
+                expand: false,
                 rootName: '',
                 withRootName: false,
                 alwaysShowRoot: false,

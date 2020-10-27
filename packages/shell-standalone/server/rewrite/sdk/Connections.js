@@ -1,8 +1,8 @@
-import * as Common from '../common/common.js.js';
-import * as Host from '../host/host.js.js';
-import * as ProtocolClient from '../protocol_client/protocol_client.js.js';
-import * as Root from '../root/root.js.js';
-import {TargetManager} from './SDKModel.js.js';
+import * as Common from '../common/common.js';
+import * as Host from '../host/host.js';
+import * as ProtocolClient from '../protocol_client/protocol_client.js';
+import * as Root from '../root/root.js';
+import {TargetManager} from './SDKModel.js';
 // 源码来自于chrome devtools，所以直接关闭eslint
 /* eslint-disable */
 

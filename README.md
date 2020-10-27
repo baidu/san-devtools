@@ -1,14 +1,14 @@
 # **San DevTools**
 
-Developer tools for debugging `San.js` applications.
+Development tool for debugging `San.js` applications.
 
 It is exists both as a browser extension and as a common line tool(works with other environments including Safari, IE, San Native and Electron.)
 
 ## 🎉 Features
 
 - Provide local server command, support remote debugging.
-- Built in chrome devtools for remote debug mobile page.
-- Provides chrome extensions.
+- Built in Chrome Devtools for remote debug mobile page.
+- Provide Chrome Extension.
 - Support `San Native` debugging (waiting for release).
 
 ## 📦 Installation
