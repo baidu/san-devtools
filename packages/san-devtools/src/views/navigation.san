@@ -1,5 +1,5 @@
 <template>
-    <div class="navigation {{disconnected ? 'navigation-disconnected' : ''}}">
+    <div class="navigation">
         <div class="navigation-header">
             <san-button
                 type="primary"
@@ -313,9 +313,6 @@
             }
         }
     }
-    .navigation-disconnected {
-        background-color: @nav-disconnected-bg-color;
-    }
     div .santd-popover-placement-bottomRight > .santd-popover-content .santd-popover-arrow {
         right: 8px !important;
     }
@@ -401,9 +398,6 @@
                     border: 1px solid @dark-icon-hover-border-color;
                 }
             }
-        }
-        .navigation-disconnected {
-            background-color: @dark-nav-disconnected-bg-color;
         }
         .santd-popover {
             .navigation-checkbox-wrap {
