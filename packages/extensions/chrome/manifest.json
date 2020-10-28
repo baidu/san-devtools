@@ -1,6 +1,7 @@
 {
     "manifest_version": 2,
     "name": "San Devtool",
+    "version": "3.0.0",
     "short_name": "san-devtool",
     "description": "Browser developer tool extension for debugging San.",
     "icons": {
