@@ -15,7 +15,6 @@ const os = require('os');
 const updateNotifier = require('update-notifier');
 const semver = require('semver');
 const chalk = require('chalk');
-const logo = require('./logo');
 
 const {
     scriptName,
@@ -24,13 +23,11 @@ const {
     version: pkgVersion
 } = require('../package.json');
 
-
 const DEFAULT_PORT = 8899;
 
 // set process
 process.title = scriptName;
 
-console.log(logo(pkgVersion));
 
 // 1. 检测 node 版本
 checkNodeVersion(requiredNodeVersion, pkgName);
@@ -38,11 +35,12 @@ checkNodeVersion(requiredNodeVersion, pkgName);
 upNotifier(pkgVersion, pkgName);
 // 3. 加载bin
 require('yargs')
+    .scriptName(scriptName)
     .detectLocale(false)
     .usage('Usage: $0 <command> [options]')
     .command(
         '$0',
-        'San DevTools Frontend',
+        'San DevTools remote debug frontend',
         {
             open: {
                 alias: 'o',
