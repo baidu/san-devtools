@@ -3,6 +3,8 @@
     "name": "frontend",
     "version": "0.0.0",
     "dependencies": {
+        "san": "~3.9.2",
+        "santd": "~0.2.8",
         "split.js": "1.3.5",
         "highlight.js": "~10.1.2",
         "json-tree-view": "0.4.12",
