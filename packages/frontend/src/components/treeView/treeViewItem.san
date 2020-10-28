@@ -361,14 +361,10 @@
         },
 
         attached() {
-            if (this.data.get('loadingToast')) {
-                let index = this.data.get('index');
-                setTimeout(() => {
-                    this.data.set('renderable', true);
-                }, index);
-            } else {
+            let index = this.data.get('index');
+            setTimeout(() => {
                 this.data.set('renderable', true);
-            }
+            }, index);
 
             const defaultSelectedIdentity = this.data.get('defaultSelectedIdentity');
             const componentId = this.data.get('componentId');
