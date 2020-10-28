@@ -298,7 +298,7 @@
                 }
                 let text = [
                     this.data.get('displayName'),
-                    this.data.get('displayName'),
+                    this.data.get('treeData.id'),
                     this.data.get('extras') ? this.data.get('extras').map(item => item ? item.text : '') : []
                 ];
                 let matched = new RegExp(value, 'ig').test(
