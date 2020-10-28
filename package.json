@@ -16,6 +16,8 @@
         "packages"
     ],
     "devDependencies": {
+        "lint-staged": "^9.2.5",
+        "husky": "^4.0.0",
         "typescript": "^3.9.7",
         "autoprefixer": "^9.8.0",
         "@typescript-eslint/parser": "2.34.0",

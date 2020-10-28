@@ -17,7 +17,7 @@ const MiniCssExportPlugin = require('mini-css-extract-plugin');
 const DefinePlugin = require('webpack/lib/DefinePlugin');
 const NamedModulesPlugin = require('webpack/lib/NamedModulesPlugin');
 
-const resolve = p => path.resolve(__dirname, p);
+const resolve = p => path.resolve(__dirname, '../', p);
 
 const isProd = process.env.NODE_ENV === 'production';
 
@@ -33,9 +33,9 @@ const baseConfig = {
     resolve: {
         extensions: ['.js', '.san', '.json', '.ts'],
         alias: {
-            '@backend': resolve('packages/backend/src/'),
-            '@shared': resolve('packages/shared/src/'),
-            '@frontend': resolve('packages/frontend/src/')
+            '@backend': resolve('backend/src/'),
+            '@shared': resolve('shared/src/'),
+            '@frontend': resolve('frontend/src/')
         }
     },
     devServer: {
