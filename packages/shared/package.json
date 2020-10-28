@@ -8,8 +8,10 @@
     },
     "author": "ksky521 <ksky521@gmail.com>",
     "license": "MIT",
-    "devDependencies": {
-        "@types/circular-json": "^0.4.0",
+    "dependencies": {
         "circular-json": "^0.5.9"
+    },
+    "devDependencies": {
+        "@types/circular-json": "^0.4.0"
     }
 }

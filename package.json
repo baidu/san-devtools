@@ -12,45 +12,36 @@
         "build:extensions": "yarn workspace extensions build"
     },
     "workspaces": [
-        "packages/*",
-        "example"
+        "packages/*"
     ],
     "files": [
         "packages"
     ],
-    "dependencies": {
-        "san": "^3.9.2",
-        "san-router": "^1.2.2"
-    },
     "devDependencies": {
-        "san-hot-loader": "^0.1.2",
-        "@typescript-eslint/parser":"2.34.0",
-        "@typescript-eslint/eslint-plugin":"2.34.0",
+        "autoprefixer": "^9.8.0",
+        "@typescript-eslint/parser": "2.34.0",
+        "@typescript-eslint/eslint-plugin": "2.34.0",
         "@babel/core": "^7.9.6",
+        "babel-cli": "^6.26.0",
+        "babel-eslint": "^10.1.0",
+        "babel-plugin-import": "^1.13.0",
         "@babel/plugin-proposal-class-properties": "^7.8.3",
         "@babel/plugin-proposal-export-default-from": "^7.8.3",
         "@babel/plugin-proposal-optional-chaining": "^7.10.1",
         "@babel/plugin-transform-modules-commonjs": "^7.10.1",
-        "babel-plugin-import": "^1.13.0",
         "@babel/preset-env": "^7.9.6",
+        "@babel/preset-typescript": "^7.9.0",
+        "@ecomfe/eslint-config": "^3.2.0",
         "@commitlint/cli": "^8.3.4",
         "@commitlint/core": "^8.3.4",
         "@commitlint/travis-cli": "^8.3.5",
-        "@ecomfe/eslint-config": "^3.2.0",
+        "eslint-plugin-jest": "^23.8.2",
         "@ksky521/cz-emoji": "^1.2.1",
-        "babel-eslint": "^10.1.0",
         "commitizen": "^4.0.3",
         "commitlint-config-gitmoji": "^1.0.1",
         "concurrently": "^5.2.0",
         "eslint": "^6.8.0",
-        "eslint-plugin-babel": "^5.3.0",
-        "html-loader": "^1.1.0",
-        "jquery": "^3.5.1",
-        "webpack": "^4.43.0",
-        "webpack-bundle-analyzer": "^3.8.0",
-        "webpack-cli": "^3.3.11",
-        "webpack-dev-server": "^3.11.0",
-        "webpack-merge": "^5.1.2"
+        "eslint-plugin-babel": "^5.3.0"
     },
     "lint-staged": {
         "!(example|dist|output|__mocks__)/**/*.(ts|js)": [
