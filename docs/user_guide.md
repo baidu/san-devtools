@@ -18,11 +18,11 @@ San Devtools 支持 **San** 应用调试的开发者工具。目前以两种形�
 - [开发者工具](#开发者工具)
     - [图标](#图标)
     - [首页](#首页)
+    - [设置](#设置)
     - [Component](#component)
     - [Store](#store)
     - [History](#history)
-- [控制台直接调试](#控制台直接调试) 
-- [新功能预告](#新功能预告)
+- [控制台直接调试](#控制台直接调试)
 
 
 ## 下载
@@ -78,7 +78,7 @@ $ sand
 ### 图标
 <p>
     <a href="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/browser_action.png">
-        <img align="right" src="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/browser_action.png" alt="browser_action" height="100">
+        <img align="right" src="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/browser_action.png" alt="browser_action" height="80">
     </a>
 </p>
 
@@ -87,7 +87,7 @@ $ sand
 #### Popup 窗口
 <p>
     <a href="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/popup.png">
-        <img align="right" src="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/popup.png" alt="popup" height="240">
+        <img src="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/popup.png" alt="popup" height="100">
     </a>
 </p>
 
@@ -106,7 +106,7 @@ San-devtools 集成在浏览器内的开发者工具界面，位于浏览器开�
 
 <p>
     <a href="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/setting.png">
-        <img src="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/setting.png" alt="setting" width="100%">
+        <img src="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/setting.png" alt="setting" width="40%">
     </a>
 </p>
 
@@ -122,7 +122,7 @@ San-devtools 集成在浏览器内的开发者工具界面，位于浏览器开�
 ##### 组件树区域: 
 <p>
     <a href="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/building_component_tree.png">
-        <img src="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/building_component_tree.png" alt="building_component_tree" width="100%">
+        <img src="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/building_component_tree.png" alt="building_component_tree" width="80%">
     </a>
 </p>
 第一次进入时，页面当前状态下的组件结构树会被一次性的加载。当组件较多的时候，加载可能会花费些时间，由于组件结构树的加载过程为异步的，这并不影响我们选择已经被加载出来的组件项目。其中每一条组件项目包含了四个内容：
@@ -138,7 +138,7 @@ San-devtools 集成在浏览器内的开发者工具界面，位于浏览器开�
 
 <p>
     <a href="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/filter.png">
-        <img src="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/filter.png" alt="filter" width="100%">
+        <img src="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/filter.png" alt="filter" width="80%">
     </a>
 </p>
 
@@ -148,22 +148,41 @@ San-devtools 集成在浏览器内的开发者工具界面，位于浏览器开�
 
 <p>
     <a href="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/inspect_component.png">
-        <img src="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/inspect_component.png" alt="inspect_component" width="100%">
+        <img src="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/inspect_component.png" alt="inspect_component" width="40%">
     </a>
 </p>
 
 ##### 详细信息区域: 
 Component tab 右侧为详细信息显示区域，包含了五个功能块：
 
- - Basic information：显示一个组件最基本的信息，包含了 ID，组件的祖先组件路径，parent/owner 组件信息，当组件被注入了 store 中的数据之后，还会有 store 的基本信息，包括 mapStates, mapActionsKeys。<br />![basic_information_group](https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/basic_information_group.png)
- - Data viewer：这是一个 JSON viewer，展示一个组件的 data。这个 viewer 是可以修改的，我们可以进行 CRUD 操作，以及修改 object 中的 key。所有的修改会自动同步到组件的 data 中。<br />**值得注意的是**：当组件的 data 发生改变时，viewer 不会自动刷新，需要重新选择该组件在组件结构树中的对应项目。<br />![component_data_group](https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/component_data_group.png)
- - Computed：对应组件 computed 定义的 function，包含其所引用的 data 中的 key 及 value。<br />![computed_group](https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/computed_group.png)
+ - Basic information：显示一个组件最基本的信息，包含了 ID，组件的祖先组件路径，parent/owner 组件信息，当组件被注入了 store 中的数据之后，还会有 store 的基本信息，包括 mapStates, mapActionsKeys。<br />
+    <p>
+        <a href="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/basic_information_group.png">
+            <img src="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/basic_information_group.png" alt="basic_information_group" width="50%">
+        </a>
+    </p>
+ - Data viewer：这是一个 JSON viewer，展示一个组件的 data。这个 viewer 是可以修改的，我们可以进行 CRUD 操作，以及修改 object 中的 key。所有的修改会自动同步到组件的 data 中。<br />**值得注意的是**：当组件的 data 发生改变时，viewer 不会自动刷新，需要重新选择该组件在组件结构树中的对应项目。<br />
+     <p>
+        <a href="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/component_data_group.png">
+            <img src="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/component_data_group.png" alt="component_data_group" width="50%">
+        </a>
+    </p>
+ - Computed：对应组件 computed 定义的 function，包含其所引用的 data 中的 key 及 value。<br />
+      <p>
+        <a href="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/computed_group.png">
+            <img src="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/computed_group.png" alt="computed_group" width="50%">
+        </a>
+    </p>
  - Filters：对应组件 filters 定义的 function。
  - Messages：对应组件 messages 定义的 function。
 
 上述五个功能块并不确保会全部显示，当某一个功能块确定为空时会隐藏整个区域。
 
-![component_detail](https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/component_detail.png)
+<p>
+    <a href="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/component_detail.png">
+        <img src="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/component_detail.png" alt="component_detail" width="50%">
+    </a>
+</p>
 
 详细信息显示区域的顶部包含了一个 title bar，其中包含了三部分：
 
@@ -177,27 +196,20 @@ Store tab 反映了在使用了 **San 框架的官方应用状态管理套件** 
 
 <p>
     <a href="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/mutation_list.png">
-        <img src="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/mutation_list.png" alt="mutation_list" width="100%">
+        <img src="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/mutation_list.png" alt="mutation_list" width="80%">
     </a>
 </p>
 
-无论是否打开开发者工具，页面从初始加载时刻起的所有状态的变化都会被记录。在左侧的列表中，每个项目包含了三个内容：
+无论是否打开开发者工具，页面从初始加载时刻起的所有状态的变化都会被记录。在左侧的列表中，每个项目包含了四个内容：
 
  - Action name：触发此状态变更的 action 的名字。
- - 状态变化时刻的时间戳：格式为【分】-【秒】-【毫秒】。
- - 附加信息。
+ - Action Id：触发此状态变更的 action 的 id。
+ - 状态变化时刻的时间戳：格式为 **分:秒:毫秒**。
+ - 状态：**done** 为完成, **pending** 为正在执行。
 
 <p>
     <a href="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/store_group.png">
-        <img src="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/store_group.png" alt="store_group" width="100%">
-    </a>
-</p>
-<p>
-    <a href="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/diff_group.png">
-        <img src="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/diff_group.png" alt="diff_group" width="40%">
-    </a>
-    <a href="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/diff_none.png">
-        <img src="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/diff_none.png" alt="diff_none" width="40%">
+        <img src="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/store_group.png" alt="store_group" width="80%">
     </a>
 </p>
 
@@ -233,7 +245,7 @@ History tab 可以列举页面从加载至今的所有 **San** 发往 san-devtoo
 
 History tab 为一张表格，表格中的每一行包含了：
 
- - 生命周期发出时间戳：格式为【时】-【分】-【秒】。
+ - 生命周期发出时间戳：格式为 **分:秒:毫秒**。
  - 生命周期类型：上述生命周期之一。
  - 生命周期发生组件：以组件 ID 显示，点击会跳转并且 inspect 至浏览器开发者工具 *Element* 面板。
  - 生命周期发生时组件 data：显示为 data viewer。data 代表当生命周期钩子执行后组件 data 的快照。
