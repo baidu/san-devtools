@@ -22,6 +22,8 @@ San Devtools 支持 **San** 应用调试的开发者工具。目前以两种形�
     - [Component](#component)
     - [Store](#store)
     - [History](#history)
+    - [Event](#event)
+    - [Message](#message)
 - [控制台直接调试](#控制台直接调试)
 
 
@@ -110,14 +112,14 @@ San-devtools 集成在浏览器内的开发者工具界面，位于浏览器开�
     </a>
 </p>
 
- - Readonly for component data：若勾选此选项，在浏览器开发者工具中的 **San** 面板中的 Component tab 中，选定组件显示出的组件 data 为只读，不允许修改其任何 key 及 value。
- - Readonly for store：若勾选此选项，在浏览器开发者工具中的 **San** 面板中的 Store tab 中，选定组件显示出的 payload 为只读，不允许修改其任何 key 及 value。
- - Readonly for event：若勾选此选项，在浏览器开发者工具中的 **San** 面板中的 Event tab 中，每条 Event 数据中的 payload 为只读。
- - Readonly for message：若勾选此选项，在浏览器开发者工具中的 **San** 面板中的 Message tab 中，选定组件显示出的 payload 为只读，不允许修改其任何 key 及 value。
+ - Readonly for component data：若勾选此选项，在浏览器开发者工具中的 **San** 面板中的 *Component tab* 中，选定组件显示出的组件 data 为只读，不允许修改其任何 key 及 value。
+ - Readonly for store：若勾选此选项，在浏览器开发者工具中的 **San** 面板中的 *Store tab* 中，选定组件显示出的 payload 为只读，不允许修改其任何 key 及 value。
+ - Readonly for event：若勾选此选项，在浏览器开发者工具中的 **San** 面板中的 *Event tab* 中，每条 Event 数据中的 payload 为只读。
+ - Readonly for message：若勾选此选项，在浏览器开发者工具中的 **San** 面板中的 *Message tab* 中，选定组件显示出的 payload 为只读，不允许修改其任何 key 及 value。
  - Mode: 可以通过点击开关来切换页面的模式，共两种模式：light 以及 dark 模式。
 
 ### Component
-浏览器开发者工具的 **San** 面板被打开后，会默认显示 Component tab。Component tab 由左右两个部分组成，中间通过一个可以拖动的分隔条隔开。左侧为页面的组件结构树。
+浏览器开发者工具的 **San** 面板被打开后，会默认显示 *Component tab*。*Component tab* 由左右两个部分组成，中间通过一个可以拖动的分隔条隔开。左侧为页面的组件结构树。
 
 ##### 组件树区域: 
 <p>
@@ -125,16 +127,13 @@ San-devtools 集成在浏览器内的开发者工具界面，位于浏览器开�
         <img src="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/building_component_tree.png" alt="building_component_tree" width="80%">
     </a>
 </p>
-第一次进入时，页面当前状态下的组件结构树会被一次性的加载。当组件较多的时候，加载可能会花费些时间，由于组件结构树的加载过程为异步的，这并不影响我们选择已经被加载出来的组件项目。其中每一条组件项目包含了四个内容：
+
+第一次进入时，页面当前状态下的组件结构树会被一次性的加载，加载过程中会出现 *Building* 进度条，当进度条走完并且消失的时候，则代表整个组件结构树已经加载完毕，我们可以将整个树形结构滚动到底部来查看当前整个页面的组件结构。当页面的组件结构发生变化时，组件结构树会自动进行刷新。当组件较多的时候，加载可能会花费些时间，由于组件结构树的加载过程为异步的，这并不影响我们选择已经被加载出来的组件项目。其中每一条组件项目包含了四个内容：
 
  - Component name：默认情况为组件的 `source.tagName` 属性，当其不存在的时候，则显示组件的 `constructor.name`，为 `ComponentClass`。
  - Component ID：即组件实例的 `ID`，是组件实例的唯一标识，当一个组件被多次实例化之后，每个实例的 `ID` 都是不一样的，但是展示的组件名称是相同的。
  - Route：当此组件由路由器的路由规则匹配时渲染生成，则显示此额外信息，内容为实际的路径。
  - Store：当组件通过 `connect` 注入了 `store` 中的数据之后，会被标记为 `connected`。
-
-当 *Building* 进度条走完并且消失的时候，则代表整个组件结构树已经加载完毕，我们可以将整个树形结构滚动到底部来查看当前整个页面的组件结构。
-
-当页面的组件结构发生变化时，组件结构树会自动进行刷新，若当前被选中的组件项目所对应的组件没有发生变化，则不会影响到右侧已经展示出的详细信息区域。
 
 <p>
     <a href="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/filter.png">
@@ -191,7 +190,7 @@ Component tab 右侧为详细信息显示区域，包含了五个功能块：
  - filter bar：与组件结构树的 filter bar 类似，随着我们输入文本，下方的六个功能块会过滤出仅包含过滤文本的内容，过滤范围包括 viewer 的 key/value，各 function 的代码字符串文本。当 filter bar 的文本为空时，恢复显示完整的功能块内容。
 
 ### Store
-Store tab 反映了在使用了 **San 框架的官方应用状态管理套件** 即 **san-store** 后，页面应用的状态及状态的变更。与 Component tab 类似，Store tab 由左右两个部分组成，中间通过一个可以拖动的分隔条隔开。左侧为页面加载至今的状态变更快照。
+*Store tab* 反映了在使用了 **San 框架的官方应用状态管理套件** 即 **san-store** 后，页面应用的状态及状态的变更。与 *Component tab* 类似，*Store tab* 由左右两个部分组成，中间通过一个可以拖动的分隔条隔开。左侧为页面加载至今的状态变更快照。
 
 
 <p>
@@ -222,7 +221,7 @@ Store tab 反映了在使用了 **San 框架的官方应用状态管理套件** 
     - status：状态，done 表示该 action 已经执行完毕，pending 表示执行中。当异步 action 的时候会出现 pending 的情况，并且要求 san-store 的版本为 v2.0.3+;
     - actionId：action 的唯一标识
     - parentActionId：触发该 action 的父 action id
-    - childsId：该 action 触发的其他的 子 action id
+    - childsId：该 action 触发的其他的子 action id
     - payload：该 action接收到的数据，支持修改该数据，点击 dispatch 按钮可以触发该 action
  - Diff：可以查看该 action dispatch 时， data 变化前后的所有差异。**⚠️ 注意：** 当没有用 san-update 来修改数据以及没有正确的 return 的时候，则无法查看 data 变化前后的差异。
 
@@ -232,7 +231,7 @@ Store tab 反映了在使用了 **San 框架的官方应用状态管理套件** 
 ### History
 ![history_list](https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/history_list.png)
 
-History tab 可以列举页面从加载至今的所有 **San** 发往 san-devtools 的组件生命周期的历史记录，这些生命周期包括：
+*History tab* 可以列举页面从加载至今的所有 **San** 发往 san-devtools 的组件生命周期的历史记录，这些生命周期包括：
 
  - compiled
  - inited
@@ -243,16 +242,40 @@ History tab 可以列举页面从加载至今的所有 **San** 发往 san-devtoo
 
 上述几种事件参见 **San 教程** 中 **组件**一章的 *生命周期* 部分，这里不再赘述。
 
-History tab 为一张表格，表格中的每一行包含了：
+*History tab* 为一张表格，表格中的每一行包含了：
 
- - 生命周期发出时间戳：格式为 **分:秒:毫秒**。
- - 生命周期类型：上述生命周期之一。
- - 生命周期发生组件：以组件 ID 显示，点击会跳转并且 inspect 至浏览器开发者工具 *Element* 面板。
- - 生命周期发生时组件 data：显示为 data viewer。data 代表当生命周期钩子执行后组件 data 的快照。
+ - Timestamp：生命周期触发的时间戳，格式为 **分:秒:毫秒**。
+ - Event：生命周期类型，上述生命周期之一。
+ - Component：生命周期发生的组件，以组件 ID 显示，点击会跳转并且 inspect 至浏览器开发者工具 *Element* 面板。
+ - Data：data 代表当生命周期钩子执行后组件 data 的快照。
 
 默认情况下，为了保证 san-devtools 的运行效率，页面从最开始的初始加载开始并不会将所有发往 san-devtools 的时间直接显示在历史记录列表内。
 
 顶部有两个部分构成：搜索框，操作按钮。搜索框的搜索规则为：两个关键字分别为「组件名称」以及「生命周期」，输入两个关键字的时候需要用 '.' 分割开。操作按钮有三个：从左到右分别为：开始/停止记录，清除所有，展示停止记录时间段触发的生命周期。
+
+### Event
+![event](https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/event.png)
+
+*Event tab* 可以记录下页面所有通过组件实例的 `fire` 方法触发的 **san** 自定义事件，*Event tab* 为一张表格，表格中的每一行包含了：
+
+ - Timestamp：生命周期发出时间戳，格式为 **分:秒:毫秒**。
+ - Event：自定义事件名称。
+ - Component：自定义事件对应的组件，以组件 ID 显示，点击会跳转并且 inspect 至浏览器开发者工具 *Element* 面板。
+ - Action：`fire` 操作按钮，点击可以触发一次事件。
+ - Payload：事件触发接受到的值，该值可以被修改，当点击了 `fire` 按钮，新的值会作为此次事件的 payload。
+
+ ### Message
+![message](https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/message.png)
+
+*Message tab* 可以记录下页面所有通过组件实例的 `dispatch` 发送的消息，可以方便的追踪消息从触发到捕获的轨迹。*Message tab* 为一张表格，表格中的每一行包含了：
+
+ - Timestamp：生命周期发出时间戳，格式为 **分:秒:毫秒**。
+ - Message：消息的名称。
+ - Sender：消息发送方组件，以组件 ID 显示，点击会跳转并且 inspect 至浏览器开发者工具 *Element* 面板。
+ - Receiver：消息接收方组件，以组件 ID 显示，点击会跳转并且 inspect 至浏览器开发者工具 *Element* 面板。
+ - Action：`dispatch` 操作按钮，点击可以触发一次事件。
+ - Payload：消息传递的值，该值可以被修改，当点击了 `dispatch` 按钮，新的值会作为此次消息的 payload。
+
 
 ## 控制台直接调试
 ![sandevtool_property](https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/sandevtool_property.png)

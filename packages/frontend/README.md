@@ -36,12 +36,12 @@ san-devtools -h
 
 ```bash
 # 启动本地server，自带WebSocket服务
-san-devtools --port 8080
+san-devtools --port 8899
 ```
 
 2. 根据提示将`ws-backend.js`添加到要调试页面的San.js之前
 3. 打开要调试的页面
-4. 进入 `localhost:8080` 页面选择需要debug的页面，然后开始San DevTools debug之旅！
+4. 进入 `localhost:8899` 页面选择需要debug的页面，然后开始San DevTools debug之旅！
 
 ## 🤝 如何贡献
 
