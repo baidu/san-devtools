@@ -271,4 +271,4 @@ if (isProd) {
     };
 }
 
-module.exports = config => merge(baseConfig, config);
+exports.createConfig = config => merge(baseConfig, config);
