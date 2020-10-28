@@ -9,7 +9,7 @@
         "start:serve": "webpack --mode development -w",
         "start:bin": "node ./bin/san-devtools",
         "build": "webpack --mode production --progress --hide-modules",
-        "pub": "yarn build && npm publish"
+        "prepublishOnly": "npm run build"
     },
     "repository": {
         "type": "git",
