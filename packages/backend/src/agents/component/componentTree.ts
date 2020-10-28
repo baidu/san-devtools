@@ -54,6 +54,9 @@ export function addToTreeData(rootTreeData: ComponentTreeData[], data: Component
                 nodeTreeData[index].displayName = data.displayName;
                 nodeTreeData[index].idPath = data.idPath;
                 nodeTreeData[index].extras = data.extras;
+                nodeTreeData[index].mapStates = data.mapStates;
+                nodeTreeData[index].mapActionsKeys = data.mapActionsKeys;
+                nodeTreeData[index].storeName = data.storeName;
             }
             nodeTreeData = nodeTreeData[index].treeData;
         }

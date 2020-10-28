@@ -21,7 +21,6 @@ San Devtools 支持 **San** 应用调试的开发者工具。目前以两种形�
     - [Component](#component)
     - [Store](#store)
     - [History](#history)
-    - [Routes](#routes)
 - [控制台直接调试](#控制台直接调试) 
 - [新功能预告](#新功能预告)
 
@@ -68,11 +67,12 @@ $ cd packages/extensions/dist
 $ sand
 ```
 
-2. 根据提示将`ws-backend.js`添加到要调试页面的 San.js 之前；
+2. 根据提示将`ws-backend.js`添加到要调试页面的 `San.js` 之前；
 
 3. 打开要调试的页面；
 
-4. 进入 `localhost:8080` 页面选择需要debug的页面，然后开始San DevTools debug之旅！
+4. 进入 `http://127.0.0.1:8899` 页面选择需要debug的页面，然后开始San DevTools debug之旅！
+
 
 ## 开发者工具
 ### 图标
@@ -81,6 +81,7 @@ $ sand
         <img align="right" src="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/browser_action.png" alt="browser_action" height="100">
     </a>
 </p>
+
 在 Chrome 浏览器中安装好 san-devtools 扩展之后，我们会在 Chrome 的工具栏中看到 **San** 的图标，图标的默认状态为灰色。刷新当前页面，若检测到当前页面有使用 **San**，并且 `san.debug` 为 `true`，图标会变为 **San** 标准的蓝色，并且下方会显示出检测到的 **San** 的版本号。
 
 #### Popup 窗口
@@ -89,53 +90,78 @@ $ sand
         <img align="right" src="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/popup.png" alt="popup" height="240">
     </a>
 </p>
-点击 **San** 图标会弹出 popup 窗口，此窗口中包含几个 san-devtools 的全局选项。
 
- - Do not display the version number：默认情况下，每次刷新页面，都会在 **San** 图标下显示当前页面所使用的 **San** 的版本号。当点击图标弹出 popup 窗口后，或者打开位于浏览器开发者工具中的 **San** 面板后，版本号会被隐藏。若勾选次选项，则始终不会显示版本号。
- - Readonly for component data：若勾选次选项，在浏览器开发者工具中的 **San** 面板中的 Component tab 中，选定组件显示出的组件 data 为只读，不允许修改其任何 key 及 value。
- - Readonly for store：若勾选次选项，在浏览器开发者工具中的 **San** 面板中的 Store tab 中，选定组件显示出的 payload 为只读，不允许修改其任何 key 及 value，以及 dispatch。
-
+点击 **San** 图标会弹出 popup 窗口，此窗口中展示 san 的版本，以及引导文案。
 
 ### 首页
 San-devtools 集成在浏览器内的开发者工具界面，位于浏览器开发者工具的 **San** 面板中。此面板分为上下两大部分。
 
 ![main](https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/main.png)
 
- - 上部 **导航栏** 包括恒定显示的 *Component* tab 和 *History* tab。当使用了 san-store，则会追加 *Store* tab。当使用了 san-router，则会追加 *Route* tab。
+ - 上部 **导航栏** 包括恒定显示的 *Component* tab 和 *History* tab。当使用了 san-store，则会追加 *Store* tab。当使用了 san-router，则会追加 *Route* tab。当 san 的版本在 3.9.4 及以上的时候，会追加 *Event* tab 以及 *Message* tab。
  - 下部 **内容区** 会在接下来的几个段落中详细介绍。
+
+ ### 设置
+ 当点击 **导航栏** 的设置图标的时候，会弹出设置面板，包含几个 san-devtools 的全局选项。
+
+<p>
+    <a href="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/setting.png">
+        <img src="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/setting.png" alt="setting" width="100%">
+    </a>
+</p>
+
+ - Readonly for component data：若勾选此选项，在浏览器开发者工具中的 **San** 面板中的 Component tab 中，选定组件显示出的组件 data 为只读，不允许修改其任何 key 及 value。
+ - Readonly for store：若勾选此选项，在浏览器开发者工具中的 **San** 面板中的 Store tab 中，选定组件显示出的 payload 为只读，不允许修改其任何 key 及 value。
+ - Readonly for event：若勾选此选项，在浏览器开发者工具中的 **San** 面板中的 Event tab 中，每条 Event 数据中的 payload 为只读。
+ - Readonly for message：若勾选此选项，在浏览器开发者工具中的 **San** 面板中的 Message tab 中，选定组件显示出的 payload 为只读，不允许修改其任何 key 及 value。
+ - Mode: 可以通过点击开关来切换页面的模式，共两种模式：light 以及 dark 模式。
 
 ### Component
 浏览器开发者工具的 **San** 面板被打开后，会默认显示 Component tab。Component tab 由左右两个部分组成，中间通过一个可以拖动的分隔条隔开。左侧为页面的组件结构树。
 
+##### 组件树区域: 
 <p>
     <a href="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/building_component_tree.png">
-        <img align="right" src="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/building_component_tree.png" alt="building_component_tree" width="45%">
+        <img src="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/building_component_tree.png" alt="building_component_tree" width="100%">
     </a>
 </p>
-第一次进入时，页面当前状态下的组件结构树会被一次性的加载。当组件较多的时候，加载可能会花费些时间，由于组件结构树的加载过程为异步的，这并不影响我们选择已经被加载出来的组件项目。其中每一条组件项目包含了三个内容：
+第一次进入时，页面当前状态下的组件结构树会被一次性的加载。当组件较多的时候，加载可能会花费些时间，由于组件结构树的加载过程为异步的，这并不影响我们选择已经被加载出来的组件项目。其中每一条组件项目包含了四个内容：
 
- - Component name：默认情况为组件的 subTag 属性，当 subTag 不存在的时候（**San 3.1.0-beta.1** 之前的版本），则显示组件的 constructor name，可能为 `ComponentClass`。
- - Component ID：即组件 ID，`_san_+数字` 。同时也是组件所对应的 DOM 元素的 ID。
+ - Component name：默认情况为组件的 `source.tagName` 属性，当其不存在的时候，则显示组件的 `constructor.name`，为 `ComponentClass`。
+ - Component ID：即组件实例的 `ID`，是组件实例的唯一标识，当一个组件被多次实例化之后，每个实例的 `ID` 都是不一样的，但是展示的组件名称是相同的。
  - Route：当此组件由路由器的路由规则匹配时渲染生成，则显示此额外信息，内容为实际的路径。
+ - Store：当组件通过 `connect` 注入了 `store` 中的数据之后，会被标记为 `connected`。
 
 当 *Building* 进度条走完并且消失的时候，则代表整个组件结构树已经加载完毕，我们可以将整个树形结构滚动到底部来查看当前整个页面的组件结构。
 
 当页面的组件结构发生变化时，组件结构树会自动进行刷新，若当前被选中的组件项目所对应的组件没有发生变化，则不会影响到右侧已经展示出的详细信息区域。
 
-![filter](https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/filter.png)
+<p>
+    <a href="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/filter.png">
+        <img src="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/filter.png" alt="filter" width="100%">
+    </a>
+</p>
 
-在组件结构树的顶部，有一个 filter bar，随着我们输入文本，下方的组件结构树会过滤出仅包含过滤文本的组件项目，过滤范围包括组件名、组件 ID、Route 信息。当 filter bar 的文本为空时，恢复显示完整的组件结构树。
+在组件结构树的顶部，有一个 filter bar，随着我们输入文本，下方的组件结构树会过滤出仅包含过滤文本的组件项目，过滤范围包括组件名、组件 ID、Store 信息等。当 filter bar 的文本为空时，恢复显示完整的组件结构树。
 
-Component tab 右侧为详细信息显示区域，包含了六个功能块：
+*san-devtools 的 Chrome 插件功能*：当右键选择页面元素的时候，从「上下文菜单」选择 *inspect san component*，component tab 会自动选中对应的组件实例，并展示详细信息。
 
- - Basic information：显示一个组件最基本的信息，包含了 ID，组件的祖先组件路径，parent/owner 组件信息等，点击蓝色按钮会跳转并且 inspect 至浏览器开发者工具 *Element* 面板中该按钮所示组件对应 DOM 元素上。<br />![basic_information_group](https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/basic_information_group.png)
+<p>
+    <a href="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/inspect_component.png">
+        <img src="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/inspect_component.png" alt="inspect_component" width="100%">
+    </a>
+</p>
+
+##### 详细信息区域: 
+Component tab 右侧为详细信息显示区域，包含了五个功能块：
+
+ - Basic information：显示一个组件最基本的信息，包含了 ID，组件的祖先组件路径，parent/owner 组件信息，当组件被注入了 store 中的数据之后，还会有 store 的基本信息，包括 mapStates, mapActionsKeys。<br />![basic_information_group](https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/basic_information_group.png)
  - Data viewer：这是一个 JSON viewer，展示一个组件的 data。这个 viewer 是可以修改的，我们可以进行 CRUD 操作，以及修改 object 中的 key。所有的修改会自动同步到组件的 data 中。<br />**值得注意的是**：当组件的 data 发生改变时，viewer 不会自动刷新，需要重新选择该组件在组件结构树中的对应项目。<br />![component_data_group](https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/component_data_group.png)
  - Computed：对应组件 computed 定义的 function，包含其所引用的 data 中的 key 及 value。<br />![computed_group](https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/computed_group.png)
  - Filters：对应组件 filters 定义的 function。
  - Messages：对应组件 messages 定义的 function。
- - Listeners：组件所挂载的事件的 listener。
 
-上述六个功能块并不确保会全部显示，当某一个功能块确定为空时会隐藏整个区域。
+上述五个功能块并不确保会全部显示，当某一个功能块确定为空时会隐藏整个区域。
 
 ![component_detail](https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/component_detail.png)
 
@@ -148,28 +174,45 @@ Component tab 右侧为详细信息显示区域，包含了六个功能块：
 ### Store
 Store tab 反映了在使用了 **San 框架的官方应用状态管理套件** 即 **san-store** 后，页面应用的状态及状态的变更。与 Component tab 类似，Store tab 由左右两个部分组成，中间通过一个可以拖动的分隔条隔开。左侧为页面加载至今的状态变更快照。
 
-![mutation_list](https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/mutation_list.png)
+
+<p>
+    <a href="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/mutation_list.png">
+        <img src="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/mutation_list.png" alt="mutation_list" width="100%">
+    </a>
+</p>
 
 无论是否打开开发者工具，页面从初始加载时刻起的所有状态的变化都会被记录。在左侧的列表中，每个项目包含了三个内容：
 
  - Action name：触发此状态变更的 action 的名字。
- - 状态变化时刻的时间戳：包括日期及时间，精确到秒。
+ - 状态变化时刻的时间戳：格式为【分】-【秒】-【毫秒】。
  - 附加信息。
 
 <p>
     <a href="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/store_group.png">
-        <img src="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/store_group.png" alt="store_group" width="40%">
+        <img src="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/store_group.png" alt="store_group" width="100%">
     </a>
+</p>
+<p>
     <a href="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/diff_group.png">
         <img src="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/diff_group.png" alt="diff_group" width="40%">
     </a>
+    <a href="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/diff_none.png">
+        <img src="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/diff_none.png" alt="diff_none" width="40%">
+    </a>
 </p>
-<br />
 
 点击列表中的项目，右侧的详细信息区域会发生变化。从上之下包括：
 
- - Store：标示了所选的状态变更的 action 对应的 store（缺省 store 还是其他 store），payload，以及 action handler。
- - Diff：可以查看该 action dispatch 时， payload 变化前后的所有差异。
+ - Basic Information：包括下面几项
+    - storeName：store 名称;
+    - actionName：action 名称;
+    - timeRange：执行的时间段，可以查看该 action 的执行时长是否异常。
+    - status：状态，done 表示该 action 已经执行完毕，pending 表示执行中。当异步 action 的时候会出现 pending 的情况，并且要求 san-store 的版本为 v2.0.3+;
+    - actionId：action 的唯一标识
+    - parentActionId：触发该 action 的父 action id
+    - childsId：该 action 触发的其他的 子 action id
+    - payload：该 action接收到的数据，支持修改该数据，点击 dispatch 按钮可以触发该 action
+ - Diff：可以查看该 action dispatch 时， data 变化前后的所有差异。**⚠️ 注意：** 当没有用 san-update 来修改数据以及没有正确的 return 的时候，则无法查看 data 变化前后的差异。
 
 > 提示：当使用了非官方的 connector 时，要确保在必要的时刻向 san-devtools 发送 `store-connected` `store-comp-inited` `store-comp-disposed` 事件，这样 san-devtools 才可以更好的生成 Store tab 中所需要状态变更快照。虽然已对无法收到上述事件做了替代方案，但这样可能会导致 Store tab 中某些地方为空。
 
@@ -177,30 +220,27 @@ Store tab 反映了在使用了 **San 框架的官方应用状态管理套件** 
 ### History
 ![history_list](https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/history_list.png)
 
-History tab 可以列举页面从加载至今的所有 **San** 发往 san-devtools 的事件的历史记录，这些事件包括：
+History tab 可以列举页面从加载至今的所有 **San** 发往 san-devtools 的组件生命周期的历史记录，这些生命周期包括：
 
- - comp-compiled
- - comp-inited
- - comp-created
- - comp-attached
- - comp-detached
- - comp-disposed
+ - compiled
+ - inited
+ - created
+ - attached
+ - detached
+ - disposed
 
-上述几种事件参见 **San 教程** 中 **组件**一章的 *生命周期* 部分，这里不再赘述。还有：
-
- - comp-route
-此事件为 **san-router** 发出，san-devtools 监听 comp-route 事件用于更新 Routes tab 中的路由变化。
+上述几种事件参见 **San 教程** 中 **组件**一章的 *生命周期* 部分，这里不再赘述。
 
 History tab 为一张表格，表格中的每一行包含了：
 
- - 事件发出时间戳：包括日期及时间，精确到秒。
- - 事件类型：上述事件之一。
- - 事件发生组件：以组件 ID 显示，点击会跳转并且 inspect 至浏览器开发者工具 *Element* 面板。
- - 事件发生时组件 data：显示为 data viewer。data 代表当事件发生时组件 data 的快照。
+ - 生命周期发出时间戳：格式为【时】-【分】-【秒】。
+ - 生命周期类型：上述生命周期之一。
+ - 生命周期发生组件：以组件 ID 显示，点击会跳转并且 inspect 至浏览器开发者工具 *Element* 面板。
+ - 生命周期发生时组件 data：显示为 data viewer。data 代表当生命周期钩子执行后组件 data 的快照。
 
 默认情况下，为了保证 san-devtools 的运行效率，页面从最开始的初始加载开始并不会将所有发往 san-devtools 的时间直接显示在历史记录列表内。
 
-当点击 *Load all history records* 按钮后，才会加载从页面加载至今的所有事件。只有当顶端工具栏中的 ▶ 被点击且显示为 *Recording* 时，当前发生的所有事件才会实时的记录在历史记录列表内。
+顶部有两个部分构成：搜索框，操作按钮。搜索框的搜索规则为：两个关键字分别为「组件名称」以及「生命周期」，输入两个关键字的时候需要用 '.' 分割开。操作按钮有三个：从左到右分别为：开始/停止记录，清除所有，展示停止记录时间段触发的生命周期。
 
 ## 控制台直接调试
 ![sandevtool_property](https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/sandevtool_property.png)
@@ -208,19 +248,15 @@ History tab 为一张表格，表格中的每一行包含了：
 默认情况下，san-devtools 会在全局写入一个对象 `window.__san_devtool__`，里面包含了 san-devtools 用于展示开发者工具的所有源信息。包括：
 
  - san：**San** 全局对象。用于版本检测及 **San** hook 检测。
- - tree：生成组件结构树的原始对象。
- - store：展示 Store 变更状态的所有对象。
+ - data：生成组件结构树的原始对象。
+ - storeMap：所有 store 的实例的 Map，健为 store 的名称。
+ - componentMap：页面上所有挂载了的组件实例的 Map，健为组件实例的 id。
  - history：历史记录快照。
- - routes：路由记录列表。
 
-![dom_properties](https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/dom_properties.png)
+除此之外，san-devtools 还会向组件挂载的 DOM 对象上附加一些内容：
 
-除此之外，san-devtools 还会向组件挂载的 DOM 对象上附加一些内容：包括但不限于：
+ - \_\_SAN_INS_ID_PATH\_\_：组件的祖先组件路径。
 
- - \_\_san_component\_\_：组件实例。
- - \_\_san_data\_\_：组件实例中的 data。
- - \_\_san_path\_\_：组件的祖先组件路径。
+通过 `window.__san_devtool__` 以及 DOM 上的组件路径，可以很方便快捷地找到组件对应的 dom，同样也可以从选中的 dom 找到对应的组件实例或者所在的组件实例。
 
-![dom_values](https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/dom_values.png)
-
-通过这些直接附加到 DOM 上的值，同样可以很方便快捷地了解组件状态，以及对组件进行适当的调试。
+![console_panel](https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/console_panel.png)

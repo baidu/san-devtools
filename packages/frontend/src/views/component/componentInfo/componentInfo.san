@@ -247,6 +247,7 @@
                     font-size: 16px;
                     color: @title-font-color;
                     padding: 8px 16px 8px 24px;
+                    user-select: none;
                 }
                 .santd-collapse-item-active {
                     .santd-icon-left {
@@ -274,7 +275,6 @@
                     margin-bottom: 20px;
                     box-sizing: border-box;
                     width: 100%;
-                    user-select: none;
                 }
             }
         }
