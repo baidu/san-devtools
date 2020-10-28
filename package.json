@@ -4,9 +4,7 @@
     "description": "Development tool for debugging San.js applications.",
     "private": true,
     "scripts": {
-        "dev:example": "yarn workspace example start",
-        "dev:standalone": "concurrently -p none \"yarn start:standalone\" \"yarn dev:example\"",
-        "start:standalone": "yarn workspace san-devtools start",
+        "start": "yarn workspace san-devtools start",
         "build:standalone": "yarn workspace san-devtools build",
         "start:extensions": "yarn workspace extensions start",
         "build:extensions": "yarn workspace extensions build"
@@ -39,7 +37,6 @@
         "@ksky521/cz-emoji": "^1.2.1",
         "commitizen": "^4.0.3",
         "commitlint-config-gitmoji": "^1.0.1",
-        "concurrently": "^5.2.0",
         "eslint": "^6.8.0",
         "eslint-plugin-babel": "^5.3.0"
     },
