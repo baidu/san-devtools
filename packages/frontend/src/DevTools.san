@@ -72,7 +72,6 @@
 
             initData() {
                 return {
-                    current_component_id: '',
                     currentTab: 'component',
                     containerShown: {
                         'component': true,

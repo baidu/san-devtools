@@ -10,13 +10,9 @@ module.exports = {
     resolve: {
         extensions: ['.js', '.jsx', '.san', '.json', '.ts'],
         alias: {
-            '@backend': resolve('backend/src/'),
-            '@shared': resolve('shared/src/'),
-            '@frontend': resolve('frontend/src/'),
             '@src': resolve('example/src/')
         }
     },
-    // entry: ['../san-devtool/standalone/backend.ts?http://0.0.0.0:8090&sock&sockHost=localhost&sockPort=8090&sockPath=/sds-sockjs-node', path.join(__dirname, 'src', 'main.js')],
     entry: [path.join(__dirname, 'src', 'main.js')],
     output: {
         path: path.join(__dirname, 'dist')
@@ -36,32 +32,6 @@ module.exports = {
     },
     module: {
         rules: [
-            {
-                test: /\.ts$/,
-                use: [
-                    {
-                        loader: 'babel-loader',
-                        options: {
-                            plugins: [
-                                require.resolve('@babel/plugin-proposal-class-properties'),
-                                require.resolve('san-hot-loader/lib/babel-plugin')
-                            ],
-                            presets: [
-                                [
-                                    require.resolve('@babel/preset-env'),
-                                    {
-                                        targets: {
-                                            browsers: 'chrome > 70, last 2 versions'
-                                        },
-                                        modules: false
-                                    }
-                                ],
-                                [require.resolve('@babel/preset-typescript'), {allExtensions: true}]
-                            ]
-                        }
-                    }
-                ]
-            },
             {
                 test: /\.js$/,
                 exclude: /node_modules/,

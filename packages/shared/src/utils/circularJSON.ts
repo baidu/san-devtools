@@ -1,7 +1,6 @@
 /**
  * @file handle circular json, Serialize and Deserialization
  */
-// TODO: 这里只是简单的处理了一下，需要紧急完善一下，参考 vue 以及 circular-json
 import {parse as circularParse, stringify as circularStringify} from 'circular-json';
 const CircularJSON = {
     parse,
