@@ -1,0 +1,31 @@
+{
+    "private": true,
+    "name": "build-tools",
+    "version": "0.0.0",
+    "main": "src/index.js",
+    "dependencies": {
+        "ejs": "~3.1.5",
+        "ejs-loader":"^0.5.0",
+        "babel-loader": "^8.1.0",
+        "clean-webpack-plugin": "^3.0.0",
+        "copy-webpack-plugin": "^6.0.3",
+        "css-loader": "^3.5.3",
+        "extract-text-webpack-plugin": "^3.0.2",
+        "file-loader": "^6.0.0",
+        "html-loader": "^1.1.0",
+        "html-webpack-plugin": "^4.3.0",
+        "less-loader": "^6.2.0",
+        "mini-css-extract-plugin": "^0.9.0",
+        "optimize-css-assets-webpack-plugin": "^5.0.3",
+        "postcss-loader": "^3.0.0",
+        "raw-loader": "^4.0.1",
+        "san-hot-loader": "^0.1.2",
+        "san-loader": "^0.1.3",
+        "style-loader": "^1.2.1",
+        "terser-webpack-plugin": "^3.0.7",
+        "url-loader": "^4.1.0",
+        "webpack": "^4.43.0",
+        "webpack-bundle-analyzer": "^3.8.0",
+        "webpack-merge": "^5.1.2"
+    }
+}

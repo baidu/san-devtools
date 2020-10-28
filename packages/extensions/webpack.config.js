@@ -5,7 +5,7 @@
 const path = require('path');
 const CopyPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const createConfig = require('../../createConfig');
+const {createConfig} = require('build-tools');
 
 const WebpackExtensionManifestPlugin = require('webpack-extension-manifest-plugin');
 const pkg = require('./package.json');
@@ -59,6 +59,6 @@ module.exports = createConfig({
                 base: baseManifest,
                 extend: {version: pkg.version}
             }
-        }),
+        })
     ]
 });

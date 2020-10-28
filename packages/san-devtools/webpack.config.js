@@ -4,7 +4,7 @@
 
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const createConfig = require('../../createConfig');
+const {createConfig} = require('build-tools');
 
 const isProd = process.env.NODE_ENV === 'production';
 
@@ -29,6 +29,6 @@ module.exports = createConfig({
             template: path.join(__dirname, 'public/home.html'),
             filename: 'home.ejs',
             chunks: ['home']
-        }),
+        })
     ]
 });
