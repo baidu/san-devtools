@@ -163,7 +163,7 @@ export function install(target: any) {
     // eslint-disable-next-line
     if (target.hasOwnProperty(SAN_DEVTOOL_NAMESPACE)) {
         // eslint-disable-next-line
-        alert('[SAN_DEVTOOLS]: If there is an old SAN_TOOL in your app please uninstall it, after that reload your app!');
+        alert('[SAN_DEVTOOLS]: This page has already installed a Hook. Make sure your page has only one ws-backend.js or one San-Devtools-Chrome-Extemsion.');
         return null;
     }
 
