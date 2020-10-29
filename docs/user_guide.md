@@ -88,8 +88,8 @@ $ sand
 
 #### Popup 窗口
 <p>
-    <a href="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/popup.png">
-        <img src="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/popup.png" alt="popup" height="100">
+    <a href="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/san-detected.png">
+        <img src="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/san-detected.png" alt="popup" height="100">
     </a>
 </p>
 

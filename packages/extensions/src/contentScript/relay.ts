@@ -1,3 +1,4 @@
+/* global chrome */
 /**
  * @file 中继站，页面 backend 与 contentScript 之间的中继
  */
@@ -20,8 +21,7 @@ export function relay() {
         } else if (evt.source === window && evt.data && evt.data.source === 'san-detector') {
             chrome.runtime.sendMessage({
                 event: 'HandShake.backendReady',
-                version: evt.data.payload,
-                visibility: true
+                version: evt.data.payload
             });
         }
     }

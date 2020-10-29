@@ -34,5 +34,5 @@ export default function getFavicon() {
     if (url) {
         return url;
     }
-    return 'https://baidu.github.io/san/img/icons/icon-144x144.png';
+    return '';
 }

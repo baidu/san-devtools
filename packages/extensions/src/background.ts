@@ -99,7 +99,6 @@ chrome.runtime.onMessage.addListener((req, sender, sendResponse) => {
     }
     let data = {
         version: req.version,
-        visibility: req.visibility,
         tabId: sender.tab.id || -1
     };
     updateBrowserAction(data);
@@ -107,35 +106,27 @@ chrome.runtime.onMessage.addListener((req, sender, sendResponse) => {
 /**
  * 找到需要设置菜单栏图标的tabid
  * @param {*} ver
- * @param {*} visibility
  * @param {*} from
  */
 interface BackendReadyData {
     version: string;
-    visibility: boolean;
     tabId: number;
 }
 function updateBrowserAction(data: BackendReadyData) {
-    let {version, visibility, tabId} = data;
+    let {version, tabId} = data;
     if (typeof version === 'undefined') {
         return;
     }
     if (tabId) {
-        updateBadgeTextAndIcon(+tabId, version, visibility);
+        updateBadgeTextAndIcon(+tabId, version);
     }
 }
 /**
  * 设置菜单栏图标文字以及背景图片
  * @param {*} tabId
- * @param {*} ver
- * @param {*} visibility
+ * @param {*} version
  */
-function updateBadgeTextAndIcon(tabId: number, version: string, visibility: boolean) {
-    // 设置chrome上的菜单栏图标san版本号
-    chrome.browserAction.setBadgeText({
-        tabId,
-        text: visibility && !+localStorage.do_not_show_version ? version : ''
-    });
+function updateBadgeTextAndIcon(tabId: number, version: string) {
     // 设置chrome上的菜单栏图标
     chrome.browserAction.setIcon({
         tabId,
