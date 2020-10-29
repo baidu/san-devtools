@@ -1,13 +1,1 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg width="40px" height="40px" viewBox="0 0 40 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <title>icon / 40 / 历史已选择</title>
-    <g id="icon-/-40-/-历史已选择" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="编组-3" transform="translate(4.000000, 2.000000)">
-            <circle id="椭圆形" fill="#06CE96" opacity="0.5" cx="18.5" cy="13.5" r="13.5"></circle>
-            <g id="历史" transform="translate(0.000000, 2.000000)" stroke="#1968FA" stroke-width="2">
-                <circle id="椭圆形" cx="16" cy="16" r="15"></circle>
-                <polyline id="路径-8" stroke-linecap="round" points="16 8.53333333 16 16.8956351 22.6294094 16.8956351"></polyline>
-            </g>
-        </g>
-    </g>
-</svg>
+<svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><g transform="translate(4 2)" fill="none" fill-rule="evenodd"><circle fill="#06CE96" opacity=".5" cx="18.5" cy="13.5" r="13.5"/><g transform="translate(0 2)" stroke="#1968FA" stroke-width="2"><circle cx="16" cy="16" r="15"/><path stroke-linecap="round" d="M16 8.533v8.363h6.63"/></g></g></svg>

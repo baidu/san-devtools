@@ -1,16 +1,1 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg width="40px" height="40px" viewBox="0 0 40 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <title>icon / 40 / 事件未选择</title>
-    <g id="icon-/-40-/-事件未选择" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g>
-            <rect id="矩形备份-4" fill-opacity="0" fill="#D8D8D8" x="0" y="0" width="40" height="40"></rect>
-            <g id="事件" transform="translate(5.000000, 6.000000)" stroke="#666666" stroke-width="2">
-                <rect id="矩形备份-2" x="1" y="2" width="28" height="26" rx="6"></rect>
-                <line x1="7" y1="12" x2="23" y2="12" id="路径-9" stroke-linecap="round"></line>
-                <line x1="7" y1="19" x2="23" y2="19" id="路径-9备份" stroke-linecap="round"></line>
-                <line x1="9" y1="4" x2="9" y2="-1.77635684e-15" id="路径-12" stroke-linecap="round"></line>
-                <line x1="21" y1="4" x2="21" y2="0" id="路径-12备份" stroke-linecap="round"></line>
-            </g>
-        </g>
-    </g>
-</svg>
+<svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><path fill="none" d="M0 0h40v40H0z"/><g transform="translate(5 6)" stroke="#666" stroke-width="2"><rect x="1" y="2" width="28" height="26" rx="6"/><path stroke-linecap="round" d="M7 12h16M7 19h16M9 4V0M21 4V0"/></g></g></svg>
