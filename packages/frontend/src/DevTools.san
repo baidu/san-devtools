@@ -18,10 +18,10 @@
             </div>
             <div
                 s-if="!wsDisconnected"
-                id="history_containter"
-                class="container {{containerShown.history ? 'show' : ''}}"
+                id="event_containter"
+                class="container {{containerShown.event ? 'show' : ''}}"
             >
-                <sandevtool-history />
+                <sandevtool-event />
             </div>
             <div
                 s-if="!wsDisconnected"
@@ -32,10 +32,10 @@
             </div>
             <div
                 s-if="!wsDisconnected"
-                id="event_containter"
-                class="container {{containerShown.event ? 'show' : ''}}"
+                id="history_containter"
+                class="container {{containerShown.history ? 'show' : ''}}"
             >
-                <sandevtool-event />
+                <sandevtool-history />
             </div>
         </san-row>
     </div>
