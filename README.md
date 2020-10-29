@@ -57,8 +57,6 @@ san-devtools
 
 Open the debugging page and san-devtools plugin will show the San version, then open the chrome devtool and will see the San tab.
 
-![](https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/san-detected.png)
-
 ![](https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/main.png)
 
 #### sand options
