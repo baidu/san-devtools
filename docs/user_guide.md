@@ -3,7 +3,9 @@
 San Devtools 支持 **San** 应用调试的开发者工具。目前以两种形式存在：
 
 - 以 Google Chrome 浏览器插件形式存在，支持传统浏览器的调试；
-- 以命令行工具形式存在，提供`san-devtools(简写sand)`命令，支持以 **San** 为框架的页面远程调试，包括 IE、Safari、Mobile、Electron以及San Native等形式的调试。
+- 以命令行工具形式存在，提供 `san-devtools(简写sand)` 命令，支持以 **San** 为框架的页面远程调试，包括 IE、Safari、Mobile、Electron 以及 San Native 等形式的调试。
+
+> 注意：在调试页面的时候两种方式不能同时存在，即当 **San-devtools Chrome 插件** 处于开启状态的时候，页面不能嵌入由 **命令行工具** 生成的 ws-backend.js，否则只有一个会生效，并且哪个生效是随机的，取决于两者的加载速度。
 
 ### 版本依赖
  - San devtools 的运行需要 **San 3.0.3-rc.17** 及以上的版本。
@@ -69,12 +71,23 @@ $ cd packages/extensions/dist
 $ sand
 ```
 
-2. 根据提示将`ws-backend.js`添加到要调试页面的 `San.js` 之前；
+2. 根据提示将 `ws-backend.js` 添加到要调试页面的 `San.js` 之前；
 
 3. 打开要调试的页面；
 
-4. 进入 `http://127.0.0.1:8899` 页面选择需要debug的页面，然后开始San DevTools debug之旅！
+4. 进入 `http://127.0.0.1:8899` 页面选择需要 debug 的页面，然后开始 San DevTools debug 之旅！
 
+<p>
+    <a href="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/inspector-connected.png">
+        <img src="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/inspector-connected.png" alt="inspector-connected" width="100%">
+    </a>
+</p>
+
+<p>
+    <a href="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/light_mode.png">
+        <img src="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/light_mode.png" alt="light_mode" width="100%">
+    </a>
+</p>
 
 ## 开发者工具
 ### 图标

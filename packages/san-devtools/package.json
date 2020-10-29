@@ -18,7 +18,6 @@
     },
     "bin": {
         "san-devtools": "bin/san-devtools.js",
-        "sandev": "bin/san-devtools.js",
         "sand": "bin/san-devtools.js"
     },
     "engines": {
