@@ -10,7 +10,7 @@
             on-loadBefore="loadBefore"
             filterPlaceholder="eg: A.attached"
             searchTip="Use '.' as separator for search, like: [componentName].[lifecycle]"
-            beforeLoaded="{{true}}"
+            showEye="{{true}}"
         >
         </san-devtools-table>
         <sand-loading

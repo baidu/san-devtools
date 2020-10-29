@@ -38,8 +38,9 @@
                     </span>
                 </san-tooltip>
                 <san-tooltip
+                    s-if="{{showEye}}"
                     placement="bottomRight"
-                    title="{{ beforeLoaded ? 'hide history records before devtool first created' : 'show history records before devtool first created' }}"
+                    title="{{ eyeOpen ? 'hide history records before devtool first created' : 'show history records before devtool first created' }}"
                 >
                     <span
                         class="toolbar-icon"
@@ -146,7 +147,8 @@
             initData() {
                 return {
                     tableHeight: 0,
-                    filterText: ''
+                    filterText: '',
+                    eyeOpen: false
                 }
             },
 
@@ -165,7 +167,7 @@
             },
             loadBefore() {
                 this.fire('loadBefore');
-                this.data.set('beforeLoaded', !this.data.get('beforeLoaded'));
+                this.data.set('eyeOpen', !this.data.get('eyeOpen'));
             },
 
             actionHandler(index) {
