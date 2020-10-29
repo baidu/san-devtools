@@ -1,6 +1,6 @@
 # San Devtools 使用指南
 
-San Devtools 支持 **San** 应用调试的开发者工具。目前以两种形式存在：
+为了快捷方便的调试 **San** 应用，San Devtools 提供了两种调试方式：
 
 - 以 Google Chrome 浏览器插件形式存在，支持传统浏览器的调试；
 - 以命令行工具形式存在，提供 `san-devtools(简写sand)` 命令，支持以 **San** 为框架的页面远程调试，包括 IE、Safari、Mobile、Electron 以及 San Native 等形式的调试。

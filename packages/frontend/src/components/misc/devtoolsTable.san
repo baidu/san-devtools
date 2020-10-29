@@ -266,6 +266,7 @@
         .santd-table {
             padding: 0 8px;
             .santd-table-thead > tr > th {
+                border: 0;
                 background: @color-white;
             }
             .santd-table-placeholder {
