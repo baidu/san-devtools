@@ -7,7 +7,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const {createConfig} = require('build-tools');
 
 const isProd = process.env.NODE_ENV === 'production';
-const config = {
+module.exports = createConfig({
     entry: {
         home: './src/home.ts',
         frontend: './src/frontend.ts',
@@ -30,18 +30,4 @@ const config = {
             chunks: ['home']
         })
     ]
-};
-if (isProd) {
-    config.optimization = {
-        splitChunks: {
-            cacheGroups: {
-                commons: {
-                    test: /[\\/]santd[\\/]/,
-                    name: 'vendors',
-                    chunks: 'all'
-                }
-            }
-        }
-    };
-}
-module.exports = createConfig(config);
+});
