@@ -39,6 +39,7 @@ const baseConfig = {
             '@frontend': resolve('frontend/src/')
         }
     },
+    
     devServer: {
         port: process.env.PORT,
         overlay: true,
@@ -79,6 +80,11 @@ const baseConfig = {
                         }
                     }
                 ]
+            },
+            {
+                test: /\.js$/,
+                use: resolve('build-tools/icons-loader.js'),
+                include: /node_modules[\\/]@ant-design[\\/]/
             },
             {
                 oneOf: [
@@ -236,7 +242,7 @@ if (isProd) {
                         // 删掉 debugger
                         drop_debugger: true, // eslint-disable-line
                         // 移除 console
-                        drop_console: true, // eslint-disable-line
+                        // drop_console: true, // eslint-disable-line
                         // 移除无用的代码
                         dead_code: true // eslint-disable-line
                     },
