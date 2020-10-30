@@ -67,7 +67,8 @@ Open the debugging page and san-devtools plugin will show the San version, then 
  - --version, -v: Show version number
  - --help, -h: Show help
 
-- ## 🍻 Companions
+
+## 🍻 Companions
 
   -   [san-devtools](https://github.com/baidu/san-devtools/blob/master/docs/user_guide.md) - Chrome DevTools extension
   -   [san-router](https://github.com/baidu/san-router) - SPA Router
@@ -83,6 +84,6 @@ Open the debugging page and san-devtools plugin will show the San version, then 
   -   [san-loader](https://github.com/ecomfe/san-loader) - Webpack loader for single-file SAN components
   -   [san-hot-loader](https://github.com/ecomfe/san-hot-loader) - Webpack loader for SAN components HMR
 
-  ## ☀️ License
+## ☀️ License
 
   MIT
