@@ -1,5 +1,6 @@
 <template>
     <san-devtools-table
+        decreasedWidth="{{decreasedWidth}}"
         data="{{data}}"
         readonly="{{readonly}}"
         columns="{{columns}}"
@@ -30,6 +31,11 @@
         });
         return newData;
     }
+    const TIMESTAMP_WIDTH = 110;
+    const EVENT_WIDTH = 100;
+    const COMPONENT_WIDTH = 160;
+    const ACTION_WIDTH = 80;
+    const REST_WIDTH = 100;
     export default connectStore({
         bridge: 'bridge',
         eventInfoList: 'eventInfoList',
@@ -57,6 +63,7 @@
             },
             initData() {
                 return {
+                    decreasedWidth: TIMESTAMP_WIDTH + EVENT_WIDTH + COMPONENT_WIDTH + ACTION_WIDTH + REST_WIDTH,
                     filterText: '',
                     bridgeOptions: {
                         targetName: 'component',
@@ -68,31 +75,30 @@
                         {
                             title: 'Timestamp',
                             dataIndex: 'time',
-                            width: '10%'
+                            width: `${TIMESTAMP_WIDTH}px`
                         },
                         {
                             title: 'Event',
                             dataIndex: 'event',
                             scopedSlots: { render: 'event' },
-                            width: '10%'
+                            width: `${EVENT_WIDTH}px`
                         },
                         {
                             title: 'Component',
                             dataIndex: 'component',
                             scopedSlots: { render: 'component' },
-                            width: '20%'
+                            width: `${COMPONENT_WIDTH}px`
                         },
                         {
                             title: 'Action',
                             dataIndex: 'action',
                             scopedSlots: { render: 'action' },
-                            width: '10%'
+                            width: `${ACTION_WIDTH}px`
                         },
                         {
                             title: 'Payload',
                             dataIndex: 'payload',
-                            scopedSlots: { render: 'payload' },
-                            width: '50%'
+                            scopedSlots: { render: 'payload' }
                         }
                     ],
                     tableHeight: 0

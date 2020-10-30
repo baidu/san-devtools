@@ -1,5 +1,6 @@
 <template>
     <san-devtools-table
+        decreasedWidth="{{decreasedWidth}}"
         data="{{data}}"
         readonly="{{readonly}}"
         columns="{{columns}}"
@@ -31,6 +32,12 @@
         return newData;
     }
 
+    const TIMESTAMP_WIDTH = 110;
+    const MESSAGE_WIDTH = 100;
+    const COMPONENT_WIDTH = 160;
+    const ACTION_WIDTH = 100;
+    const REST_WIDTH = 100;
+
     export default connectStore({
         bridge: 'bridge',
         messageInfoList: 'messageInfoList',
@@ -58,6 +65,7 @@
             },
             initData() {
                 return {
+                    decreasedWidth: TIMESTAMP_WIDTH + MESSAGE_WIDTH + COMPONENT_WIDTH * 2 + ACTION_WIDTH + REST_WIDTH,
                     filterText: '',
                     bridgeOptions: {
                         targetName: 'sender',
@@ -69,37 +77,36 @@
                         {
                             title: 'Timestamp',
                             dataIndex: 'time',
-                            width: '10%'
+                            width: `${TIMESTAMP_WIDTH}px`
                         },
                         {
                             title: 'Message',
                             dataIndex: 'event',
                             scopedSlots: { render: 'event' },
-                            width: '10%'
+                            width: `${MESSAGE_WIDTH}px`
                         },
                         {
                             title: 'Sender',
                             dataIndex: 'sender',
                             scopedSlots: { render: 'sender' },
-                            width: '20%'
+                            width: `${COMPONENT_WIDTH}px`
                         },
                         {
                             title: 'Receiver',
                             dataIndex: 'receiver',
                             scopedSlots: { render: 'receiver' },
-                            width: '20%'
+                            width: `${COMPONENT_WIDTH}px`
                         },
                         {
                             title: 'Action',
                             dataIndex: 'action',
                             scopedSlots: { render: 'action' },
-                            width: '10%'
+                            width: `${ACTION_WIDTH}px`
                         },
                         {
                             title: 'Payload',
                             dataIndex: 'payload',
-                            scopedSlots: { render: 'payload' },
-                            width: '30%'
+                            scopedSlots: { render: 'payload' }
                         }
                     ],
                     tableHeight: 0

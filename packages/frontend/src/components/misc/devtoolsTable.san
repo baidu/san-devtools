@@ -40,10 +40,11 @@
             </div>
         </div>
         <san-table
-            pagination="{{false}}"
+            pagination="{{pagination.total ? pagination : false}}"
             scroll="{{ {y: tableHeight} }}"
             columns="{{columns}}"
-            data="{{data}}"
+            data="{{filterData}}"
+            on-change="handleTableChange"
         >
             <span class="event-name" slot="event">
                 {{text}}
@@ -90,7 +91,7 @@
                 </div>
                 <span>{{text.componentName}}</span>
             </div>
-            <div slot="payload">
+            <div slot="payload" class="payload" style="overflow: auto; width: {{payloadWidth}}px">
                 <san-json-tree-view
                     s-if="!!text"
                     data="{{text}}"
@@ -115,10 +116,8 @@
     import JsonTreeView from '@frontend/components/misc/jsonTreeView.san';
     import Icon from '@frontend/components/icon/icon.san';
 
-    // TODO：长列表优化，替换 santd table
-    // 表头两倍高度
-    const TABLE_HEAD_HEIGHT = 200;
-
+    // 表格外其余部分高度
+    const TABLE_REST_HEIGHT = 250;
 
     export default connectStore({
         bridge: 'bridge'
@@ -134,8 +133,42 @@
             },
             initData() {
                 return {
+                    payloadWidth: 0,
                     tableHeight: 0,
-                    filterText: ''
+                    filterText: '',
+                    pagination: {
+                        pageSize: 100,
+                        current: 1,
+                        total: 0
+                    }
+                }
+            },
+
+            handleTableChange(payload) {
+                this.data.set('pagination', payload.pagination);
+            },
+
+            created() {
+                this.watch('data', value => {
+                    if (!value) {
+                        return;
+                    }
+                    let len = value.length;
+                    this.data.set('pagination.total', len);
+                });
+            },
+
+            computed: {
+                filterData() {
+                    let data = this.data.get('data');
+                    const pageSize = this.data.get('pagination.pageSize');
+                    const current = this.data.get('pagination.current');
+
+                    if (data.length > pageSize || pageSize === Number.MAX_VALUE) {
+                        data = data.filter((item, i) => i >= (current - 1) * pageSize && i < current * pageSize);
+                    }
+
+                    return data;
                 }
             },
 
@@ -164,11 +197,19 @@
 
             computeTableHeight() {
                 // 获取表格的宽度
-                let tableHeight = document.body.clientHeight - TABLE_HEAD_HEIGHT;
+                let tableHeight = document.body.clientHeight - TABLE_REST_HEIGHT;
                 this.data.set('tableHeight', `${tableHeight > 0 ? tableHeight : 400}px`);
             },
 
+            computedPayloadWidth() {
+                let decreasedWidth = this.data.get('decreasedWidth');
+                let payloadWidth = document.body.clientWidth - decreasedWidth;
+                this.data.set('payloadWidth', payloadWidth);
+            },
+
             attached() {
+                optimizedResize.add(this.computedPayloadWidth.bind(this));
+                this.computedPayloadWidth();
                 optimizedResize.add(this.computeTableHeight.bind(this));
                 this.computeTableHeight();
                 this.watch('filterText', value => {
@@ -281,6 +322,44 @@
                 }
             }
         }
+        .santd-table-pagination {
+            .santd-pagination-prev, .santd-pagination-next, .santd-pagination-jump-prev, .santd-pagination-jump-next {
+                color: rgba(0, 0, 0, 0.65);
+                border-radius: 10px;
+                height: 20px;
+                line-height: 20px;
+                a {
+                    color: rgba(0, 0, 0, 0.85);
+                }
+            }
+            .santd-pagination-item-ellipsis {
+                color: rgba(0, 0, 0, 0.85) !important;
+            }
+            .santd-pagination-item {
+                border-radius: 10px;
+                background-color: rgba(25, 104, 250, 0.3);
+                line-height: 20px;
+                border: 0;
+                height: 20px;
+                &-link {
+                    border: 0;
+                    border-radius: 10px;
+                    background-color: transparent;
+                    &-icon {
+                        color: #1968fa !important;
+                    }
+                }
+                a {
+                    color: #ffffff;
+                }
+                &-active {
+                    background-color: #1968fa;
+                    a {
+                        color: #ffffff;
+                    }
+                }
+            }
+        }
     }
     .dark {
         .sd-list {
@@ -324,6 +403,35 @@
                 }
                 .santd-table-tbody > tr:hover:not(.santd-table-expanded-row):not(.santd-table-row-selected) > td {
                     background: @color-blue-l2;
+                }
+            }
+            .santd-table-pagination {
+                .santd-pagination-prev, .santd-pagination-next, .santd-pagination-jump-prev, .santd-pagination-jump-next {
+                    a {
+                        color: #ffffff;
+                    }
+                }
+                .santd-pagination-item-ellipsis {
+                    color: #ffffff !important;
+                }
+                .santd-pagination-item {
+                    background-color: #50555a;
+                    &-link {
+                        background-color: transparent;
+                        &-icon {
+                            color: #1968fa !important;
+                        }
+                    }
+                    a {
+                        color: #ffffff;
+                    }
+                    &-active {
+                        background-color: #ffffff;
+                        a {
+                            color: #272b2e;
+                            
+                        }
+                    }
                 }
             }
         }

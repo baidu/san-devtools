@@ -1,6 +1,7 @@
 <template>
     <div>
         <san-devtools-table
+            decreasedWidth="{{decreasedWidth}}"
             data="{{data}}"
             readonly="{{true}}"
             columns="{{columns}}"
@@ -25,6 +26,7 @@
     import { connectStore, store } from '@frontend/store/index';
     import DevtoolsTable from '@frontend/components/misc/devtoolsTable.san';
     import SdLoading from '@frontend/components/loading/loading.san';
+    import { optimizedResize } from '@frontend/utils/index';
     function filterData(filterText, data) {
         filterText = filterText.trim();
         if (!filterText) {
@@ -39,6 +41,10 @@
         });
         return newData;
     }
+    const TIMESTAMP_WIDTH = 110;
+    const EVENT_WIDTH = 100;
+    const COMPONENT_WIDTH = 160;
+    const REST_WIDTH = 100;
     export default connectStore({
         bridge: 'bridge',
         historyRecordings: 'historyRecordings'
@@ -66,6 +72,7 @@
             },
             initData() {
                 return {
+                    decreasedWidth: TIMESTAMP_WIDTH + EVENT_WIDTH + COMPONENT_WIDTH + REST_WIDTH,
                     progress: 0,
                     loadingToast: 'Building history tree... ',
                     loading: false, // TODO：假的 loading
@@ -83,25 +90,24 @@
                         {
                             title: 'Timestamp',
                             dataIndex: 'time',
-                            width: '20%'
+                            width: `${TIMESTAMP_WIDTH}px`
                         },
                         {
                             title: 'Event',
                             dataIndex: 'event',
                             scopedSlots: { render: 'event' },
-                            width: '10%'
+                            width: `${EVENT_WIDTH}px`
                         },
                         {
                             title: 'Component',
                             dataIndex: 'component',
                             scopedSlots: { render: 'component' },
-                            width: '20%'
+                            width: `${COMPONENT_WIDTH}px`
                         },
                         {
                             title: 'Data',
                             dataIndex: 'payload',
-                            scopedSlots: { render: 'payload' },
-                            width: '50%'
+                            scopedSlots: { render: 'payload' }
                         }
                     ],
                     tableHeight: 0

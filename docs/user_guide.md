@@ -244,7 +244,7 @@ Component tab 右侧为详细信息显示区域，包含了五个功能块：
 ### History
 ![history_list](https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/history_list.png)
 
-*History tab* 可以列举页面从加载至今的所有 **San** 发往 san-devtools 的组件生命周期的历史记录，这些生命周期包括：
+*History tab* 可以记录一段时间内 **San** 发往 san-devtools 的组件生命周期事件，展示的数据包括：
 
  - compiled
  - inited
@@ -261,8 +261,6 @@ Component tab 右侧为详细信息显示区域，包含了五个功能块：
  - Event：生命周期类型，上述生命周期之一。
  - Component：生命周期发生的组件，以组件 ID 显示，点击会跳转并且 inspect 至浏览器开发者工具 *Element* 面板。
  - Data：data 代表当生命周期钩子执行后组件 data 的快照。
-
-默认情况下，为了保证 san-devtools 的运行效率，页面从最开始的初始加载开始并不会将所有发往 san-devtools 的时间直接显示在历史记录列表内。
 
 顶部有两个部分构成：搜索框，操作按钮。搜索框的搜索规则为：两个关键字分别为「组件名称」以及「生命周期」，输入两个关键字的时候需要用 '.' 分割开。操作按钮有三个：从左到右分别为：开始/停止记录，清除所有，展示停止记录时间段触发的生命周期。
 
@@ -299,7 +297,6 @@ Component tab 右侧为详细信息显示区域，包含了五个功能块：
  - data：生成组件结构树的原始对象。
  - storeMap：所有 store 的实例的 Map，健为 store 的名称。
  - componentMap：页面上所有挂载了的组件实例的 Map，健为组件实例的 id。
- - history：历史记录快照。
 
 除此之外，san-devtools 还会向组件挂载的 DOM 对象上附加一些内容：
 
