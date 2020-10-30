@@ -16,38 +16,15 @@ interface HistoryData{
 
 export const setHistory = {
     initData: {
-        historyRecordings: [],
-        historyLengthBeforeDevtoolCreated: 0
+        historyRecordings: []
     },
     actions: {
-        setHistory(history: string[] | HistoryData, {dispatch}: any) {
-            if (!Array.isArray(history)) {
-                return builder().apply('historyRecordings', (oldValue: HistoryData[]) => {
-                    let arr = oldValue.slice();
-                    arr.unshift(history);
-                    return arr;
-                });
-            } else {
-                dispatch('setHistoryLengthBeforeDevtoolCreated', history.length);
-                return builder().apply('historyRecordings', (oldValue: any) => {
-                    let historyBefore = history
-                        .map(item => {
-                            let data;
-                            try {
-                                data = JSON.parse(item);
-                            } catch (e) {
-                                // data = item;
-                                console.warn('[SAN_DEVTOOLS]:JSON.parse error', item);
-                            }
-                            return data;
-                        })
-                        .filter(Boolean);
-                    return oldValue.slice().concat(historyBefore);
-                });
-            }
-        },
-        setHistoryLengthBeforeDevtoolCreated(len: number) {
-            return builder().set('historyLengthBeforeDevtoolCreated', len);
+        setHistory(history: HistoryData) {
+            return builder().apply('historyRecordings', (oldValue: HistoryData[]) => {
+                let arr = oldValue.slice();
+                arr.unshift(history);
+                return arr;
+            });
         },
         clearHistory(index?: number) {
             if (typeof index === 'undefined') {

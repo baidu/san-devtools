@@ -37,18 +37,6 @@
                         <san-icon type="clear"></san-icon>
                     </span>
                 </san-tooltip>
-                <san-tooltip
-                    s-if="{{showEye}}"
-                    placement="bottomRight"
-                    title="{{ eyeOpen ? 'hide history records before devtool first created' : 'show history records before devtool first created' }}"
-                >
-                    <span
-                        class="toolbar-icon"
-                        on-click="loadBefore"
-                    >
-                        <san-icon type="eye"></san-icon>
-                    </span>
-                </san-tooltip>
             </div>
         </div>
         <san-table
@@ -147,8 +135,7 @@
             initData() {
                 return {
                     tableHeight: 0,
-                    filterText: '',
-                    eyeOpen: false
+                    filterText: ''
                 }
             },
 
@@ -162,12 +149,9 @@
                 this.data.set('recording', recording);
                 this.data.get('bridge').send(`${bridgeName}.${bridgeRecording}`, { recording });
             },
+
             clear() {
                 this.fire('clear');
-            },
-            loadBefore() {
-                this.fire('loadBefore');
-                this.data.set('eyeOpen', !this.data.get('eyeOpen'));
             },
 
             actionHandler(index) {

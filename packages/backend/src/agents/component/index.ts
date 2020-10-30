@@ -12,7 +12,6 @@ import {
     getComponentData
 } from './componentData';
 import {
-    buildHistory,
     getHistoryInfo
 } from './history';
 import {
@@ -30,8 +29,6 @@ export class ComponentAgent extends Agent {
             case 'comp-disposed':
                 if (this.hook.recording) {
                     this.sendToFrontend('History.setHistory', getHistoryInfo(component, evtName));
-                } else {
-                    buildHistory(this.hook, component, evtName);
                 }
                 return;
             // FIXME: 这里组件树挂载的时候由于从下往上挂载，因此会出现频繁 sendToFrontend
@@ -39,8 +36,6 @@ export class ComponentAgent extends Agent {
                 // history
                 if (this.hook.recording) {
                     this.sendToFrontend('History.setHistory', getHistoryInfo(component, evtName));
-                } else {
-                    buildHistory(this.hook, component, evtName);
                 }
                 // component
                 this.hook.componentMap.set(String(component.id), component);
@@ -57,8 +52,6 @@ export class ComponentAgent extends Agent {
                 // history
                 if (this.hook.recording) {
                     this.sendToFrontend('History.setHistory', getHistoryInfo(component, evtName));
-                } else {
-                    buildHistory(this.hook, component, evtName);
                 }
                 // component
                 this.hook.componentMap.delete(String(component.id));
@@ -121,9 +114,6 @@ export class ComponentAgent extends Agent {
         // history
         this.bridge.on('History.historyRecording', message => {
             this.hook.recording = message.recording;
-            if (message.loadBefore) {
-                this.sendToFrontend('History.setHistory', JSON.stringify(this.hook.history));
-            }
         });
 
         // 6. inspect

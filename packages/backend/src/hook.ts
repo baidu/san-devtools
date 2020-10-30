@@ -54,8 +54,6 @@ export interface RouteData {
 export interface DevToolsHook<T> {
     san: any;
     data: DevToolsHookData;
-    history: string[];
-    historyIndexBeforeFrontendCreated: number;
     routes: RouteData[];
     store: DevToolsHookStore;
     devtoolReady: boolean;
@@ -125,8 +123,6 @@ export class DevToolsHook<T> extends EventEmitter {
     eventRecording: boolean = false;
     // 记录 San devtool 事件触发列表。
     recording: boolean = false;
-    history: string[] = [];
-    historyIndexBeforeFrontendCreated: number = 0;
     // TODO 这里是数组，要不要改成Map
     routes: RouteData[] = [];
     // Stores 对象及相关信息，与 devtool 保持同步的 mutation list。
@@ -197,7 +193,6 @@ export function install(target: any) {
         },
         set(value) {
             sanHook._frontendReady = !!value;
-            sanHook.historyIndexBeforeFrontendCreated = sanHook.history.length;
             if (!!value) {
                 sanHook._flushReadyStack();
             }
