@@ -8,7 +8,7 @@
         "start": "yarn start:serve & yarn start:bin",
         "start:serve": "webpack --mode development -w",
         "start:bin": "node ./bin/san-devtools",
-        "build": "webpack --mode production --progress --hide-modules",
+        "build": "cross-env NODE_ENV=production webpack --mode production --progress --hide-modules",
         "prepublishOnly": "npm run build"
     },
     "repository": {
@@ -60,6 +60,7 @@
         "yargs": "~15.4.1"
     },
     "devDependencies": {
+        "cross-env": "^7.0.2",
         "chobitsu": "~0.2.1",
         "san": "~3.9.2",
         "santd": "~0.2.8",
