@@ -1,7 +1,7 @@
 /**
  * @file handle circular json, Serialize and Deserialization
  */
-import {parse as circularParse, stringify as circularStringify} from 'circular-json';
+import {parse as circularParse, stringify as circularStringify} from 'circular-json-es6';
 const CircularJSON = {
     parse,
     stringify

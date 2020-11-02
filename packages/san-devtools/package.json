@@ -42,7 +42,6 @@
     "dependencies": {
         "chalk": "^4.1.0",
         "chii": "~0.6.6",
-        "circular-json": "~0.5.9",
         "destroy": "~1.0.4",
         "ejs": "~3.1.5",
         "killable": "^1.0.1",
@@ -59,8 +58,8 @@
         "yargs": "~15.4.1"
     },
     "devDependencies": {
-        "cross-env": "^7.0.2",
         "chobitsu": "~0.2.1",
+        "cross-env": "^7.0.2",
         "san": "~3.9.2",
         "santd": "~0.2.8",
         "webpack": "^4.43.0",
