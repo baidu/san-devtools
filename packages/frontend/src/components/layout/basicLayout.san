@@ -17,6 +17,9 @@
     const H_WIDTH = 680;
     let splitInstance = null;
     export default {
+        dataTypes: {
+            status: DataTypes.string
+        },
         initData() {
             let width = document.body.clientWidth;
             let status = +width < H_WIDTH ? 'vertical' : 'horizontal';

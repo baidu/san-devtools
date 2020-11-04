@@ -3,7 +3,6 @@
         <sand-input
             placeholder="{{placeholder}}"
             filterText="{=filterText=}"
-            filterIcon="{{filterIcon}}"
         >
         </sand-input>
         <sand-loading

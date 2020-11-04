@@ -42,6 +42,18 @@
         readonly: 'settings.eventReadOnly'
     })(
         {
+            dataTypes: {
+                /* props */
+                bridge: DataTypes.object,
+                eventInfoList: DataTypes.array,
+                readonly: DataTypes.bool,
+                /* state */
+                decreasedWidth: DataTypes.number,
+                data: DataTypes.array,
+                columns: DataTypes.array,
+                bridgeOptions: DataTypes.object,
+                filterText: DataTypes.string
+            },
             components: {
                 'san-devtools-table': DevtoolsTable
             },
@@ -100,8 +112,7 @@
                             dataIndex: 'payload',
                             scopedSlots: { render: 'payload' }
                         }
-                    ],
-                    tableHeight: 0
+                    ]
                 }
             }
         }

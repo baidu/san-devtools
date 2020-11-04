@@ -130,6 +130,18 @@
         readonly: 'settings.storeReadOnly'
     })(
         {
+            dataTypes: {
+                /* props */
+                selectedMutationInfo: DataTypes.object,
+                storeName: DataTypes.string,
+                diffData: DataTypes.array,
+                bridge: DataTypes.object,
+                readonly: DataTypes.bool,
+                filterText: DataTypes.string,
+                /* state */
+                diffState: DataTypes.arrayOf(DataTypes.bool)
+            },
+
             filters: {
                 formateTarget(value) {
                     return value.join('.');
@@ -181,14 +193,8 @@
 
             initData() {
                 return {
-                    diffState: [true],
-                    filterText: ''
+                    diffState: [true]
                 };
-            },
-
-            dataTypes: {
-                diffState: DataTypes.arrayOf(DataTypes.bool),
-                filterText: DataTypes.string
             }
         }
     )

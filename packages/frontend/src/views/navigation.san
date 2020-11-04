@@ -77,6 +77,15 @@
         bridge: 'bridge'
     })(
         {
+            dataTypes: {
+                sanVersion: DataTypes.string,
+                currentTab: DataTypes.string,
+                setting: DataTypes.bool,
+                theme: DataTypes.string,
+                defaultValue: DataTypes.array,
+                options: DataTypes.array,
+                tabs: DataTypes.arrayOf(DataTypes.objectOf(DataTypes.string))
+            },
             components: {
                 'san-col': Grid.Col,
                 'san-row': Grid.Row,
@@ -100,7 +109,6 @@
                         { label: 'Readonly for store.', value: 'Setting:store', checked: false }
                     ],
                     setting: false,
-                    smallTabItem: false,
                     tabs: [
                         {
                             label: 'Component',
@@ -229,12 +237,6 @@
                     localStorage['settingData'] = settingData;
                 }
                 store.dispatch('settings', settingData);
-            },
-
-            dataTypes: {
-                sanVersion: DataTypes.string,
-                smallTabItem: DataTypes.bool,
-                tabs: DataTypes.arrayOf(DataTypes.objectOf(DataTypes.string))
             }
         }
     );

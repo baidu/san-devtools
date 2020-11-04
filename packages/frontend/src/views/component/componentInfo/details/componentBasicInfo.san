@@ -1,6 +1,5 @@
 <template>
     <div>
-        <input type="hidden" value="{{selectedComponentId}}" />
         <div s-for="info in data">
             <san-row align="middle">
                 <san-col span="12">{{info.key}}</san-col>
@@ -21,12 +20,17 @@
 </template>
 
 <script>
-
+    import san, { DataTypes } from 'san';
     import { Grid } from 'santd';
 
     import InspectableButton from '@frontend/components/misc/inspectableButton.san';
 
     export default {
+        dataTypes: {
+            /* props */
+            filterText: DataTypes.string,
+            infoList: DataTypes.array
+        },
 
         components: {
             'san-row': Grid.Row,

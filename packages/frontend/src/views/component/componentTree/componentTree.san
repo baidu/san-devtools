@@ -3,8 +3,6 @@
         <san-tree-view
             totalNums="{{totalCompNums}}"
             defaultSelectedIdPath="{{defaultSelectedIdPath}}"
-            s-ref="tv"
-            ref="tv"
             treeData="{=treeData=}"
             compact="{{!0}}"
             wholeLineSelected="{{!0}}"
@@ -90,6 +88,13 @@
         },
 
         dataTypes: {
+            /* props */
+            treeData: DataTypes.array,
+            totalCompNums: DataTypes.number,
+            bridge: DataTypes.object,
+            defaultSelectedIdPath: DataTypes.string,
+            filterText: DataTypes.string,
+            /* state */
             maxLengthOfExecutionCodeQueue: DataTypes.number,
             loadingToast: DataTypes.string,
             loading: DataTypes.bool,

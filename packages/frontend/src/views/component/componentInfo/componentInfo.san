@@ -30,7 +30,6 @@
                     <sand-input
                         placeholder="{{filterPlaceholder}}"
                         filterText="{=filterText=}"
-                        filterIcon="search"
                     >
                     </sand-input>
                 </div>
@@ -41,7 +40,6 @@
                         <san-collapse-panel header="Basic Information" key='1' expandIcon="left">
                             <sandevtool-component-basic-info
                                 infoList="{{selectedComponentBaseInfo | infoListFilter}}"
-                                selectedComponentId="{{selectedComponentId}}"
                                 filterText="{{filterText}}"
                             >
                             </sandevtool-component-basic-info>
@@ -66,7 +64,6 @@
                         <san-collapse-panel header="Computed" key='1' expandIcon="left">
                             <sandevtool-component-computed
                                 computed="{{componentInfo.computed}}"
-                                computedDeps="{{componentInfo.computedDeps}}"
                                 selectedComponentId="{{selectedComponentId}}"
                                 filterText="{{filterText}}"
                             >
@@ -78,7 +75,6 @@
                     <san-collapse defaultActiveKey="{{['1']}}">
                         <san-collapse-panel header="Filters" key='1' expandIcon="left">
                             <sandevtool-component-filters
-                                selectedComponentId="{{selectedComponentId}}"
                                 data="{{componentInfo.filters}}"
                                 filterText="{{filterText}}"
                             >
@@ -106,7 +102,7 @@
     import san, { DataTypes } from 'san';
     import { connectStore } from '@frontend/store/index';
 
-    import { Collapse, Input, Icon } from 'santd';
+    import { Collapse, Icon } from 'santd';
 
     import InspectableButton from '@frontend/components/misc/inspectableButton.san';
     import SdInput from '@frontend/components/input/input.san';
@@ -128,7 +124,6 @@
         {
             initData() {
                 return {
-                    version: '',
                     logoVisibility: false,
                     dataReadonly: false,
                     filterPlaceholder: 'Search keyword',
@@ -137,11 +132,16 @@
                 };
             },
             dataTypes: {
+                /* props */
+                componentInfo: DataTypes.object,
                 selectedComponentId: DataTypes.string,
-                version: DataTypes.string,
+                selectedComponentName: DataTypes.string,
+                selectedComponentBaseInfo: DataTypes.object,
+                bridge: DataTypes.object,
+                /* state */
                 logoVisibility: DataTypes.bool,
                 dataReadonly: DataTypes.bool,
-                selectedComponentName: DataTypes.string,
+                isChromePanel: DataTypes.bool,
                 filterPlaceholder: DataTypes.string,
                 filterText: DataTypes.string
             },
@@ -172,7 +172,6 @@
                 'san-collapse': Collapse,
                 'san-collapse-panel': Collapse.Panel,
                 'san-icon': Icon,
-                'san-input': Input,
                 'san-inspectable-button': InspectableButton
             },
             attached() {

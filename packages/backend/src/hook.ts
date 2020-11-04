@@ -176,8 +176,6 @@ export function install(target: any) {
         }
     });
 
-    // TODO: 1. 这里需要添加事件监听，将component，store等事件全部都收集起来
-
     Object.defineProperty(target, SAN_DEVTOOL_NAMESPACE, {
         configurable: true,
         get() {
