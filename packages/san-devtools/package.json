@@ -5,9 +5,7 @@
     "description": "Development tools for debugging San.",
     "main": "dist/backend.js",
     "scripts": {
-        "start": "yarn start:serve & yarn start:bin",
-        "start:serve": "cross-env NODE_ENV=development webpack --mode development -w",
-        "start:bin": "node ./bin/san-devtools",
+        "start": "node ./start.js",
         "build": "cross-env NODE_ENV=production webpack --mode production --progress --hide-modules",
         "prepublishOnly": "npm run build"
     },
