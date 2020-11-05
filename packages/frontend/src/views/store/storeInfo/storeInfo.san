@@ -11,7 +11,6 @@
                     <sand-input
                         placeholder="{{filterPlaceholder}}"
                         filterText="{=filterText=}"
-                        filterIcon="search"
                     >
                     </sand-input>
                 </div>
@@ -56,6 +55,7 @@
             },
 
             dataTypes: {
+                actionName: DataTypes.string,
                 filterPlaceholder: DataTypes.string,
                 filterText: DataTypes.string,
                 payloadReadonly: DataTypes.bool

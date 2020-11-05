@@ -17,6 +17,10 @@
         bridge: 'bridge'
     })(
         {
+            dataTypes: {
+                /* props */
+                bridge: DataTypes.object
+            },
             components: {
                 'sandevtool-component-tree': ComponentTree,
                 'sandevtool-component-info': ComponentInfo,

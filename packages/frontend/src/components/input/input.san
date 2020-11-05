@@ -16,7 +16,10 @@
             'san-icon': Icon
         },
 
-        inited() {
+        dataTypes: {
+            /* props */
+            placeholder: DataTypes.string,
+            filterText: DataTypes.string
         },
 
         initData() {

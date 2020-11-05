@@ -1,6 +1,6 @@
 const EventEmitter = require('events').EventEmitter;
 const {logger, getColorfulName, truncate} = require('../utils');
-const CircularJSON = require('circular-json-es6');
+const CircularJSON = require('circular-json');
 
 const STATUS_OPENING = 'opening';
 const STATUS_CLOSED = 'closed';

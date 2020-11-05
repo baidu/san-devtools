@@ -50,6 +50,22 @@
         historyRecordings: 'historyRecordings'
     })(
         {
+            dataTypes: {
+                /* props */
+                bridge: DataTypes.object,
+                historyRecordings: DataTypes.array,
+                /* state */
+                data: DataTypes.array,
+                decreasedWidth: DataTypes.number,
+                progress: DataTypes.number,
+                loadingToast: DataTypes.string,
+                loading: DataTypes.bool,
+                loadingToastContentFromColor: DataTypes.string,
+                loadingToastContentToColor: DataTypes.string,
+                filterText: DataTypes.string,
+                bridgeOptions: DataTypes.object,
+                columns: DataTypes.array
+            },
             components: {
                 'san-devtools-table': DevtoolsTable,
                 'sand-loading': SdLoading
@@ -79,8 +95,6 @@
                     loadingToastContentFromColor: 'rgba(0, 175, 255, 1)',
                     loadingToastContentToColor: '#fff',
                     filterText: '',
-                    beforeLoaded: false,
-                    recording: false,
                     bridgeOptions: {
                         bridgeName: 'History',
                         bridgeActionName: 'fire',
@@ -109,15 +123,8 @@
                             dataIndex: 'payload',
                             scopedSlots: { render: 'payload' }
                         }
-                    ],
-                    tableHeight: 0
+                    ]
                 }
-            },
-            dataTypes: {
-                beforeLoaded: DataTypes.bool,
-                recording: DataTypes.bool,
-                historyAfterDevtoolPanelCreated: DataTypes.arrayOf(DataTypes.object),
-                historyBeforeDevtoolPanelCreated: DataTypes.arrayOf(DataTypes.object)
             },
             attached() {
                 this.watch('historyRecordings', value => {

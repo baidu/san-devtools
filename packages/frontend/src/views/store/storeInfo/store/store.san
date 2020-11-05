@@ -76,15 +76,29 @@
         activeTab: 'activeTab',
     })(
         {
+            dataTypes: {
+                raw: DataTypes.object,
+                actions: DataTypes.array,
+                components: DataTypes.object,
+                storeName: DataTypes.string,
+                bridge: DataTypes.object,
+                storeChanged: DataTypes.bool,
+                activeTab: DataTypes.string,
+                filterText: DataTypes.string
+            },
+
             refreshStoreData() {
                 this.data.get('bridge') && this.data.get('bridge').send('Store.getStoreData', this.data.get('storeName'));
             },
+
             highlightNativeNode(componentId) {
                 this.data.get('bridge') && this.data.get('bridge').send('Inspect.highlight', componentId);
             },
+
             unhighlightNativeNode() {
                 this.data.get('bridge') && this.data.get('bridge').send('Inspect.unhighlight', '');
             },
+
             computed: {
                 componentIds() {
                     let components = this.data.get('components');
@@ -97,6 +111,7 @@
                     return filteredActions;
                 }
             },
+
             components: {
                 'san-json-tree-view': JsonTreeView,
                 'san-collapse': Collapse,
@@ -124,10 +139,6 @@
                         Message.destroy()
                     }
                 })
-            },
-
-            dataTypes: {
-
             }
         }
     )

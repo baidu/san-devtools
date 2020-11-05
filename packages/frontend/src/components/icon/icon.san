@@ -12,9 +12,16 @@
     </svg>
 </template>
 <script>
-    import san from 'san';
+    import san, { DataTypes } from 'san';
     import icons from './icon.ts';
     export default {
+        dataTypes: {
+            /* props */
+            type: DataTypes.string,
+            /* state */
+            className: DataTypes.string
+        },
+
         initData() {
             return {
                 className: '',

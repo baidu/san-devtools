@@ -1,8 +1,6 @@
 <template>
     <div>
-        <input type="hidden" value="{{selectedComponentId}}" />
         <san-json-tree-view
-            selectedComponentId="{{selectedComponentId}}"
             alwaysShowRoot="{{!0}}"
             data="{=data=}"
             filterText="{=filterText=}"
@@ -30,20 +28,18 @@
         readonly: 'settings.componentReadOnly'
     })(
         {
+            dataTypes: {
+                /* props */
+                data: DataTypes.object,
+                selectedComponentId: DataTypes.string,
+                dataReadonly: DataTypes.bool,
+                filterText: DataTypes.string,
+                readonly: DataTypes.bool,
+                bridge: DataTypes.object
+            },
+            
             components: {
                 'san-json-tree-view': JsonTreeView
-            },
-
-            initData() {
-                return {
-                    filterText: ''
-                };
-            },
-
-            dataTypes: {
-                selectedComponentId: DataTypes.string,
-                data: DataTypes.object,
-                filterText: DataTypes.string
             },
 
             setData(id, path, oldVal, newVal, type) {

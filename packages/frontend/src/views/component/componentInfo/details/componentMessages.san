@@ -1,6 +1,5 @@
 <template>
-    <div class="messages-wrapper" style="{{displayStyle}}">
-        <input type="hidden" value="{{selectedComponentId}}" />
+    <div class="messages-wrapper">
         <div class="messages {{hidden[index] ? 'hidden' : ''}}" s-for="item, index in data">
             <div class="func-name">{{item.name}}</div>
             <san-pretty-code fnStr="{{item.fn}}"></san-pretty-code>
@@ -20,19 +19,16 @@
 
         initData() {
             return {
-                selectedComponentId: '',
-                shown: true,
-                hidden: [],
-                filterText: ''
+                hidden: []
             }
         },
 
         dataTypes: {
-            selectedComponentId: DataTypes.string,
-            shown: DataTypes.bool,
+            /* props */
             data: DataTypes.arrayOf(DataTypes.object),
-            hidden: DataTypes.arrayOf(DataTypes.bool),
-            filterText: DataTypes.string
+            filterText: DataTypes.string,
+            /* state */
+            hidden: DataTypes.arrayOf(DataTypes.bool)
         },
 
         attached() {
@@ -56,14 +52,6 @@
                     this.data.set('hidden[' + i + ']', true);
                 }
             });
-        },
-
-        computed: {
-            displayStyle() {
-                return {
-                    display: this.data.get('shown') ? 'block' : 'none'
-                };
-            }
         }
 
     };

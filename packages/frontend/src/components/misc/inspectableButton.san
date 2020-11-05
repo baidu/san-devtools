@@ -21,7 +21,7 @@
 
     export default {
         dataTypes: {
-            cid: DataTypes.oneOfType([DataTypes.string, DataTypes.number]),
+            selectedComponentId: DataTypes.string,
             type: DataTypes.string,
             hasIcon: DataTypes.bool,
             iconName: DataTypes.string,
@@ -35,7 +35,6 @@
         },
         initData() {
             return {
-                cid: '',
                 type: 'primary',
                 hasIcon: false,
                 iconName: '',

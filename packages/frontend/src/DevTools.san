@@ -1,6 +1,6 @@
 <template>
     <div id="app">
-        <sandevtool-navigation s-ref="nav" currentTab="{=currentTab=}" disconnected="{{wsDisconnected}}"/>
+        <sandevtool-navigation currentTab="{=currentTab=}"/>
         <san-row type="flex" class="content" style="position: absolute">
             <div
                 s-if="!wsDisconnected"
@@ -42,6 +42,7 @@
 </template>
 
 <script>
+    import san, { DataTypes } from 'san';
     import { Grid, Modal } from 'santd';
 
     import Navigation from '@frontend/views/navigation.san';
@@ -60,6 +61,11 @@
         wsDisconnected: 'wsDisconnected'
     })(
         {
+            dataTypes: {
+                currentTab: DataTypes.string,
+                wsDisconnected: DataTypes.bool,
+                containerShown: DataTypes.object
+            },
             components: {
                 'san-row': Grid.Row,
                 'sandevtool-navigation': Navigation,
