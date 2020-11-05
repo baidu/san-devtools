@@ -64,7 +64,7 @@ export const versionCompare = (version1: any, version2: any) => {
     return 0;
 };
 
-export const isChromePanel = typeof chrome !== undefined && chrome && chrome.devtools;
+export const isChromePanel = !!(typeof chrome !== undefined && chrome && chrome.devtools);
 
 export const SETTINGS: Record<string, any> = {
     'Setting:component': 0b000000000001,
