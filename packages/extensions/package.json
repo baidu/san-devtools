@@ -3,8 +3,8 @@
     "private": true,
     "version": "3.0.0",
     "scripts": {
-        "start": "cross-env node ./scripts/start.js",
-        "build": "cross-env NODE_ENV=production node ./scripts/start.js",
+        "start": "cross-env NODE_ENV=development webpack --watch",
+        "build": "cross-env NODE_ENV=production webpack --hide-modules --config ./webpack.config.js && yarn zip",
         "zip": "bestzip chrome.zip dist/*"
     },
     "dependencies": {

@@ -6,7 +6,7 @@
     "main": "dist/backend.js",
     "scripts": {
         "start": "cross-env node ./scripts/start.js",
-        "build": "cross-env NODE_ENV=production node ./scripts/start.js",
+        "build": "cross-env NODE_ENV=production webpack --mode production --progress --hide-modules",
         "prepublishOnly": "npm run build"
     },
     "repository": {
