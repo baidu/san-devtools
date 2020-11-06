@@ -18,31 +18,22 @@ compiler.hooks.compilation.tap('logSourceName', compilation => {
     );
 });
 
-if (process.env.NODE_ENV !== 'production') {
-    let serverExsited = false;
-    compiler.hooks.invalid.tap('invalid', () => {
-        console.log('Compiling...');
-    });
+let serverExsited = false;
+compiler.hooks.invalid.tap('invalid', () => {
+    console.log('Compiling...');
+});
 
-    compiler.watch(
-        {},
-        (err, stats) => {
-            if (!err) {
-                !serverExsited && console.log(stats.toString());
-                console.log('compiled success!');
-                if (!serverExsited) {
-                    console.log('Webpack compiled, watching files...');
-                    fork('../bin/san-devtools.js', [], {cwd: path.join(__dirname)});
-                    serverExsited = true;
-                }
+compiler.watch(
+    {},
+    (err, stats) => {
+        if (!err) {
+            !serverExsited && console.log(stats.toString());
+            console.log('compiled success!');
+            if (!serverExsited) {
+                console.log('Webpack compiled, watching files...');
+                fork('../bin/san-devtools.js', [], {cwd: path.join(__dirname)});
+                serverExsited = true;
             }
         }
-    );
-} else {
-    compiler.run((err, stats) => {
-        if (!err) {
-            console.log(stats.toString());
-            console.log('compiled success!');
-        }
-    });
-}
+    }
+);
