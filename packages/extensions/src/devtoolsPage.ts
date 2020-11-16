@@ -26,6 +26,22 @@ function createDevtoolPanelIfNeeded() {
     });
 }
 
-chrome.devtools.network.onNavigated.addListener(createDevtoolPanelIfNeeded);
-createdCheckInterval = setInterval(createDevtoolPanelIfNeeded, checkGap);
-createDevtoolPanelIfNeeded();
+function startPoll() {
+    createdCheckInterval = setInterval(createDevtoolPanelIfNeeded, checkGap);
+    createDevtoolPanelIfNeeded();
+}
+startPoll();
+
+/**
+ *  当页面加载的时候会触发，
+ *  1. 如果 san panel 已经存在，直接退出
+ *  2. 如果不存在，重新轮询
+ */
+function onNavigatedHandler() {
+    if (created) {
+        return;
+    }
+    checkCount = 0;
+    startPoll();
+}
+chrome.devtools.network.onNavigated.addListener(onNavigatedHandler);
