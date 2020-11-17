@@ -10,11 +10,8 @@ export default san.defineComponent({
     `,
 
     initData() {
-        return {
-        };
+        return {};
     },
 
-    dataTypes: {
-    }
-
+    dataTypes: {}
 });
