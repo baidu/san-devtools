@@ -1,5 +1,6 @@
 <template>
 <div class="todos">
+    <ui-define></ui-define>
     <ui-counter on-counter="dosomething"></ui-counter>
     <div on-click="disposeStore">- dispose store -</div>
     <ui-store-count s-if="disposed"></ui-store-count>
@@ -43,15 +44,17 @@ import service from '../service';
 import { formatDate } from '../filters';
 import { Link } from 'san-router';
 import Counter from '../ui/Counter.san';
-import CountStore from '../ui/CountStore.san'
-import NumCounter from '../ui/NumCounter.san'
+import CountStore from '../ui/CountStore.san';
+import NumCounter from '../ui/NumCounter.san';
+import SanDefine from '../ui/SanDefine.js'
 
 export default {
     components: {
         'router-link': Link,
         'ui-counter': Counter,
         'ui-num-counter': NumCounter,
-        'ui-store-count': CountStore
+        'ui-store-count': CountStore,
+        'ui-define': SanDefine
     },
 
     dosomething() {

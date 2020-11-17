@@ -2,7 +2,8 @@ import {Component} from '../hook';
 import CircularJSON from '@shared/utils/circularJSON';
 
 function getComponentName(component: Component) {
-    let name = component && ((component.source && component.source.tagName) || component.constructor.name);
+    // eslint-disable-next-line
+    let name = component && ((component.source && component.source.tagName) || component.subTag || component.constructor.name);
     if (!name || name.length === 1) {
         name = component ? component.tagName : 'Component';
     }
