@@ -79,7 +79,7 @@
 <style lang="less">
     @gutter-bg-color: rgba(0, 0, 0, 0.04);
     @split-bg-color: #e5e5e5;
-    @split-button-more: 105px;
+    @split-button-more: 30%;
     @split-button-less: 5px;
     .sd-main-wrapper {
         height: 100%;
