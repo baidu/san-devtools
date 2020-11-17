@@ -21,7 +21,7 @@ export default function initBackend(hook: DevToolsHook<{}>, bridge: Bridge, glob
     // 3. message 和 event
     communication(hook, bridge);
     // 4. 高亮
-    hook.once('san', () => {
+    hook.on('san', () => {
         setupHighlighter(hook, bridge, global);
     });
     // 5. 监听 frontend 是否已经准备就绪
