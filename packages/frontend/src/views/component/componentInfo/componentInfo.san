@@ -6,8 +6,8 @@
                     <img src="../../../icons/logo.svg" />
                 </div>
                 <div class="version">San DevTools</div>
+                <div class="guide">Please select a component to inspect the detailed information.</div>
             </div>
-            <div class="guide">Please select a component to inspect the detailed information.</div>
         </div>
         <div class="sd-detail-wrapper" style="display:{{selectedComponentId?'block':'none'}}">
             <div class="title-wrapper">
@@ -196,9 +196,11 @@
             border-radius: 23px;
             background-color: @color-white;
             box-sizing: border-box;
-            padding: 5vw;
+            padding: 20px 30px;
             text-align: center;
             .devtool-info {
+                height: 100%;
+                overflow: auto;
                 .logo {
                     img {
                         width: 40%;

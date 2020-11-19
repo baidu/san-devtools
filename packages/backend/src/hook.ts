@@ -80,6 +80,7 @@ export interface DevToolsHookStore {
 export interface Component extends SanComponent<any> {
     el: any;
     id: string;
+    subTag?: string; // 组件名称：低版本 san，用 san.defineComponent 生成的组件并且不是 node_modules 中的组件
     parentId: string;
     idPath: string[];
     tagName: string;

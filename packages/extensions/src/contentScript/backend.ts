@@ -37,7 +37,7 @@ if (sanHook) {
     initBackend(hook, bridge, window);
 
     // 版本信息：backend --win--> content-script --port--> background
-    hook.once('san', () => {
+    hook.on('san', () => {
         window.postMessage(
             {
                 source: 'san-detector',
