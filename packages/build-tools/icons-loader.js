@@ -4,6 +4,9 @@
 const SVG_ENTRY = '@ant-design/icons-svg/es/index.js';
 // 如何获取到用到的 icons
 const SVG_NAME = [
+    // Home
+    'BugOutlined',
+    'ChromeOutlined',
     'CaretUpOutlined',
     'CaretDownOutlined',
     // 'compass'
