@@ -5,10 +5,14 @@ const {createFrontendUrl, createBackendjsUrl} = require('../utils');
 
 module.exports = tplpath => {
     return (req, res, next) => {
-        if (req.origFilePath !== '/') {
+        if (req.origFilePath !== '/' && req.origFilePath !== '/getHomeConfigOnly') {
             logger.debug('home middleware out');
             next();
             return;
+        }
+        let getConfigOnly = false;
+        if (req.origFilePath === '/getHomeConfigOnly') {
+            getConfigOnly = true;
         }
         const {address, port} = req;
         const sessionId = nanoid();
@@ -38,17 +42,22 @@ module.exports = tplpath => {
             sessionId
         });
 
-        ejs.renderFile(tplpath, {config}, {}, function (err, str) {
-            if (err) {
-                logger.error('Home middleware: render template error:');
-                logger.error(err);
-                logger.error('  -> With data:');
-                logger.error(config);
-                next(err);
-                return;
-            }
-            res.write(str, 'utf8');
+        if (getConfigOnly) {
+            res.write(config, 'utf8');
             res.end();
-        });
+        } else {
+            ejs.renderFile(tplpath, {config}, {}, function (err, str) {
+                if (err) {
+                    logger.error('Home middleware: render template error:');
+                    logger.error(err);
+                    logger.error('  -> With data:');
+                    logger.error(config);
+                    next(err);
+                    return;
+                }
+                res.write(str, 'utf8');
+                res.end();
+            });
+        }
     };
 };
