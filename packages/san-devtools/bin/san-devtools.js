@@ -131,7 +131,13 @@ require('yargs')
                     console.log('Hit CTRL-C to stop the server');
                     console.log('');
 
-                    argv.open && require('opener')(server.getUrl());
+                    const home = server.getUrl();
+                    // 发送消息：告诉工具链的兄弟们端口等信息
+                    process.send({
+                        home,
+                        backend: home.replace(/\/$/, '') + BACKENDJS_PATH
+                    });
+                    argv.open && require('opener')(home);
                 });
             }
         }
