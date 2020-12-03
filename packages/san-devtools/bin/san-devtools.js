@@ -50,7 +50,6 @@ require('yargs')
             },
             port: {
                 alias: 'p',
-                default: DEFAULT_PORT,
                 type: 'number',
                 describe: `Port to use [${DEFAULT_PORT}]`
             },
@@ -64,15 +63,16 @@ require('yargs')
             const portfinder = require('portfinder');
             const Server = require('../server/Server');
             const {BACKENDJS_PATH} = require('../server/constants');
-            const port = argv.port || parseInt(process.env.PORT, 10);
+            let port = argv.port || parseInt(process.env.PORT, 10);
             const host = argv.address || '0.0.0.0';
 
             if (!port) {
                 portfinder.basePort = DEFAULT_PORT;
-                portfinder.getPort((err, port) => {
+                portfinder.getPort((err, p) => {
                     if (err) {
                         throw err;
                     }
+                    port = p;
                     startServer();
                 });
             }

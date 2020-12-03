@@ -3,7 +3,7 @@
 为了快捷方便的调试 **San** 应用，San Devtools 提供了两种调试方式：
 
 - 以 Google Chrome 浏览器插件形式存在，支持传统浏览器的调试；
-- 以命令行工具形式存在，提供 `san-devtools(简写sand)` 命令，支持以 **San** 为框架的页面远程调试，包括 IE、Safari、Mobile、Electron 以及 San Native 等形式的调试。
+- 以命令行工具形式存在，提供 `san-devtools(简写sand)` 命令，支持以 **San** 为框架的页面远程调试，包括 IE、Safari、Mobile、Electron 形式的调试。
 
 > 注意：在调试页面的时候两种方式不能同时存在，即当 **San-devtools Chrome 插件** 处于开启状态的时候，页面不能嵌入由 **命令行工具** 生成的 ws-backend.js，否则只有一个会生效，并且哪个生效是随机的，取决于两者的加载速度。
 
