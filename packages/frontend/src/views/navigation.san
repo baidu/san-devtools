@@ -138,11 +138,11 @@
                 }
                 switch (theme) {
                     case LIGHT_MODE: {
-                        document.body.classList.remove('dark');
+                        document.querySelector('#san-devtools-app').classList.remove('dark');
                         break;
                     }
                     case DARK_MODE: {
-                        document.body.classList.add('dark');
+                        document.querySelector('#san-devtools-app').classList.add('dark');
                         break;
                     }
                     default: break;
@@ -152,10 +152,10 @@
 
             onThemeChange(value) {
                 if (value) {
-                    document.body.classList.add('dark');
+                    document.querySelector('#san-devtools-app').classList.add('dark');
                     window.localStorage['_san_devtool_theme'] = DARK_MODE;
                 } else {
-                    document.body.classList.remove('dark');
+                    document.querySelector('#san-devtools-app').classList.remove('dark');
                     window.localStorage['_san_devtool_theme'] = LIGHT_MODE;
                 }
             },

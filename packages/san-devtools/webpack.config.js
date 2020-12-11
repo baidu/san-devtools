@@ -11,12 +11,14 @@ module.exports = createConfig({
     entry: {
         home: './src/home.ts',
         frontend: './src/frontend.ts',
-        backend: './src/backend.ts'
+        backend: './src/backend.ts',
+        index: './src/index.ts'
     },
     output: {
         publicPath: isProd ? './' : '/',
         path: path.resolve(__dirname, 'dist'),
-        filename: '[name].js'
+        filename: '[name].js',
+        libraryTarget: 'umd'
     },
     plugins: [
         new HtmlWebpackPlugin({
