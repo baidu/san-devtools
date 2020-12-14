@@ -14,6 +14,8 @@ It is exists both as a browser extension and as a common line tool(works with ot
 - Provide Chrome Extension.
 - Support `San Native` debugging (waiting for release).
 
+![](https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/1.gif)
+
 ## 📦 Installation
 
 ### standalone
