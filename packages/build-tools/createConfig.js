@@ -39,7 +39,6 @@ const baseConfig = {
             '@frontend': resolve('frontend/src/')
         }
     },
-    
     devServer: {
         port: process.env.PORT,
         overlay: true,
@@ -90,7 +89,6 @@ const baseConfig = {
                 oneOf: [
                     {
                         test: /\.svg$/,
-                        resourceQuery: /inline/,
                         use: [
                             {
                                 loader: 'url-loader',
@@ -146,20 +144,6 @@ const baseConfig = {
                                 }
                             }
                         ]
-                    }
-                ]
-            },
-            {
-                test: /\.png$/,
-                use: [
-                    {
-                        loader: 'file-loader',
-                        options: {
-                            mimetype: 'image/png',
-                            limit: 6000,
-                            name: 'icons/[name]-[hash:8].[ext]',
-                            esModule: false
-                        }
                     }
                 ]
             },
@@ -225,7 +209,10 @@ if (isProd) {
                         return false;
                     },
                     name: 'santd',
-                    chunks: 'all'
+                    chunks(chunk) {
+                        // exclude index chunk, 这个 chunk 用于外部直接使用 frontend
+                        return chunk.name !== 'index';
+                    }
                 }
             }
         },

@@ -27,7 +27,7 @@ module.exports = {
                 next();
             });
         },
-        port: 8888,
+        port: 10086,
         open: true
     },
     module: {
