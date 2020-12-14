@@ -25,7 +25,7 @@ yarn global add san-devtools
 
 ### chrome extension
 
-[Get the Chrome Extension](https://chrome.google.com/webstore/detail/san-devtools/pjnngoafflflkagpebgfifjejlnfhahc)
+[Get the Chrome Extension](https://chrome.google.com/webstore/detail/san-devtool/fcjifbggoejmfnfcmnaobcppbfhlndad)
 
 OR
 
