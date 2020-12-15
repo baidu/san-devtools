@@ -1,5 +1,5 @@
 <template>
-    <div class="computed-wrapper">
+    <div class="san-devtools-computed-wrapper">
         <div class="computed {{hidden[index] ? 'hidden' : ''}}" s-for="item, index in computed">
             <div class="func-name">{{item.computedName}}</div>
             <div class="deps-wrapper">
@@ -62,7 +62,10 @@
 
 <style lang="less">
     @import '@frontend/views/style/variables.less';
-    .computed-wrapper {
+    .san-devtools-computed-wrapper {
+        .hidden {
+            display: none;
+        }
         .computed {
             margin: 3px 0;
             .func-name {
@@ -91,12 +94,9 @@
             }
         }
     }
-    .hidden {
-        display: none;
-    }
 
-    .dark {
-        .computed-wrapper {
+    .san-devtools-dark {
+        .san-devtools-computed-wrapper {
             .computed {
                 .func-name {
                     color: @dark-func-font-color;

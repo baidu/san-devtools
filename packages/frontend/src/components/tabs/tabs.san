@@ -114,7 +114,7 @@
             }
         }
     }
-    .dark {
+    .san-devtools-dark {
         .san-devtools-tabs {
             &-content {
                 &-item {

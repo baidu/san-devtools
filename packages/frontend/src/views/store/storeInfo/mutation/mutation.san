@@ -280,7 +280,7 @@
             }
         }
     }
-    .dark {
+    .san-devtools-dark {
         .mutation-wrap {
             .payload-wrapper {
                 .payload {

@@ -87,7 +87,7 @@
             padding-left: 46px;
         }
     }
-    .dark {
+    .san-devtools-dark {
         .san-devtool-input {
             input::-webkit-input-placeholder {
                 color: @dark-placeholder-font-color;

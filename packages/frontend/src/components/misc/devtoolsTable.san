@@ -361,7 +361,7 @@
             }
         }
     }
-    .dark {
+    .san-devtools-dark {
         .sd-list {
             background-color: #272b2e;
             .button-wrapper,

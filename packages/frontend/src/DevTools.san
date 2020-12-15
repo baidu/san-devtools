@@ -1,39 +1,39 @@
 <template>
     <div id="san-devtools-app">
         <sandevtool-navigation currentTab="{=currentTab=}"/>
-        <san-row type="flex" class="content" style="position: absolute">
+        <san-row type="flex" class="{{prefix}}-content" style="position: absolute">
             <div
                 s-if="!wsDisconnected"
                 id="component_containter"
-                class="container {{containerShown.component ? 'show' : ''}}"
+                class="{{prefix}}-container {{containerShown.component ? 'show' : ''}}"
             >
                 <sandevtool-component />
             </div>
             <div
                 s-if="!wsDisconnected"
                 id="store_containter"
-                class="container {{containerShown.store ? 'show' : ''}}"
+                class="{{prefix}}-container {{containerShown.store ? 'show' : ''}}"
             >
                 <sandevtool-store />
             </div>
             <div
                 s-if="!wsDisconnected"
                 id="event_containter"
-                class="container {{containerShown.event ? 'show' : ''}}"
+                class="{{prefix}}-container {{containerShown.event ? 'show' : ''}}"
             >
                 <sandevtool-event />
             </div>
             <div
                 s-if="!wsDisconnected"
                 id="message_containter"
-                class="container {{containerShown.message ? 'show' : ''}}"
+                class="{{prefix}}-container {{containerShown.message ? 'show' : ''}}"
             >
                 <sandevtool-message />
             </div>
             <div
                 s-if="!wsDisconnected"
                 id="history_containter"
-                class="container {{containerShown.history ? 'show' : ''}}"
+                class="{{prefix}}-container {{containerShown.history ? 'show' : ''}}"
             >
                 <sandevtool-history />
             </div>
@@ -85,7 +85,8 @@
                         'history': false,
                         'message': false,
                         'event': false
-                    }
+                    },
+                    prefix: 'san-devtools'
                 }
             },
 
@@ -115,14 +116,15 @@
     @import '@frontend/views/style/variables.less';
     @content-bg-color: #f6fbff;
     @dark-content-bg-color: #1d2126;
-    .content {
+    @prefix: san-devtools;
+    .@{prefix}-content {
         background-color: @content-bg-color;
         position: absolute;
         height: 100%;
         top: @nav-height;
         bottom: 0;
         width: 100%;
-        .container {
+        .@{prefix}-container {
             background-color: @content-bg-color;
             width: 100%;
             height: 100%;
@@ -133,12 +135,12 @@
             }
         }
     }
-    .dark {
-        .content {
+    .san-devtools-dark {
+        .@{prefix}-content {
             background-color: @dark-content-bg-color;
-            .container {
+            .@{prefix}-container {
                 background-color: @dark-content-bg-color;
             }
         }
-    }
+    }    
 </style>

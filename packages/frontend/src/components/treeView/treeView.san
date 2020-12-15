@@ -216,7 +216,7 @@
             }
         }
     }
-    .dark {
+    .san-devtools-dark {
         .sm-tree-view {
             .sm-tree-view-item-wrapper {
                 .sm-tree-view-item {

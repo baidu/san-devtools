@@ -172,7 +172,7 @@
             }
         }
     }
-    .dark {
+    .san-devtools-dark {
         .sd-store-info {
             .sd-none-wrapper {
                 background-color: #272b2e;
