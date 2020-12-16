@@ -78,6 +78,7 @@
     </div>
 </template>
 <script>
+    // TODO: 代码优化😣
     import san, { DataTypes } from 'san';
     import { connectStore, store } from '@frontend/store/index';
     import { Icon, Button, Checkbox } from 'santd';
@@ -291,22 +292,7 @@
                 this.data.get('treeData') && this.data.set('extras', value);
             });
 
-            this.watch('filterText', value => {
-                if (!value) {
-                    this.data.set('filtered', true);
-                    return;
-                }
-                let text = [
-                    this.data.get('displayName'),
-                    this.data.get('treeData.id'),
-                    this.data.get('extras') ? this.data.get('extras').map(item => item ? item.text : '') : []
-                ];
-                let matched = new RegExp(value, 'ig').test(
-                    text.reduce((a, b) => a.concat(b), []));
-                this.data.get('filtered') === matched
-                    ? this.watchFiltered(matched)
-                    : this.data.set('filtered', matched);
-            });
+            this.watch('filterText', this.doFilter.bind(this));
             this.watch('filtered', value => {
                 this.watchFiltered(value);
             });
@@ -360,7 +346,112 @@
             this.dispatch('UI:query-parent-checkbox-state');
         },
 
+        doFilter(value) {
+            if (this.data.get('type') === 'storePanel') {
+                this.componentFilter(value);
+            } else {
+                this.storeFilter(value);
+            }
+        },
+
+        storeFilter(value) {
+            if (!value || value === '[]') {
+                this.data.set('filtered', true);
+                return;
+            }
+            // demo: [58,]<setCount>test.b.c
+            // res[0]: 匹配的全字符
+            // res[1]: 子表达式匹配到的字符,表示搜索的 id 范围，闭区间
+            // res[2]: id 的下界
+            // res[3]: id 的上界
+            // res[4]: 子表达式匹配的字符，表示属性的链式结构<test.b.c>
+            // res[5]: 属性的链式结构字符串
+            // res[6]: 子表达式匹配的字符,可以直接搜索名字
+            let res = /(\[(\d*),(\d*)\])?(\<(.*)\>)?(.*)/.exec(value);
+            if (!res) {
+                return;
+            }
+            let id = this.data.get('treeData.id');
+            let idMatched = true;
+            let textMatched = true;
+            let storeDataAttribute = true;
+            // 处理 id
+            if (res[1] !== undefined) {
+                idMatched = this.idFilter(id, res[2], res[3]);
+            }
+            // 处理属性
+            if (res[4] !== undefined) {
+                storeDataAttribute = this.storeChangedTargetFilter(res[5]);
+            }
+            // 处理 text
+            if (res[6] !== undefined) {
+                let displayName = this.data.get('displayName');
+                let extras = this.data.get('extras');
+                extras = Array.isArray(extras) ? extras.map(item => item ? item.text : '') : [];
+                let text = [].concat([displayName], extras);
+                let reg;
+                try {
+                    reg = new RegExp(res[6], 'ig');
+                } catch(err) {return;}
+                textMatched = res[6] ? reg.test(text) : true;
+            }
+            let matched = idMatched && textMatched && storeDataAttribute;
+            this.data.get('filtered') === matched
+                ? this.watchFiltered(matched)
+                : this.data.set('filtered', matched);
+        },
+
+        componentFilter(value) {
+            if (!value) {
+                this.data.set('filtered', true);
+                return;
+            }
+            let id = this.data.get('treeData.id');
+            let displayName = this.data.get('displayName');
+            let extras = this.data.get('extras');
+            extras = Array.isArray(extras) ? extras.map(item => item ? item.text : '') : [];
+            let text = [].concat([displayName, id], extras);
+            let reg;
+            try {
+                reg = new RegExp(value, 'ig');
+            } catch(err) {return;}
+
+            let matched = text ? reg.test(text) : true;
+            this.data.get('filtered') === matched
+                ? this.watchFiltered(matched)
+                : this.data.set('filtered', matched);
+        },
+
+        idFilter(id, low, high) {
+            let lowId = low ? +low : 0;
+            let highId = high ? +high : 1073741823;
+            if (low > high) {
+                return true;
+            }
+            if (id === undefined) {
+                return false;
+            }
+            if (!isNaN(+id)) {
+                return id >= lowId && id <= highId;
+            }
+            return true; 
+        },
+
+        storeChangedTargetFilter(value) {
+            let {changedTarget} = this.data.get('treeData');
+            if (changedTarget) {
+                if (changedTarget.indexOf(value) > -1) {
+                    return true;
+                }
+                else {
+                    return false
+                }
+            }
+            return false;
+        },
+
         attached() {
+            this.doFilter(this.data.get('filterText'));
             let index = this.data.get('index');
             setTimeout(() => {
                 this.data.set('renderable', true);
@@ -412,6 +503,7 @@
             })
 
             this.watch('treeData', value => {
+                this.doFilter(this.data.get('filterText'));
                 if (this.data.get('dataSource') !== 'JSON') {
                     return;
                 }

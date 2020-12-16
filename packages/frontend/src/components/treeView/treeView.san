@@ -1,10 +1,22 @@
 <template>
     <div class="sm-tree-view {{treeViewClass}}">
         <sand-input
+            s-if="{{!searchTip}}"
             placeholder="{{placeholder}}"
             filterText="{=filterText=}"
         >
         </sand-input>
+        <san-tooltip
+            s-else
+            placement="bottomLeft"
+            title="{{searchTip}}"
+        >
+            <sand-input
+                placeholder="{{placeholder}}"
+                filterText="{=filterText=}"
+            >
+            </sand-input>
+        </san-tooltip>
         <sand-loading
             loadingToastContentFromColor="{{loadingToastContentFromColor}}"
             loadingToastContentToColor="{{loadingToastContentToColor}}"
@@ -35,7 +47,7 @@
 </template>
 <script>
     import san, { DataTypes } from 'san';
-    import { Icon } from 'santd';
+    import { Icon, Tooltip } from 'santd';
     import TreeViewItem from './treeViewItem.san';
     import SdInput from '@frontend/components/input/input.san';
     import SdLoading from '@frontend/components/loading/loading.san';
@@ -59,7 +71,8 @@
             'san-icon': Icon,
             'san-tree-view-item': TreeViewItem,
             'sand-input': SdInput,
-            'sand-loading': SdLoading
+            'sand-loading': SdLoading,
+            'san-tooltip': Tooltip
         },
 
         inited() {

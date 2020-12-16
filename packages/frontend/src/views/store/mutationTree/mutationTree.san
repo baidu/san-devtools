@@ -1,6 +1,7 @@
 <template>
     <div class="state-list-wrapper custom">
         <san-tree-view
+            searchTip="{{searchTip}}"
             s-ref="tv"
             ref="tv"
             treeData="{=mutationTreeData=}"
@@ -31,6 +32,11 @@
                 'UI:tree-view-item-click'({ value }) {
                     this.setSelectedMutationInfo(value);
                     this.setSelectedStoreData(value);
+                }
+            },
+            initData() {
+                return {
+                    searchTip: "The Search rules '[id-range]<store-data-key>mutation-name', e.g. [0,100]<key1.key2>setKey2"
                 }
             },
             setSelectedMutationInfo(value) {

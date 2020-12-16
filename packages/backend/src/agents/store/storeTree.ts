@@ -26,6 +26,7 @@ interface MutationData {
     id: string;
     parentId: string;
     diff: Record<string, any>;
+    changedTarget: string
 }
 
 interface ActionData {
@@ -203,6 +204,26 @@ function getActionInfo(data: any) {
  * 获取触发的 action 的基本信息
  * @param data
  * @param storeName store 名称
+ * @return targetStr 改变的 store 的 key
+ */
+function getChangedTarget(diffData: any[]) {
+    let targetStr = '';
+    if (!diffData || !Array.isArray(diffData)) {
+        return targetStr;
+    }
+    diffData.reduce((pre, cur) => {
+        let target = cur.target;
+        if (target && Array.isArray(target)) {
+            targetStr += target.join('.') + ';';
+        }
+    }, targetStr);
+    return targetStr;
+}
+
+/**
+ * 获取触发的 action 的基本信息
+ * @param data
+ * @param storeName store 名称
  */
 export function getMutationData(data: any = {}, storeName: string): MutationData | null {
     let actionInfo = getActionInfo(data);
@@ -249,7 +270,8 @@ export function getMutationData(data: any = {}, storeName: string): MutationData
         payload,
         id,
         parentId,
-        diff: diffData ? diffData : null
+        diff: diffData ? diffData : null,
+        changedTarget: getChangedTarget(diffData)
     };
 }
 
