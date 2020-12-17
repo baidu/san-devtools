@@ -425,7 +425,7 @@
         idFilter(id, low, high) {
             let lowId = low ? +low : 0;
             let highId = high ? +high : 1073741823;
-            if (low > high) {
+            if (lowId > highId) {
                 return true;
             }
             if (id === undefined) {
