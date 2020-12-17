@@ -51,7 +51,7 @@
             }
         }
     }
-    .dark {
+    .san-devtools-dark {
         pre {
             .language-js {
                 color: #ffffff;

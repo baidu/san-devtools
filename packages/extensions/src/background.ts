@@ -83,7 +83,7 @@ chrome.runtime.onMessage.addListener((req, sender, sendResponse) => {
     switch (event) {
         case SETTINGS_SET: {
             // eslint-disable-next-line
-            localStorage['settingData'] = JSON.stringify(req.settingData);
+            req.settingData && (localStorage['settingData'] = JSON.stringify(req.settingData));
             return;
         }
         case SETTINGS_GET: {

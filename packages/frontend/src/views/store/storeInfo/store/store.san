@@ -195,7 +195,7 @@
         display: none;
     }
 
-    .dark {
+    .san-devtools-dark {
         .actions-wrapper {
             .actions {
                 .func-name {

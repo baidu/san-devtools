@@ -1,5 +1,5 @@
 <template>
-    <div class="filters-wrapper">
+    <div class="san-devtools-filters-wrapper">
         <div class="filters {{hidden[index] ? 'hidden' : ''}}" s-for="item, index in data">
             <div class="func-name">{{item.name}}</div>
             <san-pretty-code fnStr="{{item.fn}}"></san-pretty-code>
@@ -57,7 +57,10 @@
 
 <style lang="less">
     @import '@frontend/views/style/variables.less';
-    .filters-wrapper {
+    .san-devtools-filters-wrapper {
+        .hidden {
+            display: none;
+        }
         .filters {
             margin: 3px 0;
             .func-name {
@@ -67,12 +70,9 @@
             }
         }
     }
-    .hidden {
-        display: none;
-    }
 
-    .dark {
-        .filters-wrapper {
+    .san-devtools-dark {
+        .san-devtools-filters-wrapper {
             .filters {
                 .func-name {
                     color: @dark-func-font-color;

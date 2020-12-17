@@ -177,7 +177,7 @@
             zoom: 0.7;
         }
     }
-    .dark {
+    .san-devtools-dark {
         .s-json-tree-view {
             div:focus {
                 outline: #e4e4e4 auto 1px;

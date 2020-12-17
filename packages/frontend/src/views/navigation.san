@@ -1,5 +1,5 @@
 <template>
-    <div class="navigation">
+    <div class="san-devtools-navigation">
         <div class="navigation-header">
             <san-button
                 type="primary"
@@ -138,11 +138,11 @@
                 }
                 switch (theme) {
                     case LIGHT_MODE: {
-                        document.querySelector('#san-devtools-app').classList.remove('dark');
+                         document.body.classList.remove('san-devtools-dark');
                         break;
                     }
                     case DARK_MODE: {
-                        document.querySelector('#san-devtools-app').classList.add('dark');
+                         document.body.classList.add('san-devtools-dark');
                         break;
                     }
                     default: break;
@@ -152,10 +152,10 @@
 
             onThemeChange(value) {
                 if (value) {
-                    document.querySelector('#san-devtools-app').classList.add('dark');
+                     document.body.classList.add('san-devtools-dark');
                     window.localStorage['_san_devtool_theme'] = DARK_MODE;
                 } else {
-                    document.querySelector('#san-devtools-app').classList.remove('dark');
+                     document.body.classList.remove('san-devtools-dark');
                     window.localStorage['_san_devtool_theme'] = LIGHT_MODE;
                 }
             },
@@ -245,7 +245,7 @@
 
 <style lang="less">
     @import '@frontend/views/style/variables.less';
-    .navigation {
+    .san-devtools-navigation {
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -384,8 +384,8 @@
         }
     }
 
-    .dark {
-        .navigation {
+    .san-devtools-dark {
+        .san-devtools-navigation {
             background-color: @dark-nav-bg-color;
             .navigation-header {
                 .logo {

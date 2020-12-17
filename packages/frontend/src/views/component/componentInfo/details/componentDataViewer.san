@@ -1,18 +1,16 @@
 <template>
-    <div>
-        <san-json-tree-view
-            alwaysShowRoot="{{!0}}"
-            data="{=data=}"
-            filterText="{=filterText=}"
-            rootName="data"
-            readonly="{{readonly}}"
-            on-change="change($event)"
-            on-append="append($event)"
-            on-rename="rename($event)"
-            on-delete="delete($event)"
-        >
-        </san-json-tree-view>
-    </div>
+    <san-json-tree-view
+        alwaysShowRoot="{{!0}}"
+        data="{=data=}"
+        filterText="{=filterText=}"
+        rootName="data"
+        readonly="{{readonly}}"
+        on-change="change($event)"
+        on-append="append($event)"
+        on-rename="rename($event)"
+        on-delete="delete($event)"
+    >
+    </san-json-tree-view>
 </template>
 
 <script>

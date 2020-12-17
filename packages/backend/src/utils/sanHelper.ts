@@ -12,7 +12,7 @@ function getComponentName(component: Component) {
 // 生成路由信息。
 function getRouteInfo(component: Component) {
     let routeData = component.data.get('route');
-    if (routeData) {
+    if (routeData && routeData.path) {
         return {
             id: component.id,
             timestamp: Date.now(),

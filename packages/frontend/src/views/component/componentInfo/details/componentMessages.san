@@ -1,5 +1,5 @@
 <template>
-    <div class="messages-wrapper">
+    <div class="san-devtools-messages-wrapper">
         <div class="messages {{hidden[index] ? 'hidden' : ''}}" s-for="item, index in data">
             <div class="func-name">{{item.name}}</div>
             <san-pretty-code fnStr="{{item.fn}}"></san-pretty-code>
@@ -59,7 +59,10 @@
 
 <style lang="less">
     @import '@frontend/views/style/variables.less';
-    .messages-wrapper {
+    .san-devtools-messages-wrapper {
+        .hidden {
+            display: none;
+        }
         .messages {
             margin: 3px 0;
             .func-name {
@@ -69,12 +72,9 @@
             }
         }
     }
-    .hidden {
-        display: none;
-    }
 
-    .dark {
-        .messages-wrapper {
+    .san-devtools-dark {
+        .san-devtools-messages-wrapper {
             .messages {
                 .func-name {
                     color: @dark-func-font-color;
