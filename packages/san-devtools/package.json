@@ -1,6 +1,6 @@
 {
     "name": "san-devtools",
-    "version": "3.0.4",
+    "version": "3.0.5",
     "scriptName": "san-devtools",
     "description": "Development tools for debugging San.",
     "main": "dist/backend.js",
