@@ -31,6 +31,7 @@
             <san-popover
                 trigger="click"
                 placement="bottomRight"
+                overlayClassName="san-devtools-popup-content"
             >
                 <san-checkboxgroup
                     defaultValue="{{defaultValue}}"
@@ -318,69 +319,71 @@
             }
         }
     }
-    div .santd-popover-placement-bottomRight > .santd-popover-content .santd-popover-arrow {
+    div .santd-popover-placement-bottomRight > .san-devtools-popup-content .santd-popover-arrow {
         right: 8px !important;
     }
     .santd-popover {
-        .santd-checkbox {
-            top: 0;
-        }
-        .santd-popover-inner-content {
-            padding: 0 0;
-        }
-        .navigation-checkbox-wrap {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            .santd-switch-checked {
-                background-color: #236eff;
+        .san-devtools-popup-content {
+            .santd-checkbox {
+                top: 0;
             }
-            .santd-switch {
-                min-width: auto;
+            .santd-popover-inner-content {
+                padding: 0 0;
             }
-            .theme {
-                color: @setting-font-color;
-                padding-left: 20px;
-            }
-            padding: 12px 16px;
-            &:hover {
-                background-color: @setting-hover-bg-color;
-            }
-            &:first-child {
-                border-top-left-radius: 9px;
-                border-top-right-radius: 9px;
-            }
-            &:last-child {
-                border-bottom-right-radius: 9px;
-                border-bottom-left-radius: 9px;
-            }
-            .santd-checkbox-checked .santd-checkbox-inner {
-                background-color: @setting-checkbox-bg-color;
-                border: 1px solid @setting-checkbox-border-color;
-            }
-            .santd-checkbox-wrapper {
-                color: @setting-font-color;
-                .santd-checkbox-inner {
-                    border-radius: 50%;
-                    width: 9px;
-                    height: 9px;
+            .navigation-checkbox-wrap {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                .santd-switch-checked {
+                    background-color: #236eff;
                 }
-                .santd-checkbox-inner::after {
-                    display: none;
+                .santd-switch {
+                    min-width: auto;
+                }
+                .theme {
+                    color: @setting-font-color;
+                    padding-left: 20px;
+                }
+                padding: 12px 16px;
+                &:hover {
+                    background-color: @setting-hover-bg-color;
+                }
+                &:first-child {
+                    border-top-left-radius: 9px;
+                    border-top-right-radius: 9px;
+                }
+                &:last-child {
+                    border-bottom-right-radius: 9px;
+                    border-bottom-left-radius: 9px;
+                }
+                .santd-checkbox-checked .santd-checkbox-inner {
+                    background-color: @setting-checkbox-bg-color;
+                    border: 1px solid @setting-checkbox-border-color;
+                }
+                .santd-checkbox-wrapper {
+                    color: @setting-font-color;
+                    .santd-checkbox-inner {
+                        border-radius: 50%;
+                        width: 9px;
+                        height: 9px;
+                    }
+                    .santd-checkbox-inner::after {
+                        display: none;
+                    }
                 }
             }
-        }
-        .santd-popover-arrow {
-            border-top-color: @setting-bg-color !important;
-            border-left-color: @setting-bg-color !important;
-        }
-        .navigation-checkbox-wrap:not(:first-child) {
-            border-top: 1px solid @setting-border-top-color;
-        }
-        .santd-popover-inner {
-            border-radius: 9px;
-            background: @setting-bg-color;
-            box-shadow: 0 2px 8px 0 @setting-shadow-color;
+            .santd-popover-arrow {
+                border-top-color: @setting-bg-color !important;
+                border-left-color: @setting-bg-color !important;
+            }
+            .navigation-checkbox-wrap:not(:first-child) {
+                border-top: 1px solid @setting-border-top-color;
+            }
+            .santd-popover-inner {
+                border-radius: 9px;
+                background: @setting-bg-color;
+                box-shadow: 0 2px 8px 0 @setting-shadow-color;
+            }
         }
     }
 
@@ -405,31 +408,33 @@
             }
         }
         .santd-popover {
-            .navigation-checkbox-wrap {
-                .theme {
-                    color: @dark-setting-font-color;
+            .san-devtools-popup-content {
+                .navigation-checkbox-wrap {
+                    .theme {
+                        color: @dark-setting-font-color;
+                    }
+                    &:hover {
+                        background-color: @dark-setting-hover-bg-color;
+                    }
+                    .santd-checkbox-checked .santd-checkbox-inner {
+                        background-color: @dark-setting-checkbox-bg-color;
+                        border: 1px solid @dark-setting-checkbox-border-color;
+                    }
+                    .santd-checkbox-wrapper {
+                        color: @dark-setting-font-color;
+                    }
                 }
-                &:hover {
-                    background-color: @dark-setting-hover-bg-color;
+                .santd-popover-arrow {
+                    border-top-color: @dark-setting-bg-color !important;
+                    border-left-color: @dark-setting-bg-color !important;
                 }
-                .santd-checkbox-checked .santd-checkbox-inner {
-                    background-color: @dark-setting-checkbox-bg-color;
-                    border: 1px solid @dark-setting-checkbox-border-color;
+                .navigation-checkbox-wrap:not(:first-child) {
+                    border-top: 1px solid @dark-setting-border-top-color;
                 }
-                .santd-checkbox-wrapper {
-                    color: @dark-setting-font-color;
+                .santd-popover-inner {
+                    background: @dark-setting-bg-color;
+                    box-shadow: 0 2px 8px 0 @dark-setting-shadow-color;
                 }
-            }
-            .santd-popover-arrow {
-                border-top-color: @dark-setting-bg-color !important;
-                border-left-color: @dark-setting-bg-color !important;
-            }
-            .navigation-checkbox-wrap:not(:first-child) {
-                border-top: 1px solid @dark-setting-border-top-color;
-            }
-            .santd-popover-inner {
-                background: @dark-setting-bg-color;
-                box-shadow: 0 2px 8px 0 @dark-setting-shadow-color;
             }
         }
     }
