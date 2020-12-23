@@ -295,6 +295,26 @@ export function dispatchAction(hook: DevToolsHook<{}>, message: IDispatchMsg) {
     store.dispatch(actionName, payload);
 }
 
+function getStrFromObject(mapData: Record<string, any>) {
+    if (Object.prototype.toString.call(mapData) === "[object Object]") {
+        return Object.entries(mapData).map(item => {
+            let value = '-';
+            switch(typeof item[1]) {
+                case 'string': {
+                    value = item[1];
+                    break;
+                }
+                case 'function' : {
+                    value = item[1].name
+                }
+                default: break;
+            }
+            return `${item[0]}: ${value},`
+        })
+    }
+    return;
+}
+
 /**
  * 由于 component inited 在 attach 之前，所以可以先存下来，用于构建 componentTree 的阶段
  * 构造并存储 storeComponentData
@@ -307,7 +327,7 @@ export function setStoreComponentData(
     component: Component,
     del: boolean,
     mapStates?: Record<string, any>,
-    mapActions?: {[index: string]: Function},
+    mapActions?: Record<string, any>,
     storeName?: string
 ) {
     let {id} = component;
@@ -315,8 +335,8 @@ export function setStoreComponentData(
         hook.storeComponentMap.delete(id + '');
         return;
     }
-    let mapActionsKeys = mapActions && Object.keys(mapActions);
-    let mapStatesArr = mapStates ? Object.entries(mapStates).map(item => `${item[0]}: ${item[1]},`) : undefined;
+    let mapActionsKeys = mapActions && getStrFromObject(mapActions);
+    let mapStatesArr = mapStates ? getStrFromObject(mapStates) : undefined;
     let componentData = {
         mapStates: mapStatesArr,
         mapActionsKeys,

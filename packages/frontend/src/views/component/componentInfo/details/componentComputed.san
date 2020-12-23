@@ -4,7 +4,7 @@
             <div class="func-name">{{item.computedName}}</div>
             <div class="deps-wrapper">
                 <span s-for="dep in item.deps" class="deps">
-                    <span class="key-value">{{dep.key}}: {{dep.value}}</span>
+                    <span class="key-value">{{dep.key}}</span>
                 </span>
             </div>
             <san-pretty-code fnStr="{{item.fn}}"></san-pretty-code>
