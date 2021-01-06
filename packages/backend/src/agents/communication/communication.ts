@@ -3,7 +3,7 @@ import {
 } from '../../utils/sanHelper';
 import {
     toLocaleDatetime
-} from '../../utils/utils';
+} from '@shared/utils/dateFormator';
 import CircularJSON from '@shared/utils/circularJSON';
 import {Component} from '../../hook';
 

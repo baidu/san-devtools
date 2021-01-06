@@ -39,6 +39,11 @@ export class CommunicationAgent extends Agent {
         this.bridge.on('Message.messageRecording', message => {
             this.hook.messageRecording = message.recording;
         });
+        this.bridge.on('Message.dispatch', data => {
+            let {componentId, payload, eventName} = data;
+            let component = this.hook.componentMap.get(componentId + '');
+            component && component.dispatch(eventName, payload);
+        });
         this.bridge.on('Event.eventRecording', message => {
             this.hook.eventRecording = message.recording;
         });
@@ -46,11 +51,6 @@ export class CommunicationAgent extends Agent {
             let {componentId, payload, eventName} = data;
             let component = this.hook.componentMap.get(componentId + '');
             component && component.fire(eventName, payload);
-        });
-        this.bridge.on('Message.dispatch', data => {
-            let {componentId, payload, eventName} = data;
-            let component = this.hook.componentMap.get(componentId + '');
-            component && component.dispatch(eventName, payload);
         });
     }
 }

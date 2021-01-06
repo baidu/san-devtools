@@ -3,6 +3,7 @@
         class="san-devtool-input"
         placeholder="{{placeholder}}"
         value="{=filterText=}"
+        on-pressEnter="pressEnter"
     >
         <div class="search" slot="prefix" />
     </san-input>
@@ -20,6 +21,10 @@
             /* props */
             placeholder: DataTypes.string,
             filterText: DataTypes.string
+        },
+
+        pressEnter() {
+            this.fire('pressEnter');
         },
 
         initData() {

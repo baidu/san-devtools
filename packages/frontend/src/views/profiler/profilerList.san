@@ -1,0 +1,157 @@
+<template>
+    <div class="san-devtools-profiler-wrapper">
+        <div class="san-devtools-profiler-filter">
+            <sand-input
+                placeholder="{{filterPlaceholder}}"
+                filterText="{=filterText=}"
+                filterIcon="{{filterIcon}}"
+            >
+            </sand-input>
+        </div>
+        <div class="san-devtools-profiler-content">
+            <div 
+                s-for="item,index in data" 
+                class="san-devtools-profiler-item {{selectedId === item[0] ? 'san-devtools-profiler-item-selected' : ''}}"
+                on-click="onClick($event, item)"
+            >
+                <span>{{item[1].name}}<span class="san-devtools-profiler-item-extra">{{item[1].id}}</span></span>
+                <span>{{item[1].totalTime | fixTime}}</span>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+    import san, { DataTypes } from 'san';
+    import { connectStore, store } from '@frontend/store/index';
+
+    import { Button, Table } from 'santd';
+    import SdInput from '@frontend/components/input/input.san';
+
+    export default connectStore({
+        bridge: 'bridge',
+        profilerDataStore: 'profilerDataStore',
+        currentTime: 'currentTime'
+    })(
+        {
+            dataTypes: {
+                /* props */
+                bridge: DataTypes.object,
+                profilerDataStore: DataTypes.object,
+                /* state */
+            },
+            components: {
+                'sand-input': SdInput
+            },
+            computed: {
+                data() {
+                    let currentTime = this.data.get('currentTime') || '';
+                    currentTime = currentTime.replace(/[\s-:]/ig,'');
+                    let profilerDataStore = this.data.get('profilerDataStore') || {};
+                    let filterText = this.data.get('filterText');
+                    let profilerData = profilerDataStore[currentTime] || {};
+                    let originData = Object.entries(profilerData);
+                    if (!filterText) {
+                        return originData;
+                    } else {
+                        let reg;
+                        try {
+                            reg = new RegExp(filterText, 'ig');
+                        } catch(err) {return originData;}
+                        let res = originData.map((item, index) => {
+                            let text = [item[1].name, item[1].id];
+                            if (reg.test(text)) {
+                                return item;
+                            }
+                            return null;
+                        }).filter(Boolean);
+                        return res;
+                    }
+                }
+            },
+            initData() {
+                return {
+                    selectedId: '',
+                    searchTip: 'sss',
+                    filterPlaceholder: 'find component',
+                    filterText: ''
+                }
+            },
+            filters: {
+                fixTime(value) {
+                    return value && typeof value.toFixed === 'function' && value.toFixed(1);
+                }
+            },
+            onClick(e, item) {
+                let componentId = item[0];
+                this.data.set('selectedId', componentId);
+                this.data.get('bridge') && this.data.get('bridge').send('Inspect.highlight', componentId);
+                this.data.get('bridge') && this.data.get('bridge').send('Profiler.getProfilerInfo', componentId);
+            }
+        }
+    )
+</script>
+
+<style lang="less">
+@import '@frontend/views/style/variables.less';
+@filter-height: 40px;
+.san-devtools-profiler-wrapper {
+    height: 100%;
+    width: 100%;
+    overflow: auto;
+    padding-bottom: 10px;
+    box-sizing: content-box;
+    .san-devtools-profiler-filter {
+        padding: 2px;
+    }
+    .san-devtools-profiler-content {
+        height: calc(100% - @filter-height);
+        overflow: auto;
+        .san-devtools-profiler-item {
+            border-radius: 6px;
+            padding: 0 14px;
+            width: 100%;
+            height: 31px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            &:hover {
+                background-color: @ripple-hover-bg-color !important;
+            }
+            &-selected {
+                background-color: @ripple-selected-bg-color !important;
+            }
+            &-extra {
+                margin-left: 6px;
+                font-size: 12px;
+                display: inline-block;
+                height: 16px;
+                line-height: 1;
+                padding: 2px 4px;
+                border-radius: 9px;
+                color: #ffffff;
+                background-color: @color-blue-l3;
+            }
+        }
+    }
+}
+.san-devtools-dark {
+    .san-devtools-profiler-wrapper {
+        color: #ffffff;
+        .san-devtools-profiler-content {
+            .san-devtools-profiler-item {
+                &:hover {
+                    background-color: @dark-ripple-hover-bg-color !important;
+                }
+                &-selected {
+                    background-color: @dark-ripple-selected-bg-color !important;
+                }
+                &-extra {
+                    color: #ffffff;
+                    background-color: @color-grey;
+                }
+            }
+        }
+    }
+}
+</style>

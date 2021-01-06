@@ -18,6 +18,7 @@
         dataTypes: {
             /* props */
             type: DataTypes.string,
+            options: DataTypes.object,
             /* state */
             className: DataTypes.string
         },
@@ -31,7 +32,11 @@
         computed: {
             pathData() {
                 let type = this.data.get('type');
-                return icons[type] || null;
+                let options = this.data.get('options');
+                let pathData = icons[type] || [];
+                return pathData.map(item => {
+                    return Object.assign({}, item, options);
+                }).filter(Boolean);
             }
         }
 

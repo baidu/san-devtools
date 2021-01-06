@@ -1,0 +1,22 @@
+<template>
+    <div>
+        <son21 />
+    </div>
+</template>
+
+<script>
+import CounterItemSon21 from './CounterItemSon21.san';
+export default {
+    components: {
+        'son21': CounterItemSon21
+    },
+    initData() {
+        return {
+
+        }
+    }
+}
+</script>
+
+<style>
+</style>

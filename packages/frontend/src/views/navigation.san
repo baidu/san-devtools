@@ -51,9 +51,10 @@
             </san-popover>
             <san-tooltip placement="bottomRight">
                 <span slot="title">
-                    1: only development san/san-native allowed.<br/>
-                    2: only 3.9.4+ version of san the EVENT and MESSAGE panel allowed.<br/>
-                    3: async dispatch detecting surported when your san-store's version is 2.0.3+. <br/>
+                    1: San-DevTools only support development san/san-native.<br/>
+                    2: The EVENT and MESSAGE panel only support 3.9.4+ version of san.<br/>
+                    3: The PROFILER panel only support 3.10.1+ version of san.<br/>
+                    4: Async dispatch detecting surport 2.0.3+ version of san-store. <br/>
                 </span>
                 <span
                     class="help-desc"
@@ -67,7 +68,8 @@
     import san, { DataTypes } from 'san';
     import Tabs from '@frontend/components/tabs/tabs.san';
     import { connectStore, store } from '@frontend/store/index';
-    import { versionCompare, isChromePanel, setSettings, getSettings } from '@frontend/utils/index';
+    import {isChromePanel, setSettings, getSettings } from '@frontend/utils/index';
+    import {versionCompare} from '@shared/utils/versionCompare';
     import { Grid, Icon, Avatar, AppBar, Button, Tooltip, Popover, Checkbox, Switch } from 'santd';
 
     const LIGHT_MODE = 'Light Mode';
@@ -125,6 +127,11 @@
                             label: 'History',
                             icon: 'history',
                             value: 'history'
+                        },
+                        {
+                            label: 'Profiler',
+                            icon: 'profiler',
+                            value: 'profiler'
                         }
                     ],
                     currentTab: 'component'

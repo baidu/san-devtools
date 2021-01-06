@@ -51,6 +51,23 @@ export interface RouteData {
     routeData: string;
 }
 
+export interface ProfilerData {
+    name: string; // 组件名称
+    id: string; // 组件 id
+    hooks: Record<string, HookData>; // 组件的生命周期钩子函数的数据
+    totalTime: number; // 组件渲染的总时间
+    parentId: string; // 父组件的 id
+    start: number; // 第一个生命周期触发的开始时间
+    end: number;
+}
+
+export interface HookData {
+    count: number; // 执行次数
+    totalTime: number; // 执行的总时长
+    start: number[]; // 开始时间，before* 触发的时刻
+    end: number[]; // 结束时间，*ed 结束的时刻
+}
+
 export interface DevToolsHook<T> {
     san: any;
     data: DevToolsHookData;
@@ -116,8 +133,14 @@ export class DevToolsHook<T> extends EventEmitter {
         selectedComponentId: '',
         treeData: []
     };
+    // profiler data
+    profilerData: Map<string, ProfilerData> = new Map();
+    // profiler 选中的 id
+    profilerComponentId: string = '';
     // sanDevtoolsContextMenuTargetIdPath 保存页面被选中的dom所在组件的 idPath
     sanDevtoolsContextMenuTargetIdPath: any = null;
+    // 监听 profiler
+    profilerRecording: boolean = false;
     // 监听 message
     messageRecording: boolean = false;
     // 监听 event
