@@ -16,6 +16,7 @@ import {setEvent} from './setEvent';
 import {settings} from './settings';
 import {setInspectId} from './setInspectId';
 import {setActiveTab} from './setActiveTab';
+import {setProfilerData} from './setProfiler';
 
 import {EnhancedStore, sanConnect, actionCreator, StoreItem} from './resetFactory';
 
@@ -56,7 +57,8 @@ let store = new EnhancedStore(getInitData(
     setEvent,
     settings,
     setInspectId,
-    setActiveTab
+    setActiveTab,
+    setProfilerData
 ));
 // 创建一个与 store 的链接
 const connectStore = sanConnect.createConnector(store);

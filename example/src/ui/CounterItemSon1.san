@@ -1,0 +1,22 @@
+<template>
+    <div>
+        <son11 />
+    </div>
+</template>
+
+<script>
+import CounterItemSon11 from './CounterItemSon11.san';
+export default {
+    components: {
+        'son11': CounterItemSon11
+    },
+    initData() {
+        return {
+
+        }
+    }
+}
+</script>
+
+<style>
+</style>

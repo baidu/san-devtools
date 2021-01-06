@@ -10,7 +10,15 @@ export const SAN_COMPONENT_HOOK = [
     'comp-attached',
     'comp-detached',
     'comp-disposed',
-    'comp-updated'
+    'comp-updated',
+    // for profiler, TODO: 事件名称命名方式
+    'comp-beforeCompile',
+    'comp-beforeInit',
+    'comp-beforeCreate',
+    'comp-beforeAttach',
+    'comp-beforeDetach',
+    'comp-beforeDispose',
+    'comp-beforeUpdate'
 ];
 // san-store hook
 export const SAN_STORE_HOOK = [

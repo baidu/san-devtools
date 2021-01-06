@@ -21,6 +21,12 @@ const MESSAGE_INFO_LISTENER = 'Message.setMessage';
 const EVENT_INFO_LISTENER = 'Event.setEvent';
 // inspect component
 const INSPECT_COMPONENT = 'Inspector.component';
+// profiler
+const PROFILER_DATA = 'Profiler.setProfilerData';
+// 获取某个组件的渲染数据
+const PROFILER_INFO = 'Profiler.setProfilerInfo';
+// 获取首屏组件挂载的 profiler 数据
+const PROFILER_FIRST_RENDER_DATA = 'Profiler.setFirstReanderProfilerData';
 
 // 后端已链接
 const BACKEND_CONNECTED = 'SYSTEM:backendConnected';
@@ -36,6 +42,10 @@ export {
     STORE_DATA_CHANGED,
 
     HISTORY_INFO_LISTENER,
+
+    PROFILER_DATA,
+    PROFILER_INFO,
+    PROFILER_FIRST_RENDER_DATA,
 
     BACKEND_CONNECTED,
     BACKEND_DISCONNECTED,

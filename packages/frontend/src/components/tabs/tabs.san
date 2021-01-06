@@ -74,7 +74,9 @@
                 .tab-history-grey,
                 .tab-history-color,
                 .tab-component-grey,
-                .tab-component-color {
+                .tab-component-color,
+                .tab-profiler-color,
+                .tab-profiler-grey {
                     background-size: 100%;
                     background-repeat: no-repeat;
                     width: 30px;
@@ -111,6 +113,12 @@
                 .tab-component-color {
                     background-image: url('~@frontend/icons/component-color.svg');
                 }
+                .tab-profiler-grey {
+                    background-image: url('~@frontend/icons/history-grey.svg');
+                }
+                .tab-profiler-color {
+                    background-image: url('~@frontend/icons/history-color.svg');
+                }
             }
         }
     }
@@ -132,6 +140,9 @@
                     }
                     .tab-component-color {
                         background-image: url('~@frontend/icons/dark-component-color.svg');
+                    }
+                    .tab-profiler-color {
+                        background-image: url('~@frontend/icons/dark-history-color.svg');
                     }
                 }
             }

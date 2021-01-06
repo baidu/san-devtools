@@ -15,13 +15,49 @@ import {
     getHistoryInfo
 } from './history';
 import {
+    addToProfilerData,
+    generateProfilerDataList
+} from './profiler';
+import {
     inspectSanInstance,
     setupInspectInstance
 } from './inspector';
 import CircularJSON from '@shared/utils/circularJSON';
+import {versionCompare} from '@shared/utils/versionCompare';
+
+// 标记首屏数据是否完成
+let firstRender = false;
+// 标记是否在首屏完成之前请求过数据
+let getFirstReanderProfilerData = false;
 
 export class ComponentAgent extends Agent {
     onHookEvent(evtName: string, component: Component): void {
+        if (versionCompare(this.hook.san.version, '3.10.1') >= 0) {
+            // 存储 profiler 数据
+            let profilerData = addToProfilerData(this.hook, component, evtName);
+            // 首屏根据根组件挂载来判断
+            if (evtName === 'comp-attached' && !component.parentComponent) {
+                firstRender = true;
+                if (getFirstReanderProfilerData) {
+                    // 处理在组件还没挂载完成的之前获取首屏数据，这里重新发送一下
+                    let firstRenderList = generateProfilerDataList(this.hook.profilerData);
+                    this.sendToFrontend('Profiler.setFirstReanderProfilerData', JSON.stringify(firstRenderList));
+                }
+            }
+            // 是否 profiler 面板在记录数据
+            if (this.hook.profilerRecording) {
+                if (profilerData) {
+                    this.sendToFrontend('Profiler.setProfilerData', JSON.stringify(profilerData));
+                }
+                // 如果选中的组件的数组更新了，直接发送 info
+                if (component.id + '' === this.hook.profilerComponentId) {
+                    let profilerInfo = this.hook.profilerData.get(component.id + '');
+                    this.sendToFrontend('Profiler.setProfilerInfo', JSON.stringify(profilerInfo));
+                }
+            }
+        }
+
+        // 处理其他的 backend 模块
         switch (evtName) {
             case 'comp-compiled':
             case 'comp-inited':
@@ -74,8 +110,6 @@ export class ComponentAgent extends Agent {
             }
             default: break;
         }
-        // TODO: 这里需要发送消息给Bridge，处理好old和new
-        // this.sendToFrontend(evtName, component);
     }
 
     setupHook() {
@@ -118,6 +152,31 @@ export class ComponentAgent extends Agent {
 
         // 6. inspect
         setupInspectInstance(this.hook);
+
+        // profiler
+        this.bridge.on('Profiler.getProfilerInfo', profilerComponentId => {
+            this.hook.profilerComponentId = profilerComponentId + '';
+            if (!profilerComponentId) {
+                return;
+            }
+            let profilerInfo = this.hook.profilerData.get(profilerComponentId + '');
+            this.sendToFrontend('Profiler.setProfilerInfo', JSON.stringify(profilerInfo));
+        });
+
+        this.bridge.on('Profiler.profilerRecording', message => {
+            this.hook.profilerRecording = message.recording;
+        });
+
+        this.bridge.on('Profiler.getFirstReanderProfilerData', () => {
+            if (firstRender) {
+                getFirstReanderProfilerData = false;
+                let firstRenderList = generateProfilerDataList(this.hook.profilerData);
+                this.sendToFrontend('Profiler.setFirstReanderProfilerData', JSON.stringify(firstRenderList));
+            }
+            else {
+                getFirstReanderProfilerData = true;
+            }
+        });
     }
 }
 

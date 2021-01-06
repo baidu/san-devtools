@@ -67,7 +67,8 @@
     import san, { DataTypes } from 'san';
     import Tabs from '@frontend/components/tabs/tabs.san';
     import { connectStore, store } from '@frontend/store/index';
-    import { versionCompare, isChromePanel, setSettings, getSettings } from '@frontend/utils/index';
+    import {isChromePanel, setSettings, getSettings } from '@frontend/utils/index';
+    import {versionCompare} from '@shared/utils/versionCompare';
     import { Grid, Icon, Avatar, AppBar, Button, Tooltip, Popover, Checkbox, Switch } from 'santd';
 
     const LIGHT_MODE = 'Light Mode';
@@ -192,6 +193,16 @@
                                 { label: 'Readonly for event.', value: 'Setting:event', checked: false },
                                 { label: 'Readonly for messages.', value: 'Setting:messages', checked: false }
                             ]
+                        );
+                    }
+                    if (versionCompare(sanVersion, '3.10.1') >= 0) {
+                        this.data.push(
+                            'tabs',
+                            {
+                                label: 'Profiler',
+                                icon: 'profiler',
+                                value: 'profiler'
+                            }
                         );
                     }
                     this.initOptions()

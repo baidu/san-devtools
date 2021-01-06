@@ -1,0 +1,18 @@
+<template>
+    <span>
+        左叶子节点内容
+    </span>
+</template>
+
+<script>
+export default {
+    initData() {
+        return {
+
+        }
+    }
+}
+</script>
+
+<style>
+</style>

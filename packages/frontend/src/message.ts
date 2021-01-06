@@ -15,7 +15,10 @@ import {
     INSPECT_COMPONENT,
     STORE_DATA_CHANGED,
     BACKEND_CONNECTED,
-    BACKEND_DISCONNECTED
+    BACKEND_DISCONNECTED,
+    PROFILER_DATA,
+    PROFILER_INFO,
+    PROFILER_FIRST_RENDER_DATA
 } from './common/constants';
 import {store} from './store';
 import {isChromePanel} from './utils/index';
@@ -33,6 +36,9 @@ export default class FrontendReceiver extends EventEmitter {
         bridge.on(HISTORY_INFO_LISTENER, this.onHistory.bind(this));
         bridge.on(MESSAGE_INFO_LISTENER, this.onMessage.bind(this));
         bridge.on(EVENT_INFO_LISTENER, this.onEvent.bind(this));
+        bridge.on(PROFILER_DATA, this.onProfilerData.bind(this));
+        bridge.on(PROFILER_INFO, this.onProfilerInfo.bind(this));
+        bridge.on(PROFILER_FIRST_RENDER_DATA, this.onFirstRenderProfilerData.bind(this));
         // inspect component
         bridge.on(INSPECT_COMPONENT, this.onInspectComponent.bind(this));
         // 后端链接
@@ -73,6 +79,15 @@ export default class FrontendReceiver extends EventEmitter {
     }
     onEvent(data: any) {
         store.dispatch('setEvent', JSON.parse(data));
+    }
+    onProfilerData(data: any) {
+        store.dispatch('setProfilerData', JSON.parse(data));
+    }
+    onProfilerInfo(data: any) {
+        store.dispatch('setProfilerInfo', JSON.parse(data));
+    }
+    onFirstRenderProfilerData(data: any) {
+        store.dispatch('setProfilerDataList', JSON.parse(data));
     }
     // inspect component
     onInspectComponent() {

@@ -1,0 +1,49 @@
+<template>
+    <sd-basic-layout prefix="profiler">
+        <sandevtool-profiler-list slot="left"/>
+        <sandevtool-profiler-info slot="right"/>
+    </sd-basic-layout>
+</template>
+
+<script>
+    import san, { DataTypes } from 'san';
+    import Split from 'split.js';
+    import { connectStore, store } from '@frontend/store/index';
+
+    import BasicLayout from '@frontend/components/layout/basicLayout.san';
+    import ProfilerList from './profilerList.san';
+    import ProfilerInfo from './profilerInfo.san';
+
+    export default connectStore({
+        bridge: 'bridge'
+    })(
+        {
+            components: {
+                'sandevtool-profiler-list': ProfilerList,
+                'sandevtool-profiler-info': ProfilerInfo,
+                'sd-basic-layout': BasicLayout
+            },
+
+            initData() {
+                return {
+                    index: -1
+                };
+            },
+
+            attached() {
+                this.data.get('bridge').send('Profiler.getFirstReanderProfilerData', '');
+                this.watch('bridge', bridge => {
+                    bridge.send('Profiler.getFirstReanderProfilerData', '');
+                });
+            },
+
+            dataTypes: {
+                index: DataTypes.number
+            }
+        }
+    )
+
+</script>
+
+<style lang="less">
+</style>

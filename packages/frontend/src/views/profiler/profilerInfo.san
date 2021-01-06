@@ -1,0 +1,590 @@
+<template>
+    <div class="sand-profiler-info-wrap">
+        <div class="sand-profiler-action">
+            <san-tooltip
+                class="sand-profiler-action-btns"
+                placement="bottomRight"
+                title="{{ recording ? 'start record' : 'stop record' }}"
+            >
+                <span
+                    class="sand-profiler-action-icon"
+                    on-click="record"
+                >
+                    <san-icon type="{{ recording ? 'stop-record' : 'start-record' }}"></san-icon>
+                </span>
+            </san-tooltip>
+            <san-tooltip
+                class="sand-profiler-action-btns {{recording ? 'sand-profiler-action-btns-disabled' : ''}}"
+                placement="bottomRight"
+                title="inspect flame"
+            >
+                <span
+                    class="sand-profiler-action-icon"
+                    on-click="flameClick"
+                >
+                    <san-icon type="flame" options="{{flameOptions}}"></san-icon>
+                </span>
+            </san-tooltip>
+            <san-drop-down class="sand-profiler-action-drop" placement="bottomCenter">
+                <san-menu
+                    selectedKeys="{{[0]}}"
+                    on-click="menuClick"
+                    slot="overlay">
+                    <san-menu-item s-for="time,index in profilerTime" key="{{index}}" disabled="{{recording}}">
+                        <span>{{time}}</span>
+                    </san-menu-item>
+                </san-menu>
+                <span>{{currentTime}}<santd-icon class="sand-drop-icon" type="left"/></span>
+            </san-drop-down>
+        </div>
+        <div class="sand-profiler-info-table">
+            <san-table
+                s-if="data.length > 0"
+                pagination="{{false}}"
+                columns="{{columns}}"
+                data="{{data}}"
+                bordered="{{true}}"
+            >
+            </san-table>
+        </div>
+        <div class="sand-pie-wrap" style="visibility: {{data.length > 0 ? 'visible' : 'hidden'}}">
+            <div class="sand-pie-title">生命周期平均耗时(average time)</div>
+            <div id="sand-pie" class="sand-pie"></div>
+        </div>
+        <div class="sand-d3-flame-wrapper {{showFlame ? '' : 'sand-d3-flame-wrapper-hide'}}">
+            <div class="sand-d3-flame-header">
+                <div class="sand-d3-flame-header-title">FLAME GRAPH for {{currentTime}}</div>
+                <div class="sand-d3-flame-header-filter">
+                    <sand-input
+                        placeholder="Find Flame"
+                        filterText="{=filterText=}"
+                    >
+                    </sand-input>
+                </div>
+            </div>
+            <div id="sand-d3-flame-container" class="sand-d3-flame-container"></div>
+        </div>
+    </div>
+</template>
+
+<script>
+    import san, { DataTypes } from 'san';
+    import { connectStore, store } from '@frontend/store/index';
+
+    import { Table, Menu, Icon as StandIcon, Tooltip } from 'santd';
+    import DropDown from 'santd/es/dropdown';
+    import 'santd/es/dropdown/style/index.less';
+
+    import Icon from '@frontend/components/icon/icon.san';
+    import SdInput from '@frontend/components/input/input.san';
+
+    import { toLocaleDatetime } from '@shared/utils/dateFormator';
+    import { flameJsonGenerator } from '@frontend/utils/flameJsonGenerator';
+
+    import echarts from 'echarts/lib/echarts';
+    import 'echarts/lib/chart/pie';
+    import 'echarts/lib/component/tooltip';
+
+    import * as d3 from "d3";
+    import { flamegraph, defaultFlamegraphTooltip } from 'd3-flame-graph';
+    import 'd3-flame-graph/dist/d3-flamegraph.css';
+
+    const columns = [
+        {
+            title: 'Type',
+            dataIndex: 'type'
+        },
+        {
+            title: 'Count',
+            dataIndex: 'count'
+        },
+        {
+            title: 'Total time',
+            dataIndex: 'totalTime'
+        },
+        {
+            title: 'Average time',
+            dataIndex: 'averageTime'
+        }
+    ]
+
+    const data = [{
+        key: '1',
+        type: 'compiled',
+        count: '0',
+        totalTime: '0 ms',
+        averageTime: '0 ms'
+    }, {
+        key: '2',
+        type: 'inited',
+        count: '0',
+        totalTime: '0 ms',
+        averageTime: '0 ms'
+    }, {
+        key: '3',
+        type: 'created',
+        count: '0',
+        totalTime: '0 ms',
+        averageTime: '0 ms'
+    }, {
+        key: '4',
+        type: 'attached',
+        count: '0',
+        totalTime: '0 ms',
+        averageTime: '0 ms'
+    }, {
+        key: '5',
+        type: 'detached',
+        count: '0',
+        totalTime: '0 ms',
+        averageTime: '0 ms'
+    }, {
+        key: '6',
+        type: 'disposed',
+        count: '0',
+        totalTime: '0 ms',
+        averageTime: '0 ms'
+    }, {
+        key: '7',
+        type: 'updated',
+        count: '0',
+        totalTime: '0 ms',
+        averageTime: '0 ms'
+    }];
+
+    const pieOptions = {
+        tooltip: {
+            trigger: 'item',
+            formatter: '{a} <br/>{b}: {c} ms ({d}%)'
+        },
+        series: [
+            {
+                name: '生命周期平均耗时',
+                type: 'pie',
+                radius: ['50%', '70%'],
+                avoidLabelOverlap: false,
+                label: {
+                    show: false,
+                    position: 'center'
+                },
+                emphasis: {
+                    label: {
+                        show: true,
+                        fontSize: '18',
+                        fontWeight: 'bold'
+                    }
+                },
+                labelLine: {
+                    show: true
+                },
+                data: []
+            }
+        ]
+    }
+
+    export default connectStore({
+        bridge: 'bridge',
+        profilerInfo: 'profilerInfo',
+        profilerTime: 'profilerTime',
+        currentTime: 'currentTime',
+        componentComponentId: 'componentComponentId'
+    })(
+        {
+            dataTypes: {
+                /* props */
+                bridge: DataTypes.object,
+                profilerInfo: DataTypes.object,
+                /* state */
+            },
+            components: {
+                'san-table': Table,
+                'san-icon': Icon,
+                'santd-icon': StandIcon,
+                'san-drop-down': DropDown,
+                'san-menu': Menu,
+                'san-menu-item': Menu.Item,
+                'san-tooltip': Tooltip,
+                'sand-input': SdInput
+            },
+            computed: {
+                data() {
+                    let profilerInfo = this.data.get('profilerInfo');
+                    if (!profilerInfo || !profilerInfo.hooks) {
+                        return [];
+                    }
+                    let res = data.map((item, index) => {
+                        let hookData = profilerInfo.hooks[`comp-${item.type}`];
+                        if (!hookData) {
+                            return item;
+                        }
+                        let { count, totalTime } = hookData;
+                        let averageTime = (+totalTime / +count).toFixed(1);
+                        totalTime = +totalTime.toFixed(1);
+                        let newHookData = {
+                            count: count + '',
+                            totalTime: `${totalTime} ms`,
+                            averageTime: `${averageTime} ms`
+                        }
+                        return Object.assign({}, item, newHookData);
+                    });
+                    return res;
+                }
+            },
+
+            initData() {
+                return {
+                    columns,
+                    data,
+                    recording: false,
+                    selectedKeys: '0',
+                    flameOptions: {
+                        fill: '#999999'
+                    },
+                    showFlame: false,
+                    filterText: ''
+                    // santd bug，menu 作为 slot 的情况下，当具备 prefixCls 的时候动态设置数据样式混乱
+                    // prefixCls: 'san-devtools'
+                }
+            },
+
+            attached() {
+                // 基于准备好的dom，初始化echarts实例
+                this.pie = echarts.init(document.getElementById('sand-pie'));
+                // 绘制图表
+                this.setPieData();
+                this.watch('data', value => {
+                    this.setPieData(value);
+                });
+                // 初始化火焰图 tootip
+                let tip = defaultFlamegraphTooltip()
+                    .html(function (d) {
+                        if ('componentId' in d.data && 'hookName' in d.data) {
+                            return `${d.data.name}:${d.data.componentId}:${d.data.hookName}:${d.data.value}`;
+                        }
+                        else {
+                            return `生命周期总耗时:${d.data.value}`;
+                        }
+                    });
+                // 初始化火焰图容器
+                this.chart = flamegraph()
+                    .width(960)
+                    .inverted(true)
+                    .tooltip(tip)
+                    .setSearchHandler(this.flameSearch.bind(this))
+                    .setSearchMatch(this.flameSearchMatch.bind(this))
+                    .onClick(this.flameHighlight.bind(this))
+                    .setColorHue('warm');
+                // watch 数据来生成火焰图
+                this.watch('currentTime', currentTime => {
+                    if (this.data.get('showFlame')) {
+                        this.generateFlame();
+                    }
+                });
+                // 搜索火焰图数据
+                this.watch('filterText', filterText => {
+                    this.chart.search(filterText);
+                });
+            },
+
+            record() {
+                let recording = !this.data.get('recording');
+                this.data.set('recording', recording);
+                if (recording) {
+                    // 设置开始记录的标记
+                    store.dispatch('beginRecord', toLocaleDatetime(new Date(), 'yyyy-MM-dd hh:mm:ss'));
+                }
+                // 设置火焰图
+                this.data.set('showFlame', false);
+                this.data.set('flameOptions.fill', '#999999');
+                // 重置选中的组件
+                this.data.get('bridge').send('Profiler.getProfilerInfo', '');
+                this.data.get('bridge').send('Profiler.profilerRecording', { recording });
+            },
+
+            flameClick() {
+                if (this.data.get('recording')) {
+                    return;
+                }
+                let showFlame = this.data.get('showFlame');
+                if (showFlame) {
+                    this.data.set('showFlame', false);
+                    this.data.set('flameOptions.fill', '#999999');
+                }
+                else {
+                    this.data.set('showFlame', true);
+                    this.data.set('flameOptions.fill', 'red');
+                    // TODO：体验优化，定时器以及 loading
+                    this.generateFlame();
+                }
+            },
+
+            generateFlame() {
+                let profilerDataStore = store.getState('profilerDataStore');
+                let currentTime = store.getState('currentTime');
+                currentTime = currentTime.replace(/[\s-:]/ig, '');
+                let originData = profilerDataStore[currentTime] || {};
+                let flameData = flameJsonGenerator(originData);
+                d3.select("#sand-d3-flame-container")
+                    .datum(flameData)
+                    .call(this.chart)
+            },
+
+            flameHighlight(d) {
+                if (!d || !d.data || !d.data.componentId) {
+                    return;
+                }
+                this.data.get('bridge') && this.data.get('bridge').send('Inspect.highlight', d.data.componentId);
+            },
+
+            flameSearch(searchResults, searchSum, totalValue) {
+                // console.log('setSearchHandler', searchResults, searchSum, totalValue);
+            },
+
+            flameSearchMatch(d, term) {
+                if (!term) {
+                    return false;
+                }
+                let text = [d.data.name, d.data.componentId, d.data.hookName];
+                let reg;
+                try {
+                    reg = new RegExp(term, 'ig');
+                } catch(err) {return false;}
+                return reg.test(text);
+            },
+
+            setPieData(data = []) {
+                let pieData = data.map((item, index) => {
+                    return {
+                        value: +item.averageTime.replace(' ms', ''),
+                        name: item.type
+                    }
+                });
+                pieOptions.series[0].data = pieData;
+                this.pie.setOption(pieOptions, true);
+            },
+
+            menuClick({ key }) {
+                let profilerTime = this.data.get('profilerTime');
+                store.dispatch('setCurrentTime', profilerTime[key]);
+            }
+        }
+    )
+</script>
+
+<style lang="less">
+    @import '@frontend/views/style/variables.less';
+    @start-record-color: #ec3b11;
+    .santd-dropdown {
+        .santd-dropdown-content {
+            .santd-menu {
+                border: none !important;
+                box-shadow: 0 2px 8px 0 rgba(189, 189, 189, 0.3);
+                border-radius: 6px;
+                .santd-menu-item-selected {
+                    color: #1968fa;
+                    background-color: #e6f0ff;
+                }
+                .santd-menu-item {
+                    margin: 0;
+                    &:first-child {
+                        border-top-left-radius: 6px;
+                        border-top-right-radius: 6px;
+                    }
+                    &:last-child {
+                        border-bottom-left-radius: 6px;
+                        border-bottom-right-radius: 6px;
+                    }
+                }
+            }
+        }
+    }
+    .sand-profiler-info-wrap {
+        .sand-d3-flame-wrapper-hide {
+            display: none;
+        }
+        .sand-d3-flame-wrapper {
+            z-index: 10;
+            position: fixed;
+            left: 50%;
+            background-color: @color-white;
+            transform: translateX(-50%);
+            top: 200px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px 0 rgba(189, 189, 189, 0.3);
+            .sand-d3-flame-container {
+                padding: 100px 20px;
+                overflow: auto;
+            }
+            .sand-d3-flame-header {
+                display: flex;
+                justify-content: flex-start;
+                align-items: center;
+                padding: 10px 20px;
+                &-title {
+                    display: inline-block;
+                    font-size: 16px;
+                    font-weight: 600;
+                    margin-right: 20px;
+                }
+                &-filter {
+                    flex: 1;
+                    padding: 0 10px;
+                    display: inline-block;
+                }
+            }
+        }
+        .sand-profiler-action {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            height: 36px;
+            &-drop {
+                padding: 6px 20px;
+                border-radius: 6px;
+                user-select: none;
+                .sand-drop-icon {
+                    transform: rotate(-90deg);
+                    margin-left: 20px;
+                }
+            }
+            &-btns-disabled {
+                cursor: not-allowed;
+            }
+            &-icon {
+                font-size: 24px;
+                display: flex;
+                padding: 0 11px;
+                .Icon {
+                    border: 1px solid transparent;
+                }
+                .Icon:hover {
+                    border-radius: 50%;
+                    background-color: @icon-hover-bg-color;
+                    border: 1px solid @icon-hover-border-color;
+                }
+            }
+            .start-record {
+                color: @start-record-color;
+            }
+        }
+        .sand-profiler-info-table {
+            width: 100%;
+            background-color: @color-white;
+            border-radius: 6px;
+            .santd-table {
+                padding: 0 8px;
+                .santd-table-thead > tr > th {
+                    border: 0;
+                    background: @color-white;
+                }
+                .santd-table-placeholder {
+                    padding-top: 80px;
+                    padding-bottom: 80px;
+                    border: 0;
+                }
+                .santd-table-scroll {
+                    border-radius: 18px;
+                }
+                .santd-table-body {
+                    table {
+                        border: 0 !important;
+                    }
+                }
+                .santd-table-tbody > tr {
+                    box-shadow: 0 1px 0px 0 @color-white-e;
+                }
+                .santd-table-tbody > tr > td {
+                    border: 0;
+                    padding: 6px 16px;
+                }
+                .santd-table-tbody > tr:hover:not(.santd-table-expanded-row):not(.santd-table-row-selected) > td {
+                    background: @color-blue-l2;
+                    &:first-child {
+                        border-top-left-radius: 8px;
+                        border-bottom-left-radius: 8px;
+                    }
+                    &:last-child {
+                        border-top-right-radius: 8px;
+                        border-bottom-right-radius: 8px;
+                    }
+                }
+            }
+        }
+        .sand-pie-wrap {
+            background-color: @color-white;
+            border-radius: 6px;
+            margin-top: 16px;
+            padding: 16px 24px 0;
+            width: 100%;
+            .sand-pie-title {
+                font-size: 16px;
+                font-weight: 600;
+            }
+            .sand-pie {
+                width: 200px;
+                height: 200px;
+                margin: 0 auto;
+            }
+        }
+    }
+    .san-devtools-dark {
+        .santd-dropdown {
+            .santd-dropdown-content {
+                .santd-menu {
+                    color: @color-white;
+                    background: @dark-setting-bg-color;
+                    box-shadow: 0 2px 8px 0 @dark-setting-shadow-color;
+                    .santd-menu-item-selected {
+                        color: @color-white;
+                        background-color: @dark-setting-hover-bg-color;
+                    }
+                    .santd-menu-item:not(:first-child) {
+                        border-top: 1px solid @dark-setting-border-top-color;
+                    }
+                }
+            }
+        }
+        .sand-d3-flame-wrapper {
+            color: @color-white;
+            background: #272b2e;
+            box-shadow: 0 2px 8px 0 @dark-setting-shadow-color;
+        }
+        .sand-profiler-info-wrap {
+            .sand-profiler-action {
+                color: @color-white;
+                &-icon {
+                    .Icon:hover {
+                        background-color: @dark-icon-hover-bg-color;
+                        border: 1px solid @dark-icon-hover-border-color;
+                    }
+                }
+            }
+            .sand-profiler-info-table {
+                background-color: #272b2e;
+                .santd-table {
+                    .santd-table-header,
+                    .santd-table-body,
+                    .santd-table-placeholder,
+                    .santd-table-thead > tr > th {
+                        background-color: #272b2e !important;
+                        color: @color-white;
+                    }
+                    .santd-empty-description {
+                        color: @color-white;
+                    }
+                    .santd-table-tbody > tr {
+                        box-shadow: 0 1px 0px 0 rgba(238, 238, 238, 0.1);
+                    }
+                    .santd-table-tbody > tr:hover:not(.santd-table-expanded-row):not(.santd-table-row-selected) > td {
+                        background: @color-blue-l2;
+                    }
+                }
+            }
+            .sand-pie-wrap {
+                background-color: #272b2e;
+                color: @color-white;
+            }
+        }
+    }
+</style>

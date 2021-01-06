@@ -9,6 +9,7 @@ function initHookData(hook: DevToolsHook<{}>) {
     hook.messageRecording = false;
     hook.eventRecording = false;
     hook.recording = false;
+    hook.profilerRecording = false;
 }
 
 // const target: global = typeof navigator !== 'undefined' ? window : typeof global !== 'undefined' ? global : {};
