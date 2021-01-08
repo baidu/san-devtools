@@ -126,6 +126,11 @@
                             label: 'History',
                             icon: 'history',
                             value: 'history'
+                        },
+                        {
+                            label: 'Profiler',
+                            icon: 'profiler',
+                            value: 'profiler'
                         }
                     ],
                     currentTab: 'component'
@@ -193,16 +198,6 @@
                                 { label: 'Readonly for event.', value: 'Setting:event', checked: false },
                                 { label: 'Readonly for messages.', value: 'Setting:messages', checked: false }
                             ]
-                        );
-                    }
-                    if (versionCompare(sanVersion, '3.10.1') >= 0) {
-                        this.data.push(
-                            'tabs',
-                            {
-                                label: 'Profiler',
-                                icon: 'profiler',
-                                value: 'profiler'
-                            }
                         );
                     }
                     this.initOptions()

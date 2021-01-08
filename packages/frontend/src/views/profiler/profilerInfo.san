@@ -58,10 +58,12 @@
                     <sand-input
                         placeholder="Find Flame"
                         filterText="{=filterText=}"
+                        on-pressEnter="pressEnter"
                     >
                     </sand-input>
                 </div>
             </div>
+            <div s-if="{{flameLoading}}" class="sand-d3-flame-loading">generate flame-graph-data...</div>
             <div id="sand-d3-flame-container" class="sand-d3-flame-container"></div>
         </div>
     </div>
@@ -88,6 +90,7 @@
     import * as d3 from "d3";
     import { flamegraph, defaultFlamegraphTooltip } from 'd3-flame-graph';
     import 'd3-flame-graph/dist/d3-flamegraph.css';
+import { setTimeout } from 'timers';
 
     const columns = [
         {
@@ -241,7 +244,8 @@
                         fill: '#999999'
                     },
                     showFlame: false,
-                    filterText: ''
+                    filterText: '',
+                    flameLoading: false
                     // santd bug，menu 作为 slot 的情况下，当具备 prefixCls 的时候动态设置数据样式混乱
                     // prefixCls: 'san-devtools'
                 }
@@ -273,17 +277,24 @@
                     .setSearchHandler(this.flameSearch.bind(this))
                     .setSearchMatch(this.flameSearchMatch.bind(this))
                     .onClick(this.flameHighlight.bind(this))
-                    .setColorHue('warm');
+                    .setColorHue('warm')
+                    // 设置高亮颜色
+                    .setColorMapper(function(d, originalColor) {
+                        return d.highlight ? '#1968fa' : originalColor;
+                    });
                 // watch 数据来生成火焰图
                 this.watch('currentTime', currentTime => {
                     if (this.data.get('showFlame')) {
-                        this.generateFlame();
+                        this.data.set('flameLoading', true);
+                        this.nextTick(this.generateFlame.bind(this));
                     }
                 });
-                // 搜索火焰图数据
-                this.watch('filterText', filterText => {
-                    this.chart.search(filterText);
-                });
+            },
+
+            // 回车搜索火焰图数据
+            pressEnter() {
+                let filterText = this.data.get('filterText');
+                this.chart.search(filterText);
             },
 
             record() {
@@ -313,8 +324,8 @@
                 else {
                     this.data.set('showFlame', true);
                     this.data.set('flameOptions.fill', 'red');
-                    // TODO：体验优化，定时器以及 loading
-                    this.generateFlame();
+                    this.data.set('flameLoading', true);
+                    setTimeout(this.generateFlame.bind(this), 0);
                 }
             },
 
@@ -324,9 +335,12 @@
                 currentTime = currentTime.replace(/[\s-:]/ig, '');
                 let originData = profilerDataStore[currentTime] || {};
                 let flameData = flameJsonGenerator(originData);
-                d3.select("#sand-d3-flame-container")
-                    .datum(flameData)
-                    .call(this.chart)
+                this.data.set('flameLoading', false);
+                this.nextTick(() => {
+                    d3.select("#sand-d3-flame-container")
+                        .datum(flameData)
+                        .call(this.chart);
+                });
             },
 
             flameHighlight(d) {
@@ -399,6 +413,14 @@
         }
     }
     .sand-profiler-info-wrap {
+        .sand-d3-flame-mask {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            top: 0;
+            background: rgba(0,0,0,0.65);
+        }        
         .sand-d3-flame-wrapper-hide {
             display: none;
         }
@@ -414,6 +436,10 @@
             .sand-d3-flame-container {
                 padding: 100px 20px;
                 overflow: auto;
+            }
+            .sand-d3-flame-loading {
+                text-align: center;
+                margin: 10px;
             }
             .sand-d3-flame-header {
                 display: flex;
@@ -549,6 +575,9 @@
             color: @color-white;
             background: #272b2e;
             box-shadow: 0 2px 8px 0 @dark-setting-shadow-color;
+            .sand-d3-flame-loading {
+                color: @color-white;
+            }
         }
         .sand-profiler-info-wrap {
             .sand-profiler-action {
