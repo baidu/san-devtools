@@ -113,7 +113,6 @@ export default class FrontendReceiver extends EventEmitter {
                 'bridge',
                 'settings',
                 'wsDisconnected',
-                'treeData',
                 'activeTab'
             ]
         });
