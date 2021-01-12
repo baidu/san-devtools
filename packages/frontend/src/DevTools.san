@@ -37,6 +37,13 @@
             >
                 <sandevtool-history />
             </div>
+            <div
+                s-if="!wsDisconnected"
+                id="profiler_containter"
+                class="{{prefix}}-container {{containerShown.profiler ? 'show' : ''}}"
+            >
+                <sandevtool-profiler />
+            </div>
         </san-row>
     </div>
 </template>
@@ -51,6 +58,7 @@
     import History from '@frontend/views/history.san';
     import Message from '@frontend/views/message.san';
     import Event from '@frontend/views/event.san';
+    import Profiler from '@frontend/views/profiler/profiler.san';
 
     import { store, connectStore } from './store';
 
@@ -73,7 +81,8 @@
                 'sandevtool-store': Store,
                 'sandevtool-history': History,
                 'sandevtool-message': Message,
-                'sandevtool-event': Event
+                'sandevtool-event': Event,
+                'sandevtool-profiler': Profiler
             },
 
             initData() {
@@ -84,7 +93,8 @@
                         'store': false,
                         'history': false,
                         'message': false,
-                        'event': false
+                        'event': false,
+                        'profiler': false
                     },
                     prefix: 'san-devtools'
                 }

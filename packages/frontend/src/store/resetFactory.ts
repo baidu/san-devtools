@@ -13,6 +13,9 @@ export function actionCreator(actionOptions: StoreItem) {
     let {initData, actions} = actionOptions;
     let resetActions: Record<string, any> = {};
     Object.entries(initData).forEach(([key, val]) => {
+        if (Array.isArray(initData[key])) {
+            val = val.slice();
+        }
         resetActions[`${prefix}${key}`] = function () {
             return builder().set(key, val);
         };

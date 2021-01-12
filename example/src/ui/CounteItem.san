@@ -1,12 +1,19 @@
 <template>
-    <span>
-        <span on-click="testMessage">打酱油的，删除/增加</span>
-    </span>
+    <div>
+        <son1 />
+        <son2 />
+    </div>
 </template>
 
 <script>
+import CounterItemSon1 from './CounterItemSon1.san';
+import CounterItemSon2 from './CounterItemSon2.san';
 let count = 0;
 export default {
+    components: {
+        'son1': CounterItemSon1,
+        'son2': CounterItemSon2
+    },
     initData() {
         return {
 

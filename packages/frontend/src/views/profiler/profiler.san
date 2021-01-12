@@ -1,0 +1,78 @@
+<template>
+    <div class="sand-profiler-wrapper">
+        <sd-basic-layout prefix="profiler" s-if="hasProfiler">
+            <sandevtool-profiler-list slot="left"/>
+            <sandevtool-profiler-info slot="right"/>
+        </sd-basic-layout>
+        <div s-else class="profiler-empty">
+            The Profiler-Panel is only for 3.10.1+ version of <a target="_blank" href="https://github.com/baidu/san/releases/tag/{{sanVersion}}">San.js</a>
+            <br/>Your San.js is lower than 3.10.1
+        </div>
+    </div>
+</template>
+
+<script>
+    import san, { DataTypes } from 'san';
+    import Split from 'split.js';
+    import {versionCompare} from '@shared/utils/versionCompare';
+    import { connectStore, store } from '@frontend/store/index';
+
+    import BasicLayout from '@frontend/components/layout/basicLayout.san';
+    import ProfilerList from './profilerList.san';
+    import ProfilerInfo from './profilerInfo.san';
+
+    export default connectStore({
+        bridge: 'bridge',
+        sanVersion: 'sanVersion'
+    })(
+        {
+            components: {
+                'sandevtool-profiler-list': ProfilerList,
+                'sandevtool-profiler-info': ProfilerInfo,
+                'sd-basic-layout': BasicLayout
+            },
+
+            initData() {
+                return {
+                    index: -1
+                };
+            },
+
+            computed: {
+                hasProfiler() {
+                    let sanVersion = this.data.get('sanVersion');
+                    return versionCompare(sanVersion, '3.10.1') >= 0;
+                }
+            },
+
+            attached() {
+                this.data.get('bridge').send('Profiler.getFirstReanderProfilerData', '');
+                this.watch('bridge', bridge => {
+                    bridge.send('Profiler.getFirstReanderProfilerData', '');
+                });
+            },
+
+            dataTypes: {
+                index: DataTypes.number
+            }
+        }
+    )
+
+</script>
+
+<style lang="less">
+@import '@frontend/views/style/variables.less';
+.sand-profiler-wrapper {
+    width: 100%;
+    height: 100%;
+    .profiler-empty {
+        color: @color-grey;
+        text-align: center;
+        transform: translateY(-50%);
+        position: relative;
+        top: 40%;
+        font-size: 1.2vw;
+        padding: 0 30px;
+    }
+}
+</style>

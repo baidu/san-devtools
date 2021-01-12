@@ -74,8 +74,6 @@ export class ComponentAgent extends Agent {
             }
             default: break;
         }
-        // TODO: 这里需要发送消息给Bridge，处理好old和new
-        // this.sendToFrontend(evtName, component);
     }
 
     setupHook() {
