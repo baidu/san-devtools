@@ -10,7 +10,6 @@ function initHookData(hook: DevToolsHook<{}>) {
     hook.profilerRecording = false;
 }
 
-// const target: global = typeof navigator !== 'undefined' ? window : typeof global !== 'undefined' ? global : {};
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function initBackend(hook: DevToolsHook<{}>, bridge: Bridge, global: any) {
     // san 注册成功之后，组件视实例化之前注册对应的 agent

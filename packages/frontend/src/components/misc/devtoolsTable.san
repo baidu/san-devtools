@@ -233,7 +233,7 @@
     @import '@frontend/views/style/variables.less';
     @start-record-color: #ec3b11;
     .sd-list {
-        margin: 20px 14px;
+        margin: 20px 14px 0;
         border-radius: 18px;
         background-color: @color-white;
         .button-wrapper,

@@ -12,15 +12,6 @@ import {
 import CircularJSON from '@shared/utils/circularJSON';
 
 export class StoreAgent extends Agent {
-    sendToFrontend(evtName: string, data: any) {
-        if (this.hook.devtoolReady) {
-            this.bridge.send(evtName, data);
-        } else {
-            this.hook.ready(() => {
-                this.bridge.send(evtName, data);
-            }, false);
-        }
-    }
     setupHook() {
         // 生命周期监听
         SAN_STORE_HOOK.map(evtName => {
@@ -33,7 +24,6 @@ export class StoreAgent extends Agent {
         switch (evtName) {
             /**
              * 页面 import san-store: 创建默认的 store，new Store({name: '__default__'})
-             * TODO: 这个感觉可以去掉，没啥用，还是存一下吧
              */
             case 'store-default-inited': {
                 let {store} = data;

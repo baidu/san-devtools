@@ -15,8 +15,9 @@ export function inspectSanInstance(component: Component, idPath: string[]) {
 
 // 根据该 dom 上是否存在 idPath 来判断是否是 san 组件
 type ISanEl = Element & {'__SAN_INS_ID_PATH__'?: string} | null;
+
 /**
- * 从当前 dom 开始往上找，知道 dom 具备 __SAN_INS_ID_PATH_
+ * 从当前 dom 开始往上找，直到 dom 具备 __SAN_INS_ID_PATH_
  * @param el
  */
 export function findRelatedComponentId(el: ISanEl) {
@@ -29,7 +30,10 @@ export function findRelatedComponentId(el: ISanEl) {
     return el[sanInternalIdPath];
 }
 
-// 当 san-app 页面的 dom 被右键点击的时候，找到上层san组件对应的 dom
+/**
+ * 当 san-app 页面的 dom 被右键点击的时候，找到上层san组件对应的 dom
+ * @param {DevToolsHook<{}>} hook 钩子
+ */
 export function setupInspectInstance(hook: DevToolsHook<{}>) {
     if (typeof navigator === 'undefined') {
         return;

@@ -4,7 +4,6 @@
  */
 
 export function relay() {
-    //  TODO: background.js 中监听该connect触发的链接事件
     const port = chrome.runtime.connect({
         name: 'content-script'
     });
