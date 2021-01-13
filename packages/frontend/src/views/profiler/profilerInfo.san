@@ -63,7 +63,11 @@
                     </sand-input>
                 </div>
             </div>
-            <div s-if="{{flameLoading}}" class="sand-d3-flame-loading">generate flame-graph-data...</div>
+            <sand-spin
+                class="sand-spin"
+                tip="generating flame-graph-data.."
+                spinning="{{flameLoading}}"
+            />
             <div id="sand-d3-flame-container" class="sand-d3-flame-container"></div>
         </div>
     </div>
@@ -73,7 +77,7 @@
     import san, { DataTypes } from 'san';
     import { connectStore, store } from '@frontend/store/index';
 
-    import { Table, Menu, Icon as StandIcon, Tooltip } from 'santd';
+    import { Table, Menu, Icon as StandIcon, Tooltip, Spin } from 'santd';
     import DropDown from 'santd/es/dropdown';
     import 'santd/es/dropdown/style/index.less';
 
@@ -208,7 +212,8 @@
                 'san-menu': Menu,
                 'san-menu-item': Menu.Item,
                 'san-tooltip': Tooltip,
-                'sand-input': SdInput
+                'sand-input': SdInput,
+                'sand-spin': Spin
             },
             computed: {
                 data() {
@@ -435,6 +440,12 @@
             top: 200px;
             border-radius: 10px;
             box-shadow: 0 2px 8px 0 rgba(189, 189, 189, 0.3);
+            .sand-spin {
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+            }
             .sand-d3-flame-container {
                 display: flex;
                 justify-content: center;
