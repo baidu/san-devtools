@@ -26,7 +26,7 @@ interface MutationData {
     id: string;
     parentId: string;
     diff: Record<string, any>;
-    changedTarget: string
+    changedTarget: string;
 }
 
 interface ActionData {
@@ -251,7 +251,6 @@ export function getMutationData(data: any = {}, storeName: string): MutationData
 
     let timeRange = getTimeRange(startTime, endTime);
     let status = !!done ? 'done' : 'pendding';
-    // TODO: 应该frontend来组装treeData，否则通讯还是传递了冗余，并且随着时间的推移，树越来越庞大
     // mutation backend 不需要存储，在点开 mutation 详情面板并修改数据的时候直接找到 store name 以及相关数据直接操作 store
     return {
         storeName: storeName,
@@ -296,21 +295,21 @@ export function dispatchAction(hook: DevToolsHook<{}>, message: IDispatchMsg) {
 }
 
 function getStrFromObject(mapData: Record<string, any>) {
-    if (Object.prototype.toString.call(mapData) === "[object Object]") {
+    if (Object.prototype.toString.call(mapData) === '[object Object]') {
         return Object.entries(mapData).map(item => {
             let value = '-';
-            switch(typeof item[1]) {
+            switch (typeof item[1]) {
                 case 'string': {
                     value = item[1];
                     break;
                 }
                 case 'function' : {
-                    value = item[1].name
+                    value = item[1].name;
                 }
                 default: break;
             }
-            return `${item[0]}: ${value},`
-        })
+            return `${item[0]}: ${value},`;
+        });
     }
     return;
 }

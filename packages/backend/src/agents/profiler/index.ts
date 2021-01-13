@@ -51,7 +51,6 @@ export class ProfilerAgent extends Agent {
     }
 
     addListener() {
-        // profiler
         this.bridge.on('Profiler.getProfilerInfo', profilerComponentId => {
             this.hook.profilerComponentId = profilerComponentId + '';
             if (!profilerComponentId) {

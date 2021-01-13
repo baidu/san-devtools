@@ -11,7 +11,7 @@ export const SAN_COMPONENT_HOOK = [
     'comp-detached',
     'comp-disposed',
     'comp-updated',
-    // for profiler, TODO: 事件名称命名方式
+    // for profiler
     'comp-beforeCompile',
     'comp-beforeInit',
     'comp-beforeCreate',

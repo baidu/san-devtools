@@ -45,11 +45,6 @@ export interface HistoryData {
     data: any;
     event: string;
 }
-export interface RouteData {
-    id: string;
-    timestamp: number;
-    routeData: string;
-}
 
 export interface ProfilerData {
     name: string; // 组件名称
@@ -71,7 +66,6 @@ export interface HookData {
 export interface DevToolsHook<T> {
     san: any;
     data: DevToolsHookData;
-    routes: RouteData[];
     store: DevToolsHookStore;
     devtoolReady: boolean;
     sub(eventName: EventType, listener: Listener): void;
@@ -147,8 +141,6 @@ export class DevToolsHook<T> extends EventEmitter {
     eventRecording: boolean = false;
     // 记录 San devtool 事件触发列表。
     recording: boolean = false;
-    // TODO 这里是数组，要不要改成Map
-    routes: RouteData[] = [];
     // Stores 对象及相关信息，与 devtool 保持同步的 mutation list。
     storeMap: Map<string, any> = new Map();
     storeComponentMap: Map<string, any> = new Map();

@@ -61,10 +61,18 @@ export class ComponentAgent extends Agent {
                 const data: {idPath: string[]} = {
                     idPath: getComponentPath(component)
                 };
+                // 如果 fontend 选中的组件被卸载了，则通知 frontend
+                if (data.idPath.slice(-1)[0] + '' === this.hook.data.selectedComponentId + '') {
+                    this.sendToFrontend('Component.setComponentInfo', null);
+                }
                 this.sendToFrontend('Component.setTreeData', JSON.stringify({type: 'del', data}));
                 break;
             }
             case 'comp-updated': {
+                // history
+                if (this.hook.recording) {
+                    this.sendToFrontend('History.setHistory', getHistoryInfo(component, evtName));
+                }
                 // 发送更新的组件信息
                 this.hook.componentMap.set(component.id + '', component);
                 if (this.hook.data && this.hook.data.selectedComponentId === component.id + '') {
@@ -116,7 +124,7 @@ export class ComponentAgent extends Agent {
             this.hook.recording = message.recording;
         });
 
-        // 6. inspect
+        // inspect
         setupInspectInstance(this.hook);
     }
 }
