@@ -3,10 +3,12 @@ import {SAN_COMPONENT_HOOK} from '../../constants';
 import {DevToolsHook, ComponentTreeData, Component} from '../../hook';
 import Agent from '../Agent';
 import {
-    addToTreeData,
-    deleteFromTreeData,
+    getAllComponentTree,
     getComponentTree
 } from './componentTree';
+import {
+    getComponentPath
+} from '../../utils/sanHelper';
 import {
     editComponentData,
     getComponentData
@@ -31,7 +33,6 @@ export class ComponentAgent extends Agent {
                     this.sendToFrontend('History.setHistory', getHistoryInfo(component, evtName));
                 }
                 return;
-            // FIXME: 这里组件树挂载的时候由于从下往上挂载，因此会出现频繁 sendToFrontend
             case 'comp-attached': {
                 // history
                 if (this.hook.recording) {
@@ -41,13 +42,12 @@ export class ComponentAgent extends Agent {
                 this.hook.componentMap.set(String(component.id), component);
                 this.hook.data.totalCompNums = this.hook.data.totalCompNums + 1;
                 const data: ComponentTreeData = getComponentTree(this.hook, component);
+                this.hook.data.treeData.set(String(component.id), data);
                 // inspector，更新 dom 上的 idPath
                 inspectSanInstance(component, data.idPath);
-                addToTreeData(this.hook.data.treeData, data);
-                this.sendToFrontend('Component.setTreeData', JSON.stringify(this.hook.data));
+                this.sendToFrontend('Component.setTreeData', JSON.stringify({type: 'add', data}));
                 break;
             }
-            // FIXME: 这里组件树卸载的时候由于从下往上卸载，因此会出现频繁 sendToFrontend
             case 'comp-detached': {
                 // history
                 if (this.hook.recording) {
@@ -55,12 +55,13 @@ export class ComponentAgent extends Agent {
                 }
                 // component
                 this.hook.componentMap.delete(String(component.id));
+                this.hook.data.treeData.delete(String(component.id));
                 this.hook.data.totalCompNums = this.hook.data.totalCompNums - 1;
-                const data: ComponentTreeData = getComponentTree(this.hook, component);
-                // inspector，更新 dom 上的 idPath
-                inspectSanInstance(component, data.idPath);
-                deleteFromTreeData(this.hook.data.treeData, data);
-                this.sendToFrontend('Component.setTreeData', JSON.stringify(this.hook.data));
+                // 删除只需要 idPath 即可
+                const data: {idPath: string[]} = {
+                    idPath: getComponentPath(component)
+                };
+                this.sendToFrontend('Component.setTreeData', JSON.stringify({type: 'del', data}));
                 break;
             }
             case 'comp-updated': {
@@ -90,7 +91,8 @@ export class ComponentAgent extends Agent {
     /* eslint-disable  @typescript-eslint/no-empty-function */
     addListener() {
         this.bridge.on('Component.getTreeData', () => {
-            this.sendToFrontend('Component.setTreeData', JSON.stringify(this.hook.data));
+            let treeData = getAllComponentTree(this.hook);
+            this.sendToFrontend('Component.setTreeData', JSON.stringify(treeData));
         });
 
         // 监听组件信息获取信号，并返回结果

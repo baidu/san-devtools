@@ -4,7 +4,6 @@
     >
         <div
             class="san-devtool-loading-toast-content"
-            style="{{loadingToastContentStyle}}"
         >
             {{loadingToast}}
         </div>
@@ -16,25 +15,9 @@
     import SdInput from '@frontend/components/input/input.san';
     export default {
         dataTypes: {
-            loadingToastContentFromColor: DataTypes.string,
-            loadingToastContentToColor: DataTypes.string,
             loadingToast: DataTypes.string,
             progress: DataTypes.number,
             loading: DataTypes.bool
-        },
-        computed: {
-            loadingToastContentStyle() {
-                let fromColor = this.data.get('loadingToastContentFromColor');
-                let toColor = this.data.get('loadingToastContentToColor');
-                let progress = this.data.get('progress');
-                let leftBound = Math.max(0, progress - 3);
-                let rightBound = Math.min(100, progress + 3);
-                return {
-                    'background-image':
-                        `linear-gradient(to right, ${fromColor} ${leftBound}%,
-                        ${toColor} ${rightBound}%, ${toColor})`
-                };
-            }
         }
     }
 </script>

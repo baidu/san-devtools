@@ -1,5 +1,10 @@
 <template>
     <div class="sm-tree-view-wrapper custom">
+        <sand-spin
+            class="sand-spin"
+            tip="{{loadingToast}}"
+            spinning="{{generatingTreeData}}"
+        />
         <san-tree-view
             totalNums="{{totalCompNums}}"
             defaultSelectedIdPath="{{defaultSelectedIdPath}}"
@@ -14,11 +19,6 @@
             initiallyOpen="{{!0}}"
             primaryTogglesNestedTreeView="{{!0}}"
             dataSource="JSON"
-            loadingToast="{{loadingToast}} {{processingComponentInfo}}"
-            loading="{=loading=}"
-            loadingToastContentFromColor="rgba(0, 175, 255, 1)"
-            loadingToastContentToColor="#fff"
-            progress="{=progress=}"
             type="component"
         >
         </san-tree-view>
@@ -27,6 +27,7 @@
 
 <script>
     import san, { DataTypes } from 'san';
+    import { Spin } from 'santd';
     import { connectStore, store } from '@frontend/store/index';
     import TreeView from '@frontend/components/treeView/treeView.san';
 
@@ -36,7 +37,8 @@
         treeData: 'treeData',
         totalCompNums: 'totalCompNums',
         bridge: 'bridge',
-        defaultSelectedIdPath: 'inspectedIdPathStr'
+        defaultSelectedIdPath: 'inspectedIdPathStr',
+        generatingTreeData: 'generatingTreeData'
     })({
         messages: {
             'UI:tree-view-item-click'({ value }) {
@@ -48,10 +50,21 @@
         },
         components: {
             'san-tree-view': TreeView,
+            'sand-spin': Spin
         },
 
         setInspectedId({ idPath }) {
             store.dispatch('setInspectId', idPath);
+        },
+
+        messages: {
+            'UI:treeViewUpdated'() {
+                store.dispatch('setGenerateTreeData', false);
+            }
+        },
+
+        attached() {
+            store.dispatch('setGenerateTreeData', false);
         },
 
         setSelectedComponentBaseInfo(treeData) {
@@ -81,9 +94,7 @@
             return {
                 // 默认不对执行代码进行合并处理
                 maxLengthOfExecutionCodeQueue: 10,
-                loadingToast: 'Building component tree... ',
-                loading: true,
-                processingComponentInfo: ''
+                loadingToast: 'Building component tree... '
             };
         },
 
@@ -97,8 +108,7 @@
             /* state */
             maxLengthOfExecutionCodeQueue: DataTypes.number,
             loadingToast: DataTypes.string,
-            loading: DataTypes.bool,
-            processingComponentInfo: DataTypes.string
+            setGenerateTreeData: DataTypes.bool
         },
     })
 </script>
@@ -108,5 +118,11 @@
         width: 100%;
         height: 100%;
         user-select: none;
+        .sand-spin {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
     }
 </style>

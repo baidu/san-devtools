@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="san-devtools-history-wrapper">
         <san-devtools-table
             decreasedWidth="{{decreasedWidth}}"
             data="{{data}}"
@@ -12,17 +12,16 @@
             searchTip="Use '.' as separator for search, like: [componentName].[lifecycle]"
         >
         </san-devtools-table>
-        <sand-loading
-            loadingToastContentFromColor="{{loadingToastContentFromColor}}"
-            loadingToastContentToColor="{{loadingToastContentToColor}}"
-            loadingToast="{{loadingToast}}"
-            progress="{{progress}}"
-            loading="{{loading}}"
+        <sand-spin
+            class="sand-spin"
+            tip="{{loadingToast}}"
+            spinning="{{loading}}"
         />
     </div>
 </template>
 <script>
     import san, { DataTypes } from 'san';
+    import { Spin } from 'santd';
     import { connectStore, store } from '@frontend/store/index';
     import DevtoolsTable from '@frontend/components/misc/devtoolsTable.san';
     import SdLoading from '@frontend/components/loading/loading.san';
@@ -57,18 +56,14 @@
                 /* state */
                 data: DataTypes.array,
                 decreasedWidth: DataTypes.number,
-                progress: DataTypes.number,
                 loadingToast: DataTypes.string,
-                loading: DataTypes.bool,
-                loadingToastContentFromColor: DataTypes.string,
-                loadingToastContentToColor: DataTypes.string,
                 filterText: DataTypes.string,
                 bridgeOptions: DataTypes.object,
                 columns: DataTypes.array
             },
             components: {
                 'san-devtools-table': DevtoolsTable,
-                'sand-loading': SdLoading
+                'sand-spin': Spin
             },
             clearHandler() {
                 store.dispatch('clearHistory');
@@ -89,11 +84,8 @@
             initData() {
                 return {
                     decreasedWidth: TIMESTAMP_WIDTH + EVENT_WIDTH + COMPONENT_WIDTH + REST_WIDTH,
-                    progress: 0,
                     loadingToast: 'Building history tree... ',
-                    loading: false, // TODO：假的 loading
-                    loadingToastContentFromColor: 'rgba(0, 175, 255, 1)',
-                    loadingToastContentToColor: '#fff',
+                    loading: false,
                     filterText: '',
                     bridgeOptions: {
                         bridgeName: 'History',
@@ -128,13 +120,11 @@
             },
             attached() {
                 this.watch('historyRecordings', value => {
-                    this.data.set('progress', 90);
                     this.data.set('loading', true);
                 });
             },
             updated() {
                 setTimeout(() => {
-                    this.data.set('progress', 0);
                     this.data.set('loading', false);
                 }, 0);
             }
@@ -142,4 +132,12 @@
     )
 </script>
 <style lang="less">
+.san-devtools-history-wrapper {
+    .sand-spin {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+    }
+}
 </style>

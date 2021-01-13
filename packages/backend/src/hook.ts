@@ -85,7 +85,7 @@ export interface DevToolsHook<T> {
 export interface DevToolsHookData {
     totalCompNums: number;
     selectedComponentId: string;
-    treeData: ComponentTreeData[];
+    treeData: Map<string, ComponentTreeData>;
 }
 export interface DevToolsHookStore {
     stores: any;
@@ -131,7 +131,7 @@ export class DevToolsHook<T> extends EventEmitter {
     data: DevToolsHookData = {
         totalCompNums: 0,
         selectedComponentId: '',
-        treeData: []
+        treeData: new Map()
     };
     // profiler data
     profilerData: Map<string, ProfilerData> = new Map();

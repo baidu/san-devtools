@@ -257,7 +257,6 @@
                 this.watch('profilerTime', value => {
                     // 设置menu选中项
                     let index = value.length - 1 || 0;
-                    console.log('profilerTime', value.length);
                     this.data.set('selectedKeys', [index]);
                 });
                 const flameWidth = document.documentElement.offsetWidth * FlAME_WRAPPER_WIDTH_RATIO - FlAME_WRAPPER_PADDING_WIDTH

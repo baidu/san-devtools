@@ -15,7 +15,7 @@
                                 </span>
                             </san-col>
                             <san-col span="12" s-else>
-                                {{info.value}}
+                                {{info.value === 'undefined' ? '-' : info.value}}
                             </san-col>
                         </san-row>
                     </div>
