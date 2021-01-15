@@ -45,13 +45,6 @@
                 }
             },
 
-            attached() {
-                this.data.get('bridge').send('Profiler.getFirstReanderProfilerData', '');
-                this.watch('bridge', bridge => {
-                    bridge.send('Profiler.getFirstReanderProfilerData', '');
-                });
-            },
-
             dataTypes: {
                 index: DataTypes.number
             }
