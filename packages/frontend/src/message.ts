@@ -50,6 +50,7 @@ export default class FrontendReceiver extends EventEmitter {
         store.dispatch('setWsDisconnected', false);
         store.dispatch('setSanVersion', d);
         this._bridge.send('Component.getTreeData', '');
+        this._bridge.send('Profiler.getFirstReanderProfilerData', '');
     }
     onTreeData(data: any) {
         // do something

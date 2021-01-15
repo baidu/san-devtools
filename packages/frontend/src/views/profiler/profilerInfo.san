@@ -37,9 +37,8 @@
                 <span>{{currentTime}}<santd-icon class="sand-drop-icon" type="left"/></span>
             </san-drop-down>
         </div>
-        <div class="sand-profiler-info-table">
+        <div class="sand-profiler-info-table" s-if="data.length > 0">
             <san-table
-                s-if="data.length > 0"
                 pagination="{{false}}"
                 columns="{{columns}}"
                 data="{{data}}"
@@ -47,6 +46,7 @@
             >
             </san-table>
         </div>
+        <div class="sand-guide" s-else>Please select a component to inspect the detailed performance data.</div>
         <div class="sand-pie-wrap" style="visibility: {{data.length > 0 ? 'visible' : 'hidden'}}">
             <div class="sand-pie-title">生命周期平均耗时(average time)</div>
             <div id="sand-pie" class="sand-pie"></div>
@@ -63,8 +63,22 @@
                     </sand-input>
                 </div>
             </div>
-            <div s-if="{{flameLoading}}" class="sand-d3-flame-loading">generate flame-graph-data...</div>
-            <div id="sand-d3-flame-container" class="sand-d3-flame-container"></div>
+            <sand-spin
+                class="sand-spin"
+                tip="generating flame-graph-data.."
+                spinning="{{flameLoading}}"
+            />
+            <sand-flame
+                theme="warm"
+                flameWidth="{{flameWidth}}"
+                tipFn="{{flameTipFn}}"
+                inverted="{{true}}"
+                flameSearchMatch="{{flameSearchMatch}}"
+                data="{{flameData}}"
+                highlightColor="#1968fa"             
+                filterText="{{flameTerm}}"
+                on-click="flameHighlight"
+            />
         </div>
     </div>
 </template>
@@ -73,12 +87,13 @@
     import san, { DataTypes } from 'san';
     import { connectStore, store } from '@frontend/store/index';
 
-    import { Table, Menu, Icon as StandIcon, Tooltip } from 'santd';
+    import { Table, Menu, Icon as StandIcon, Tooltip, Spin } from 'santd';
     import DropDown from 'santd/es/dropdown';
     import 'santd/es/dropdown/style/index.less';
 
     import Icon from '@frontend/components/icon/icon.san';
     import SdInput from '@frontend/components/input/input.san';
+    import Flame from '@frontend/components/flame/flame.san';
 
     import { toLocaleDatetime } from '@shared/utils/dateFormator';
     import { flameJsonGenerator } from '@frontend/utils/flameJsonGenerator';
@@ -87,9 +102,6 @@
     import 'echarts/lib/chart/pie';
     import 'echarts/lib/component/tooltip';
 
-    import * as d3 from "d3";
-    import { flamegraph, defaultFlamegraphTooltip } from 'd3-flame-graph';
-    import 'd3-flame-graph/dist/d3-flamegraph.css';
     const FlAME_WRAPPER_WIDTH_RATIO = 0.8;
     const FlAME_WRAPPER_PADDING_WIDTH = 40;
 
@@ -190,15 +202,28 @@
         bridge: 'bridge',
         profilerInfo: 'profilerInfo',
         profilerTime: 'profilerTime',
-        currentTime: 'currentTime',
-        componentComponentId: 'componentComponentId'
+        currentTime: 'currentTime'
     })(
         {
             dataTypes: {
                 /* props */
                 bridge: DataTypes.object,
                 profilerInfo: DataTypes.object,
+                profilerTime: DataTypes.array,
+                currentTime: DataTypes.string,
                 /* state */
+                columns: DataTypes.array,
+                data: DataTypes.array,
+                recording: DataTypes.bool,
+                selectedKeys: DataTypes.array,
+                flameOptions: DataTypes.object,
+                showFlame: DataTypes.bool,
+                filterText: DataTypes.string,
+                flameLoading: DataTypes.bool,
+                flameData: DataTypes.object,
+                flameWidth: DataTypes.number,
+                flameSearchMatch: DataTypes.func,
+                flameTipFn: DataTypes.func
             },
             components: {
                 'san-table': Table,
@@ -208,9 +233,12 @@
                 'san-menu': Menu,
                 'san-menu-item': Menu.Item,
                 'san-tooltip': Tooltip,
-                'sand-input': SdInput
+                'sand-input': SdInput,
+                'sand-spin': Spin,
+                'sand-flame': Flame
             },
             computed: {
+                // table 数据
                 data() {
                     let profilerInfo = this.data.get('profilerInfo');
                     if (!profilerInfo || !profilerInfo.hooks) {
@@ -236,6 +264,7 @@
             },
 
             initData() {
+                const flameWidth = document.documentElement.offsetWidth * FlAME_WRAPPER_WIDTH_RATIO - FlAME_WRAPPER_PADDING_WIDTH;
                 return {
                     columns,
                     data,
@@ -245,21 +274,40 @@
                         fill: '#999999'
                     },
                     showFlame: false,
+                    // 火焰图相关数据
                     filterText: '',
-                    flameLoading: false
-                    // santd bug，menu 作为 slot 的情况下，当具备 prefixCls 的时候动态设置数据样式混乱
-                    // prefixCls: 'san-devtools'
+                    flameLoading: false,
+                    flameData: {},
+                    flameWidth,
+                    flameSearchMatch: (d, term) => {
+                        if (!term) {
+                            return false;
+                        }
+                        let text = [d.data.name, d.data.componentId, d.data.hookName];
+                        let reg;
+                        try {
+                            reg = new RegExp(term, 'ig');
+                        } catch(err) {return false;}
+                        return reg.test(text);
+                    },
+                    flameTipFn: (d) => {
+                        if ('componentId' in d.data && 'hookName' in d.data) {
+                            return `${d.data.name}:${d.data.componentId}:${d.data.hookName}:${d.data.value}`;
+                        }
+                        else {
+                            return `生命周期总耗时:${d.data.value}`;
+                        }
+                    }
                 }
             },
 
             attached() {
-                // watch profilerTime
+                // 点击记录性能的时候更新 menu 选中项
                 this.watch('profilerTime', value => {
                     // 设置menu选中项
                     let index = value.length - 1 || 0;
                     this.data.set('selectedKeys', [index]);
                 });
-                const flameWidth = document.documentElement.offsetWidth * FlAME_WRAPPER_WIDTH_RATIO - FlAME_WRAPPER_PADDING_WIDTH
                 // 基于准备好的dom，初始化echarts实例
                 this.pie = echarts.init(document.getElementById('sand-pie'));
                 // 绘制图表
@@ -267,29 +315,6 @@
                 this.watch('data', value => {
                     this.setPieData(value);
                 });
-                // 初始化火焰图 tootip
-                let tip = defaultFlamegraphTooltip()
-                    .html(function (d) {
-                        if ('componentId' in d.data && 'hookName' in d.data) {
-                            return `${d.data.name}:${d.data.componentId}:${d.data.hookName}:${d.data.value}`;
-                        }
-                        else {
-                            return `生命周期总耗时:${d.data.value}`;
-                        }
-                    });
-                // 初始化火焰图容器
-                this.chart = flamegraph()
-                    .width(flameWidth)
-                    .inverted(true)
-                    .tooltip(tip)
-                    .setSearchHandler(this.flameSearch.bind(this))
-                    .setSearchMatch(this.flameSearchMatch.bind(this))
-                    .onClick(this.flameHighlight.bind(this))
-                    .setColorHue('warm')
-                    // 设置高亮颜色
-                    .setColorMapper(function(d, originalColor) {
-                        return d.highlight ? '#1968fa' : originalColor;
-                    });
                 // watch 数据来生成火焰图
                 this.watch('currentTime', currentTime => {
                     if (this.data.get('showFlame')) {
@@ -299,12 +324,10 @@
                 });
             },
 
-            // 回车搜索火焰图数据
-            pressEnter() {
-                let filterText = this.data.get('filterText');
-                this.chart.search(filterText);
-            },
-
+            /**
+            * 操作按钮 record，menu，flame 按钮
+            */
+            // 点击记录性能数据
             record() {
                 let recording = !this.data.get('recording');
                 this.data.set('recording', recording);
@@ -320,6 +343,13 @@
                 this.data.get('bridge').send('Profiler.profilerRecording', { recording });
             },
 
+            // 选择 menu 查看对应的性能数据 
+            menuClick({ key }) {
+                let profilerTime = this.data.get('profilerTime');
+                store.dispatch('setCurrentTime', profilerTime[key]);
+            },
+
+            // 点击火焰图按钮
             flameClick() {
                 if (this.data.get('recording')) {
                     return;
@@ -337,6 +367,16 @@
                 }
             },
 
+            // 回车搜索火焰图数据
+            pressEnter() {
+                let filterText = this.data.get('filterText');
+                this.data.set('flameTerm', filterText);
+            },
+
+            /**
+            * 火焰图相关函数
+            */
+            // 生成火焰图数据
             generateFlame() {
                 let profilerDataStore = store.getState('profilerDataStore');
                 let currentTime = store.getState('currentTime');
@@ -344,13 +384,10 @@
                 let originData = profilerDataStore[currentTime] || {};
                 let flameData = flameJsonGenerator(originData);
                 this.data.set('flameLoading', false);
-                this.nextTick(() => {
-                    d3.select("#sand-d3-flame-container")
-                        .datum(flameData)
-                        .call(this.chart);
-                });
+                this.data.set('flameData', flameData);
             },
 
+            // 火焰图点击
             flameHighlight(d) {
                 if (!d || !d.data || !d.data.componentId) {
                     return;
@@ -358,22 +395,9 @@
                 this.data.get('bridge') && this.data.get('bridge').send('Inspect.highlight', d.data.componentId);
             },
 
-            flameSearch(searchResults, searchSum, totalValue) {
-                // console.log('setSearchHandler', searchResults, searchSum, totalValue);
-            },
-
-            flameSearchMatch(d, term) {
-                if (!term) {
-                    return false;
-                }
-                let text = [d.data.name, d.data.componentId, d.data.hookName];
-                let reg;
-                try {
-                    reg = new RegExp(term, 'ig');
-                } catch(err) {return false;}
-                return reg.test(text);
-            },
-
+            /**
+            * 饼图相关
+            */
             setPieData(data = []) {
                 let pieData = data.map((item, index) => {
                     return {
@@ -383,11 +407,6 @@
                 });
                 pieOptions.series[0].data = pieData;
                 this.pie.setOption(pieOptions, true);
-            },
-
-            menuClick({ key }) {
-                let profilerTime = this.data.get('profilerTime');
-                store.dispatch('setCurrentTime', profilerTime[key]);
             }
         }
     )
@@ -421,6 +440,16 @@
         }
     }
     .sand-profiler-info-wrap {
+        height: 100%;
+        .sand-guide {
+            color: @color-grey;
+            text-align: center;
+            transform: translateY(-50%);
+            position: relative;
+            top: 40%;
+            font-size: 1.2vw;
+            padding: 0 30px;
+        }
         .sand-d3-flame-wrapper-hide {
             display: none;
         }
@@ -435,6 +464,12 @@
             top: 200px;
             border-radius: 10px;
             box-shadow: 0 2px 8px 0 rgba(189, 189, 189, 0.3);
+            .sand-spin {
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+            }
             .sand-d3-flame-container {
                 display: flex;
                 justify-content: center;
