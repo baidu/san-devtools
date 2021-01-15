@@ -37,19 +37,21 @@
                 <span>{{currentTime}}<santd-icon class="sand-drop-icon" type="left"/></span>
             </san-drop-down>
         </div>
-        <div class="sand-profiler-info-table" s-if="data.length > 0">
-            <san-table
-                pagination="{{false}}"
-                columns="{{columns}}"
-                data="{{data}}"
-                bordered="{{true}}"
-            >
-            </san-table>
-        </div>
-        <div class="sand-guide" s-else>Please select a component to inspect the detailed performance data.</div>
-        <div class="sand-pie-wrap" style="visibility: {{data.length > 0 ? 'visible' : 'hidden'}}">
-            <div class="sand-pie-title">生命周期平均耗时(average time)</div>
-            <div id="sand-pie" class="sand-pie"></div>
+        <div class="sand-profiler-content">
+            <div class="sand-profiler-info-table" s-if="data.length > 0">
+                <san-table
+                    pagination="{{false}}"
+                    columns="{{columns}}"
+                    data="{{data}}"
+                    bordered="{{true}}"
+                >
+                </san-table>
+            </div>
+            <div class="sand-guide" s-else>Please select a component to inspect the detailed performance data.</div>
+            <div class="sand-pie-wrap" style="visibility: {{data.length > 0 ? 'visible' : 'hidden'}}">
+                <div class="sand-pie-title">生命周期平均耗时(average time)</div>
+                <div id="sand-pie" class="sand-pie"></div>
+            </div>  
         </div>
         <div class="sand-d3-flame-wrapper {{showFlame ? '' : 'sand-d3-flame-wrapper-hide'}}">
             <div class="sand-d3-flame-header">
@@ -68,17 +70,33 @@
                 tip="generating flame-graph-data.."
                 spinning="{{flameLoading}}"
             />
-            <sand-flame
-                theme="warm"
-                flameWidth="{{flameWidth}}"
-                tipFn="{{flameTipFn}}"
-                inverted="{{true}}"
-                flameSearchMatch="{{flameSearchMatch}}"
-                data="{{flameData}}"
-                highlightColor="#1968fa"             
-                filterText="{{flameTerm}}"
-                on-click="flameHighlight"
-            />
+            <div class="sand-d3-flame-container">
+                <sand-flame
+                    theme="warm"
+                    flameWidth="{{flameWidth}}"
+                    tipFn="{{flameTipFn}}"
+                    inverted="{{true}}"
+                    flameSearchMatch="{{flameSearchMatch}}"
+                    data="{{flameData}}"
+                    highlightColor="#1968fa"             
+                    filterText="{{flameTerm}}"
+                    on-click="flameHighlight"
+                />
+            </div>
+            <div class="sand-d3-flame-footer">
+                <span
+                    class="sand-flame-action-icon sand-d3-flame-close"
+                    on-click="flameClick"
+                >
+                    <san-icon type="close"></san-icon>
+                </span>
+                <span
+                    class="sand-flame-action-icon sand-d3-flame-reset"
+                    on-click="changeFlameWidth"
+                >
+                    <san-icon type="reset"></san-icon>
+                </span>
+            </div>
         </div>
     </div>
 </template>
@@ -263,8 +281,16 @@
                 }
             },
 
+            getFlameWidth() {
+                const rootDom = document.getElementById('san-devtools-app');
+                let flameWidth = 0;
+                rootDom &&
+                    (flameWidth = rootDom.getBoundingClientRect().width * FlAME_WRAPPER_WIDTH_RATIO - FlAME_WRAPPER_PADDING_WIDTH);
+                return flameWidth;
+            },
+
             initData() {
-                const flameWidth = document.documentElement.offsetWidth * FlAME_WRAPPER_WIDTH_RATIO - FlAME_WRAPPER_PADDING_WIDTH;
+                let flameWidth = this.getFlameWidth();
                 return {
                     columns,
                     data,
@@ -287,7 +313,7 @@
                         let reg;
                         try {
                             reg = new RegExp(term, 'ig');
-                        } catch(err) {return false;}
+                        } catch (err) { return false; }
                         return reg.test(text);
                     },
                     flameTipFn: (d) => {
@@ -374,6 +400,14 @@
             },
 
             /**
+            * 火焰图重新设置宽度按钮
+            */
+            changeFlameWidth() {
+                let flameWidth = this.getFlameWidth();
+                this.data.set('flameWidth', flameWidth);
+            },
+
+            /**
             * 火焰图相关函数
             */
             // 生成火焰图数据
@@ -454,14 +488,16 @@
             display: none;
         }
         .sand-d3-flame-wrapper {
+            height: 50%;
             width: 80%;
+            overflow: auto;
             padding: 0 20px;
             z-index: 10;
             position: fixed;
             left: 50%;
             background-color: @color-white;
             transform: translateX(-50%);
-            top: 200px;
+            top: 30%;
             border-radius: 10px;
             box-shadow: 0 2px 8px 0 rgba(189, 189, 189, 0.3);
             .sand-spin {
@@ -470,10 +506,19 @@
                 top: 50%;
                 transform: translate(-50%, -50%);
             }
+            .sand-d3-flame-footer {
+                display: flex;
+                justify-content: center;
+                padding-bottom: 10px;
+                .sand-flame-action-icon {
+                    font-size: 30px;
+                    padding: 0 10px;
+                }
+            }
             .sand-d3-flame-container {
                 display: flex;
                 justify-content: center;
-                padding: 100px 0;
+                padding: 40px 0;
                 overflow: auto;
             }
             .sand-d3-flame-loading {
@@ -533,63 +578,69 @@
                 color: @start-record-color;
             }
         }
-        .sand-profiler-info-table {
-            width: 100%;
-            background-color: @color-white;
-            border-radius: 6px;
-            .santd-table {
-                padding: 0 8px;
-                .santd-table-thead > tr > th {
-                    border: 0;
-                    background: @color-white;
-                }
-                .santd-table-placeholder {
-                    padding-top: 80px;
-                    padding-bottom: 80px;
-                    border: 0;
-                }
-                .santd-table-scroll {
-                    border-radius: 18px;
-                }
-                .santd-table-body {
-                    table {
-                        border: 0 !important;
+        .sand-profiler-content {
+            height: calc(100% - 36px);
+            overflow: auto;
+            padding-bottom: 10px;
+            box-sizing: border-box; 
+            .sand-profiler-info-table {
+                width: 100%;
+                background-color: @color-white;
+                border-radius: 6px;
+                .santd-table {
+                    padding: 0 8px;
+                    .santd-table-thead > tr > th {
+                        border: 0;
+                        background: @color-white;
                     }
-                }
-                .santd-table-tbody > tr {
-                    box-shadow: 0 1px 0px 0 @color-white-e;
-                }
-                .santd-table-tbody > tr > td {
-                    border: 0;
-                    padding: 6px 16px;
-                }
-                .santd-table-tbody > tr:hover:not(.santd-table-expanded-row):not(.santd-table-row-selected) > td {
-                    background: @color-blue-l2;
-                    &:first-child {
-                        border-top-left-radius: 8px;
-                        border-bottom-left-radius: 8px;
+                    .santd-table-placeholder {
+                        padding-top: 80px;
+                        padding-bottom: 80px;
+                        border: 0;
                     }
-                    &:last-child {
-                        border-top-right-radius: 8px;
-                        border-bottom-right-radius: 8px;
+                    .santd-table-scroll {
+                        border-radius: 18px;
+                    }
+                    .santd-table-body {
+                        table {
+                            border: 0 !important;
+                        }
+                    }
+                    .santd-table-tbody > tr {
+                        box-shadow: 0 1px 0px 0 @color-white-e;
+                    }
+                    .santd-table-tbody > tr > td {
+                        border: 0;
+                        padding: 6px 16px;
+                    }
+                    .santd-table-tbody > tr:hover:not(.santd-table-expanded-row):not(.santd-table-row-selected) > td {
+                        background: @color-blue-l2;
+                        &:first-child {
+                            border-top-left-radius: 8px;
+                            border-bottom-left-radius: 8px;
+                        }
+                        &:last-child {
+                            border-top-right-radius: 8px;
+                            border-bottom-right-radius: 8px;
+                        }
                     }
                 }
             }
-        }
-        .sand-pie-wrap {
-            background-color: @color-white;
-            border-radius: 6px;
-            margin-top: 16px;
-            padding: 16px 24px 0;
-            width: 100%;
-            .sand-pie-title {
-                font-size: 16px;
-                font-weight: 600;
-            }
-            .sand-pie {
-                width: 200px;
-                height: 200px;
-                margin: 0 auto;
+            .sand-pie-wrap {
+                background-color: @color-white;
+                border-radius: 6px;
+                margin-top: 16px;
+                padding: 16px 24px 0;
+                width: 100%;
+                .sand-pie-title {
+                    font-size: 16px;
+                    font-weight: 600;
+                }
+                .sand-pie {
+                    width: 200px;
+                    height: 200px;
+                    margin: 0 auto;
+                }
             }
         }
     }
@@ -628,30 +679,32 @@
                     }
                 }
             }
-            .sand-profiler-info-table {
-                background-color: #272b2e;
-                .santd-table {
-                    .santd-table-header,
-                    .santd-table-body,
-                    .santd-table-placeholder,
-                    .santd-table-thead > tr > th {
-                        background-color: #272b2e !important;
-                        color: @color-white;
-                    }
-                    .santd-empty-description {
-                        color: @color-white;
-                    }
-                    .santd-table-tbody > tr {
-                        box-shadow: 0 1px 0px 0 rgba(238, 238, 238, 0.1);
-                    }
-                    .santd-table-tbody > tr:hover:not(.santd-table-expanded-row):not(.santd-table-row-selected) > td {
-                        background: @color-blue-l2;
+            .sand-profiler-content {
+                .sand-profiler-info-table {
+                    background-color: #272b2e;
+                    .santd-table {
+                        .santd-table-header,
+                        .santd-table-body,
+                        .santd-table-placeholder,
+                        .santd-table-thead > tr > th {
+                            background-color: #272b2e !important;
+                            color: @color-white;
+                        }
+                        .santd-empty-description {
+                            color: @color-white;
+                        }
+                        .santd-table-tbody > tr {
+                            box-shadow: 0 1px 0px 0 rgba(238, 238, 238, 0.1);
+                        }
+                        .santd-table-tbody > tr:hover:not(.santd-table-expanded-row):not(.santd-table-row-selected) > td {
+                            background: @color-blue-l2;
+                        }
                     }
                 }
-            }
-            .sand-pie-wrap {
-                background-color: #272b2e;
-                color: @color-white;
+                .sand-pie-wrap {
+                    background-color: #272b2e;
+                    color: @color-white;
+                }
             }
         }
     }
