@@ -1,5 +1,5 @@
 <template>
-    <div id="sand-d3-flame-container" class="sand-d3-flame-container"></div>
+    <div id="sand-d3-flame-svg" class="sand-d3-flame-svg"></div>
 </template>
 
 <script>
@@ -8,6 +8,7 @@
     import { flamegraph, defaultFlamegraphTooltip } from 'd3-flame-graph';
     import 'd3-flame-graph/dist/d3-flamegraph.css';
 
+    const MIN_FLAME_WIDTH = 400;
     export default {
         dataTypes: {
             /* props */
@@ -27,18 +28,50 @@
             }
         },
 
-        attached() {
+        handleFlameWidth(flameWidth) {
+            return flameWidth < MIN_FLAME_WIDTH? MIN_FLAME_WIDTH : flameWidth;
+        },
+
+        // 渲染 data
+        renderFlame(data) {
+            let flameData = data || this.data.get('data');
+            d3.select("#sand-d3-flame-svg")
+                .datum(flameData)
+                .call(this.chart);
+        },
+
+        // 将 data 更新
+        updateFlame(data) {
+            if (!this.chart) {
+                // 重新创建 flame
+                this.createFlame();
+                // 开始渲染数据
+                this.renderFlame();
+                return;
+            }
+            this.chart.update(data);
+        },
+
+        // 创建 flame graph 
+        createFlame(options) {
+            options = options || this.data.get();
             let {
-                tipFn,
+                tipFn = (d) => {return `${d.data.name}:${d.data.value}`;},
                 flameWidth,
                 inverted,
-                theme,
+                theme = 'warm',
                 flameSearch,
-                highlightColor,
-                flameSearchMatch
-            } = this.data.get();
+                highlightColor = '#E600E6',
+                flameSearchMatch,
+            } = options;
             // 初始化火焰图 tootip
             let tip = defaultFlamegraphTooltip().html(tipFn);
+            // flameWidth
+            flameWidth = this.handleFlameWidth(flameWidth);
+            // 移除
+            if (this.chart && this.chart.destroy) {
+                this.chart.destroy();
+            }
             // 初始化火焰图容器
             this.chart = flamegraph()
                 .tooltip(tip)
@@ -58,15 +91,28 @@
             if (typeof flameSearchMatch === 'function') {
                 this.chart.setSearchMatch(flameSearchMatch);
             }
+        },
+
+        attached() {
+            let data = this.data.get('data');
+            if ('name' in data && 'value' in data) {
+                // 开始创建新的 flame graph
+                this.createFlame();
+                // 开始渲染数据
+                this.renderFlame(data);                
+            }
             // 搜索火焰图数据
             this.watch('filterText', value => {
-                this.chart.search(value);
+                this.chart && this.chart.search(value);
             });
             // 数据更新，重新渲染火焰图
-            this.watch('data', data => {
-                d3.select("#sand-d3-flame-container")
-                    .datum(data)
-                    .call(this.chart);
+            this.watch('data', this.updateFlame);
+            // 更新 width
+            this.watch('flameWidth', flameWidth => {
+                // 重新创建 flame
+                this.createFlame();
+                // 开始渲染数据
+                this.renderFlame();
             });
         },
 
@@ -77,10 +123,4 @@
 </script>
 
 <style lang="less">
-    .sand-d3-flame-container {
-        display: flex;
-        justify-content: center;
-        padding: 100px 0;
-        overflow: auto;
-    }
 </style>
