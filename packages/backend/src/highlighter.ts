@@ -24,7 +24,6 @@ class HighlighterBubble {
     init() {
         this.bubble = this.doc.createElement('div');
         let styles = this._getStylesObj(this.defaultStyle);
-        // TODO 这里是否有必要增加个id？
         this.bubble.id = 'san_devtool_highlighter';
         this.bubble.style.cssText = styles;
         this.doc.addEventListener('click', () => {
@@ -72,7 +71,6 @@ class HighlighterBubble {
     }
 }
 
-// TODO: native 和 h5 的高亮方式不一样
 export function highlighter(hook: DevToolsHook<{}>, componentId: string, highlighterBubble: HighlighterBubble) {
     if (highlighterBubble.currentHighlightedComponentId === componentId + '') {
         return;
@@ -83,7 +81,6 @@ export function highlighter(hook: DevToolsHook<{}>, componentId: string, highlig
         if (nativeNode && typeof nativeNode.scrollIntoView === 'function') {
             nativeNode.scrollIntoView({block: 'nearest', inline: 'nearest'});
         }
-        // TODO: 高亮
         highlighterBubble.highlight(nativeNode);
     }
 }

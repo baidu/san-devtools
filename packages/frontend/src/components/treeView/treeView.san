@@ -17,13 +17,6 @@
             >
             </sand-input>
         </san-tooltip>
-        <sand-loading
-            loadingToastContentFromColor="{{loadingToastContentFromColor}}"
-            loadingToastContentToColor="{{loadingToastContentToColor}}"
-            loadingToast="{{loadingToast}}"
-            progress="{{progress}}"
-            loading="{{loading}}"
-        />
         <div class="sm-tree-view-item-wrapper">
             <slot s-if="dataSource!=='JSON'"></slot>
             <san-tree-view-item
@@ -50,7 +43,6 @@
     import { Icon, Tooltip } from 'santd';
     import TreeViewItem from './treeViewItem.san';
     import SdInput from '@frontend/components/input/input.san';
-    import SdLoading from '@frontend/components/loading/loading.san';
     export default {
         dataTypes: {
             compact: DataTypes.bool,
@@ -61,17 +53,13 @@
             filterBarHintText: DataTypes.string,
             dataSource: DataTypes.oneOf(['ATTRIBUTE', 'JSON']),
             highlighted: DataTypes.bool,
-            treeData: DataTypes.arrayOf(DataTypes.object),
-            loading: DataTypes.bool,
-            loadingToast: DataTypes.string,
-            progress: DataTypes.number
+            treeData: DataTypes.arrayOf(DataTypes.object)
         },
 
         components: {
             'san-icon': Icon,
             'san-tree-view-item': TreeViewItem,
             'sand-input': SdInput,
-            'sand-loading': SdLoading,
             'san-tooltip': Tooltip
         },
 
@@ -87,47 +75,20 @@
                 filterBarHintText: '',
                 dataSource: 'ATTRIBUTE',
                 highlighted: false,
-                loading: true,
-                loadingToast: '',
-                loadingToastContentFromColor: 'rgba(0, 175, 255, 1)',
-                loadingToastContentToColor: '#fff',
-                progress: 0,
                 rootTreeView: true,
-                filterText: '',
-                totalNumsChange: false
+                filterText: ''
             };
         },
 
-        updated() {
-            if (this.data.get('totalNumsChange') || true) {
-                setTimeout(() => {
-                    let totalNums = this.data.get('totalNums');
-                    let type = this.data.get('type');
-                    let curNums = document.querySelectorAll(`.tree-view-type-${type}`).length;
-                    if (totalNums <= 0 || !curNums) {
-                        return;
-                    }
-                    let progress = curNums / totalNums * 100;
-                    this.data.set('progress', progress);
-                }, 60);
-            }
-        },
-
         attached() {
-
+            this.watch('treeData', value => {
+                this.data.set('progress', 90);
+                this.data.set('loading', true);
+            });
         },
 
-        created() {
-            if (!this.data.get('loadingToast')) {
-                this.data.set('loading', false);
-            }
-            this.watch('progress', value => {
-                this.data.set('loading', value < 100);
-                value === 100 && this.data.set('totalNumsChange', false);
-            });
-            this.watch('totalNums', value => {
-                this.data.set('totalNumsChange', true);
-            })
+        updated() {
+            this.dispatch('UI:treeViewUpdated');
         },
 
         messages: {

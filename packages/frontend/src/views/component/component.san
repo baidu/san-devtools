@@ -25,13 +25,6 @@
                 'sandevtool-component-tree': ComponentTree,
                 'sandevtool-component-info': ComponentInfo,
                 'sd-basic-layout': BasicLayout
-            },
-
-            attached() {
-                this.data.get('bridge').send('Component.getTreeData', '');
-                this.watch('bridge', bridge => {
-                    bridge.send('Component.getTreeData', '');
-                });
             }
         }
     )

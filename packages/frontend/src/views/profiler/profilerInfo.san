@@ -37,19 +37,21 @@
                 <span>{{currentTime}}<santd-icon class="sand-drop-icon" type="left"/></span>
             </san-drop-down>
         </div>
-        <div class="sand-profiler-info-table">
-            <san-table
-                s-if="data.length > 0"
-                pagination="{{false}}"
-                columns="{{columns}}"
-                data="{{data}}"
-                bordered="{{true}}"
-            >
-            </san-table>
-        </div>
-        <div class="sand-pie-wrap" style="visibility: {{data.length > 0 ? 'visible' : 'hidden'}}">
-            <div class="sand-pie-title">生命周期平均耗时(average time)</div>
-            <div id="sand-pie" class="sand-pie"></div>
+        <div class="sand-profiler-content">
+            <div class="sand-profiler-info-table" s-if="data.length > 0">
+                <san-table
+                    pagination="{{false}}"
+                    columns="{{columns}}"
+                    data="{{data}}"
+                    bordered="{{true}}"
+                >
+                </san-table>
+            </div>
+            <div class="sand-guide" s-else>Please select a component to inspect the detailed performance data.</div>
+            <div class="sand-pie-wrap" style="visibility: {{data.length > 0 ? 'visible' : 'hidden'}}">
+                <div class="sand-pie-title">生命周期平均耗时(average time)</div>
+                <div id="sand-pie" class="sand-pie"></div>
+            </div>  
         </div>
         <div class="sand-d3-flame-wrapper {{showFlame ? '' : 'sand-d3-flame-wrapper-hide'}}">
             <div class="sand-d3-flame-header">
@@ -63,8 +65,38 @@
                     </sand-input>
                 </div>
             </div>
-            <div s-if="{{flameLoading}}" class="sand-d3-flame-loading">generate flame-graph-data...</div>
-            <div id="sand-d3-flame-container" class="sand-d3-flame-container"></div>
+            <sand-spin
+                class="sand-spin"
+                tip="generating flame-graph-data.."
+                spinning="{{flameLoading}}"
+            />
+            <div class="sand-d3-flame-container">
+                <sand-flame
+                    theme="warm"
+                    flameWidth="{{flameWidth}}"
+                    tipFn="{{flameTipFn}}"
+                    inverted="{{true}}"
+                    flameSearchMatch="{{flameSearchMatch}}"
+                    data="{{flameData}}"
+                    highlightColor="#1968fa"             
+                    filterText="{{flameTerm}}"
+                    on-click="flameHighlight"
+                />
+            </div>
+            <div class="sand-d3-flame-footer">
+                <span
+                    class="sand-flame-action-icon sand-d3-flame-close"
+                    on-click="flameClick"
+                >
+                    <san-icon type="close"></san-icon>
+                </span>
+                <span
+                    class="sand-flame-action-icon sand-d3-flame-reset"
+                    on-click="changeFlameWidth"
+                >
+                    <san-icon type="reset"></san-icon>
+                </span>
+            </div>
         </div>
     </div>
 </template>
@@ -73,12 +105,13 @@
     import san, { DataTypes } from 'san';
     import { connectStore, store } from '@frontend/store/index';
 
-    import { Table, Menu, Icon as StandIcon, Tooltip } from 'santd';
+    import { Table, Menu, Icon as StandIcon, Tooltip, Spin } from 'santd';
     import DropDown from 'santd/es/dropdown';
     import 'santd/es/dropdown/style/index.less';
 
     import Icon from '@frontend/components/icon/icon.san';
     import SdInput from '@frontend/components/input/input.san';
+    import Flame from '@frontend/components/flame/flame.san';
 
     import { toLocaleDatetime } from '@shared/utils/dateFormator';
     import { flameJsonGenerator } from '@frontend/utils/flameJsonGenerator';
@@ -87,9 +120,6 @@
     import 'echarts/lib/chart/pie';
     import 'echarts/lib/component/tooltip';
 
-    import * as d3 from "d3";
-    import { flamegraph, defaultFlamegraphTooltip } from 'd3-flame-graph';
-    import 'd3-flame-graph/dist/d3-flamegraph.css';
     const FlAME_WRAPPER_WIDTH_RATIO = 0.8;
     const FlAME_WRAPPER_PADDING_WIDTH = 40;
 
@@ -190,15 +220,28 @@
         bridge: 'bridge',
         profilerInfo: 'profilerInfo',
         profilerTime: 'profilerTime',
-        currentTime: 'currentTime',
-        componentComponentId: 'componentComponentId'
+        currentTime: 'currentTime'
     })(
         {
             dataTypes: {
                 /* props */
                 bridge: DataTypes.object,
                 profilerInfo: DataTypes.object,
+                profilerTime: DataTypes.array,
+                currentTime: DataTypes.string,
                 /* state */
+                columns: DataTypes.array,
+                data: DataTypes.array,
+                recording: DataTypes.bool,
+                selectedKeys: DataTypes.array,
+                flameOptions: DataTypes.object,
+                showFlame: DataTypes.bool,
+                filterText: DataTypes.string,
+                flameLoading: DataTypes.bool,
+                flameData: DataTypes.object,
+                flameWidth: DataTypes.number,
+                flameSearchMatch: DataTypes.func,
+                flameTipFn: DataTypes.func
             },
             components: {
                 'san-table': Table,
@@ -208,9 +251,12 @@
                 'san-menu': Menu,
                 'san-menu-item': Menu.Item,
                 'san-tooltip': Tooltip,
-                'sand-input': SdInput
+                'sand-input': SdInput,
+                'sand-spin': Spin,
+                'sand-flame': Flame
             },
             computed: {
+                // table 数据
                 data() {
                     let profilerInfo = this.data.get('profilerInfo');
                     if (!profilerInfo || !profilerInfo.hooks) {
@@ -235,7 +281,16 @@
                 }
             },
 
+            getFlameWidth() {
+                const rootDom = document.getElementById('san-devtools-app');
+                let flameWidth = 0;
+                rootDom &&
+                    (flameWidth = rootDom.getBoundingClientRect().width * FlAME_WRAPPER_WIDTH_RATIO - FlAME_WRAPPER_PADDING_WIDTH);
+                return flameWidth;
+            },
+
             initData() {
+                let flameWidth = this.getFlameWidth();
                 return {
                     columns,
                     data,
@@ -245,22 +300,40 @@
                         fill: '#999999'
                     },
                     showFlame: false,
+                    // 火焰图相关数据
                     filterText: '',
-                    flameLoading: false
-                    // santd bug，menu 作为 slot 的情况下，当具备 prefixCls 的时候动态设置数据样式混乱
-                    // prefixCls: 'san-devtools'
+                    flameLoading: false,
+                    flameData: {},
+                    flameWidth,
+                    flameSearchMatch: (d, term) => {
+                        if (!term) {
+                            return false;
+                        }
+                        let text = [d.data.name, d.data.componentId, d.data.hookName];
+                        let reg;
+                        try {
+                            reg = new RegExp(term, 'ig');
+                        } catch (err) { return false; }
+                        return reg.test(text);
+                    },
+                    flameTipFn: (d) => {
+                        if ('componentId' in d.data && 'hookName' in d.data) {
+                            return `${d.data.name}:${d.data.componentId}:${d.data.hookName}:${d.data.value}`;
+                        }
+                        else {
+                            return `生命周期总耗时:${d.data.value}`;
+                        }
+                    }
                 }
             },
 
             attached() {
-                // watch profilerTime
+                // 点击记录性能的时候更新 menu 选中项
                 this.watch('profilerTime', value => {
                     // 设置menu选中项
                     let index = value.length - 1 || 0;
-                    console.log('profilerTime', value.length);
                     this.data.set('selectedKeys', [index]);
                 });
-                const flameWidth = document.documentElement.offsetWidth * FlAME_WRAPPER_WIDTH_RATIO - FlAME_WRAPPER_PADDING_WIDTH
                 // 基于准备好的dom，初始化echarts实例
                 this.pie = echarts.init(document.getElementById('sand-pie'));
                 // 绘制图表
@@ -268,29 +341,6 @@
                 this.watch('data', value => {
                     this.setPieData(value);
                 });
-                // 初始化火焰图 tootip
-                let tip = defaultFlamegraphTooltip()
-                    .html(function (d) {
-                        if ('componentId' in d.data && 'hookName' in d.data) {
-                            return `${d.data.name}:${d.data.componentId}:${d.data.hookName}:${d.data.value}`;
-                        }
-                        else {
-                            return `生命周期总耗时:${d.data.value}`;
-                        }
-                    });
-                // 初始化火焰图容器
-                this.chart = flamegraph()
-                    .width(flameWidth)
-                    .inverted(true)
-                    .tooltip(tip)
-                    .setSearchHandler(this.flameSearch.bind(this))
-                    .setSearchMatch(this.flameSearchMatch.bind(this))
-                    .onClick(this.flameHighlight.bind(this))
-                    .setColorHue('warm')
-                    // 设置高亮颜色
-                    .setColorMapper(function(d, originalColor) {
-                        return d.highlight ? '#1968fa' : originalColor;
-                    });
                 // watch 数据来生成火焰图
                 this.watch('currentTime', currentTime => {
                     if (this.data.get('showFlame')) {
@@ -300,12 +350,10 @@
                 });
             },
 
-            // 回车搜索火焰图数据
-            pressEnter() {
-                let filterText = this.data.get('filterText');
-                this.chart.search(filterText);
-            },
-
+            /**
+            * 操作按钮 record，menu，flame 按钮
+            */
+            // 点击记录性能数据
             record() {
                 let recording = !this.data.get('recording');
                 this.data.set('recording', recording);
@@ -321,6 +369,13 @@
                 this.data.get('bridge').send('Profiler.profilerRecording', { recording });
             },
 
+            // 选择 menu 查看对应的性能数据 
+            menuClick({ key }) {
+                let profilerTime = this.data.get('profilerTime');
+                store.dispatch('setCurrentTime', profilerTime[key]);
+            },
+
+            // 点击火焰图按钮
             flameClick() {
                 if (this.data.get('recording')) {
                     return;
@@ -338,6 +393,24 @@
                 }
             },
 
+            // 回车搜索火焰图数据
+            pressEnter() {
+                let filterText = this.data.get('filterText');
+                this.data.set('flameTerm', filterText);
+            },
+
+            /**
+            * 火焰图重新设置宽度按钮
+            */
+            changeFlameWidth() {
+                let flameWidth = this.getFlameWidth();
+                this.data.set('flameWidth', flameWidth);
+            },
+
+            /**
+            * 火焰图相关函数
+            */
+            // 生成火焰图数据
             generateFlame() {
                 let profilerDataStore = store.getState('profilerDataStore');
                 let currentTime = store.getState('currentTime');
@@ -345,13 +418,10 @@
                 let originData = profilerDataStore[currentTime] || {};
                 let flameData = flameJsonGenerator(originData);
                 this.data.set('flameLoading', false);
-                this.nextTick(() => {
-                    d3.select("#sand-d3-flame-container")
-                        .datum(flameData)
-                        .call(this.chart);
-                });
+                this.data.set('flameData', flameData);
             },
 
+            // 火焰图点击
             flameHighlight(d) {
                 if (!d || !d.data || !d.data.componentId) {
                     return;
@@ -359,22 +429,9 @@
                 this.data.get('bridge') && this.data.get('bridge').send('Inspect.highlight', d.data.componentId);
             },
 
-            flameSearch(searchResults, searchSum, totalValue) {
-                // console.log('setSearchHandler', searchResults, searchSum, totalValue);
-            },
-
-            flameSearchMatch(d, term) {
-                if (!term) {
-                    return false;
-                }
-                let text = [d.data.name, d.data.componentId, d.data.hookName];
-                let reg;
-                try {
-                    reg = new RegExp(term, 'ig');
-                } catch(err) {return false;}
-                return reg.test(text);
-            },
-
+            /**
+            * 饼图相关
+            */
             setPieData(data = []) {
                 let pieData = data.map((item, index) => {
                     return {
@@ -384,11 +441,6 @@
                 });
                 pieOptions.series[0].data = pieData;
                 this.pie.setOption(pieOptions, true);
-            },
-
-            menuClick({ key }) {
-                let profilerTime = this.data.get('profilerTime');
-                store.dispatch('setCurrentTime', profilerTime[key]);
             }
         }
     )
@@ -422,24 +474,51 @@
         }
     }
     .sand-profiler-info-wrap {
+        height: 100%;
+        .sand-guide {
+            color: @color-grey;
+            text-align: center;
+            transform: translateY(-50%);
+            position: relative;
+            top: 40%;
+            font-size: 1.2vw;
+            padding: 0 30px;
+        }
         .sand-d3-flame-wrapper-hide {
             display: none;
         }
         .sand-d3-flame-wrapper {
+            height: 50%;
             width: 80%;
+            overflow: auto;
             padding: 0 20px;
             z-index: 10;
             position: fixed;
             left: 50%;
             background-color: @color-white;
             transform: translateX(-50%);
-            top: 200px;
+            top: 30%;
             border-radius: 10px;
             box-shadow: 0 2px 8px 0 rgba(189, 189, 189, 0.3);
+            .sand-spin {
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+            }
+            .sand-d3-flame-footer {
+                display: flex;
+                justify-content: center;
+                padding-bottom: 10px;
+                .sand-flame-action-icon {
+                    font-size: 30px;
+                    padding: 0 10px;
+                }
+            }
             .sand-d3-flame-container {
                 display: flex;
                 justify-content: center;
-                padding: 100px 0;
+                padding: 40px 0;
                 overflow: auto;
             }
             .sand-d3-flame-loading {
@@ -499,63 +578,69 @@
                 color: @start-record-color;
             }
         }
-        .sand-profiler-info-table {
-            width: 100%;
-            background-color: @color-white;
-            border-radius: 6px;
-            .santd-table {
-                padding: 0 8px;
-                .santd-table-thead > tr > th {
-                    border: 0;
-                    background: @color-white;
-                }
-                .santd-table-placeholder {
-                    padding-top: 80px;
-                    padding-bottom: 80px;
-                    border: 0;
-                }
-                .santd-table-scroll {
-                    border-radius: 18px;
-                }
-                .santd-table-body {
-                    table {
-                        border: 0 !important;
+        .sand-profiler-content {
+            height: calc(100% - 36px);
+            overflow: auto;
+            padding-bottom: 10px;
+            box-sizing: border-box; 
+            .sand-profiler-info-table {
+                width: 100%;
+                background-color: @color-white;
+                border-radius: 6px;
+                .santd-table {
+                    padding: 0 8px;
+                    .santd-table-thead > tr > th {
+                        border: 0;
+                        background: @color-white;
                     }
-                }
-                .santd-table-tbody > tr {
-                    box-shadow: 0 1px 0px 0 @color-white-e;
-                }
-                .santd-table-tbody > tr > td {
-                    border: 0;
-                    padding: 6px 16px;
-                }
-                .santd-table-tbody > tr:hover:not(.santd-table-expanded-row):not(.santd-table-row-selected) > td {
-                    background: @color-blue-l2;
-                    &:first-child {
-                        border-top-left-radius: 8px;
-                        border-bottom-left-radius: 8px;
+                    .santd-table-placeholder {
+                        padding-top: 80px;
+                        padding-bottom: 80px;
+                        border: 0;
                     }
-                    &:last-child {
-                        border-top-right-radius: 8px;
-                        border-bottom-right-radius: 8px;
+                    .santd-table-scroll {
+                        border-radius: 18px;
+                    }
+                    .santd-table-body {
+                        table {
+                            border: 0 !important;
+                        }
+                    }
+                    .santd-table-tbody > tr {
+                        box-shadow: 0 1px 0px 0 @color-white-e;
+                    }
+                    .santd-table-tbody > tr > td {
+                        border: 0;
+                        padding: 6px 16px;
+                    }
+                    .santd-table-tbody > tr:hover:not(.santd-table-expanded-row):not(.santd-table-row-selected) > td {
+                        background: @color-blue-l2;
+                        &:first-child {
+                            border-top-left-radius: 8px;
+                            border-bottom-left-radius: 8px;
+                        }
+                        &:last-child {
+                            border-top-right-radius: 8px;
+                            border-bottom-right-radius: 8px;
+                        }
                     }
                 }
             }
-        }
-        .sand-pie-wrap {
-            background-color: @color-white;
-            border-radius: 6px;
-            margin-top: 16px;
-            padding: 16px 24px 0;
-            width: 100%;
-            .sand-pie-title {
-                font-size: 16px;
-                font-weight: 600;
-            }
-            .sand-pie {
-                width: 200px;
-                height: 200px;
-                margin: 0 auto;
+            .sand-pie-wrap {
+                background-color: @color-white;
+                border-radius: 6px;
+                margin-top: 16px;
+                padding: 16px 24px 0;
+                width: 100%;
+                .sand-pie-title {
+                    font-size: 16px;
+                    font-weight: 600;
+                }
+                .sand-pie {
+                    width: 200px;
+                    height: 200px;
+                    margin: 0 auto;
+                }
             }
         }
     }
@@ -594,30 +679,32 @@
                     }
                 }
             }
-            .sand-profiler-info-table {
-                background-color: #272b2e;
-                .santd-table {
-                    .santd-table-header,
-                    .santd-table-body,
-                    .santd-table-placeholder,
-                    .santd-table-thead > tr > th {
-                        background-color: #272b2e !important;
-                        color: @color-white;
-                    }
-                    .santd-empty-description {
-                        color: @color-white;
-                    }
-                    .santd-table-tbody > tr {
-                        box-shadow: 0 1px 0px 0 rgba(238, 238, 238, 0.1);
-                    }
-                    .santd-table-tbody > tr:hover:not(.santd-table-expanded-row):not(.santd-table-row-selected) > td {
-                        background: @color-blue-l2;
+            .sand-profiler-content {
+                .sand-profiler-info-table {
+                    background-color: #272b2e;
+                    .santd-table {
+                        .santd-table-header,
+                        .santd-table-body,
+                        .santd-table-placeholder,
+                        .santd-table-thead > tr > th {
+                            background-color: #272b2e !important;
+                            color: @color-white;
+                        }
+                        .santd-empty-description {
+                            color: @color-white;
+                        }
+                        .santd-table-tbody > tr {
+                            box-shadow: 0 1px 0px 0 rgba(238, 238, 238, 0.1);
+                        }
+                        .santd-table-tbody > tr:hover:not(.santd-table-expanded-row):not(.santd-table-row-selected) > td {
+                            background: @color-blue-l2;
+                        }
                     }
                 }
-            }
-            .sand-pie-wrap {
-                background-color: #272b2e;
-                color: @color-white;
+                .sand-pie-wrap {
+                    background-color: #272b2e;
+                    color: @color-white;
+                }
             }
         }
     }

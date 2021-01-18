@@ -550,13 +550,6 @@
             }
         },
 
-        updated() {
-            if (this.data.get('selected')) {
-                let treeData = this.data.get('treeData');
-                this.dispatch('UI:tree-view-item-click', treeData);
-            }
-        },
-
         watchFiltered(filtered) {
             let parent = this.parentComponent;
             if (!filtered) {

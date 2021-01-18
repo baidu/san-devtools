@@ -23,6 +23,12 @@ interface EventData {
     name: string;
 }
 
+/**
+ * 用于生成 messageInfo 数据
+ *
+ * @param {*} data san.js 传递的数据
+ * @return {string} messageInfo
+ */
 function getMessageInfo(data: MessageData): string {
     let time = toLocaleDatetime(new Date(), 'hh:mm:ss');
     let {
@@ -49,6 +55,12 @@ function getMessageInfo(data: MessageData): string {
     });
 }
 
+/**
+ * 用于生成 eventInfo 数据
+ *
+ * @param {*} data san.js 传递的数据
+ * @return {string} eventInfo
+ */
 function getEventInfo(data: EventData): string {
     let time = toLocaleDatetime(new Date(), 'hh:mm:ss');
     let {

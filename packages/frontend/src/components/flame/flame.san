@@ -1,0 +1,126 @@
+<template>
+    <div id="sand-d3-flame-svg" class="sand-d3-flame-svg"></div>
+</template>
+
+<script>
+    import san, { DataTypes } from 'san';
+    import * as d3 from "d3";
+    import { flamegraph, defaultFlamegraphTooltip } from 'd3-flame-graph';
+    import 'd3-flame-graph/dist/d3-flamegraph.css';
+
+    const MIN_FLAME_WIDTH = 400;
+    export default {
+        dataTypes: {
+            /* props */
+            theme: DataTypes.string, // 主题颜色
+            flameWidth: DataTypes.number, // svg 宽度
+            tipFn: DataTypes.func, // tooltip 样式
+            inverted: DataTypes.bool, // 倒立
+            flameSearch: DataTypes.func, // (searchResults, searchSum, totalValue) => {}
+            flameSearchMatch: DataTypes.func, // (d, term) => {}
+            data: DataTypes.object, // 火焰图数据
+            highlightColor: DataTypes.string // 搜索结果高亮之后的颜色
+        },
+
+        initData() {
+            return {
+                filterText: ''
+            }
+        },
+
+        handleFlameWidth(flameWidth) {
+            return flameWidth < MIN_FLAME_WIDTH? MIN_FLAME_WIDTH : flameWidth;
+        },
+
+        // 渲染 data
+        renderFlame(data) {
+            let flameData = data || this.data.get('data');
+            d3.select("#sand-d3-flame-svg")
+                .datum(flameData)
+                .call(this.chart);
+        },
+
+        // 将 data 更新
+        updateFlame(data) {
+            if (!this.chart) {
+                // 重新创建 flame
+                this.createFlame();
+                // 开始渲染数据
+                this.renderFlame();
+                return;
+            }
+            this.chart.update(data);
+        },
+
+        // 创建 flame graph 
+        createFlame(options) {
+            options = options || this.data.get();
+            let {
+                tipFn = (d) => {return `${d.data.name}:${d.data.value}`;},
+                flameWidth,
+                inverted,
+                theme = 'warm',
+                flameSearch,
+                highlightColor = '#E600E6',
+                flameSearchMatch,
+            } = options;
+            // 初始化火焰图 tootip
+            let tip = defaultFlamegraphTooltip().html(tipFn);
+            // flameWidth
+            flameWidth = this.handleFlameWidth(flameWidth);
+            // 移除
+            if (this.chart && this.chart.destroy) {
+                this.chart.destroy();
+            }
+            // 初始化火焰图容器
+            this.chart = flamegraph()
+                .tooltip(tip)
+                .width(flameWidth) // svg 宽度
+                .inverted(inverted) // 倒立
+                .setColorHue(theme) // 主题颜色
+                .onClick(this.onClick.bind(this)) // 点击
+                // 搜索高亮颜色
+                .setColorMapper(function(d, originalColor) {
+                    return d.highlight ? highlightColor : originalColor;
+                });
+            // 获取搜索结果
+            if (typeof flameSearch === 'function') {
+                this.chart.setSearchHandler(flameSearch);
+            }
+            // 搜索匹配配置
+            if (typeof flameSearchMatch === 'function') {
+                this.chart.setSearchMatch(flameSearchMatch);
+            }
+        },
+
+        attached() {
+            let data = this.data.get('data');
+            if ('name' in data && 'value' in data) {
+                // 开始创建新的 flame graph
+                this.createFlame();
+                // 开始渲染数据
+                this.renderFlame(data);                
+            }
+            // 搜索火焰图数据
+            this.watch('filterText', value => {
+                this.chart && this.chart.search(value);
+            });
+            // 数据更新，重新渲染火焰图
+            this.watch('data', this.updateFlame);
+            // 更新 width
+            this.watch('flameWidth', flameWidth => {
+                // 重新创建 flame
+                this.createFlame();
+                // 开始渲染数据
+                this.renderFlame();
+            });
+        },
+
+        onClick(d) {
+            this.fire('click', d);
+        }
+    }
+</script>
+
+<style lang="less">
+</style>

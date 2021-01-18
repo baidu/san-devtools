@@ -50,12 +50,19 @@ export default class FrontendReceiver extends EventEmitter {
         store.dispatch('setWsDisconnected', false);
         store.dispatch('setSanVersion', d);
         this._bridge.send('Component.getTreeData', '');
+        this._bridge.send('Profiler.getFirstReanderProfilerData', '');
     }
     onTreeData(data: any) {
         // do something
         store.dispatch('setTreeData', JSON.parse(data));
     }
     onComponentInfo(data: any) {
+        if (!data) {
+            store.dispatch('setInspectId', '');
+            store.dispatch('setComponentInfo', null);
+            store.dispatch('setSelectedComponentBaseInfo', {id: '', displayName: ''});
+            return;
+        }
         store.dispatch('setComponentInfo', JSON.parse(data));
     }
     onMutation(data: any) {
@@ -69,7 +76,6 @@ export default class FrontendReceiver extends EventEmitter {
     }
     onHistory(data: any) {
         // history 数据的接收是一个频繁触发的动作，store 的修改是同步的，会阻塞用户的交互动作
-        // TODO: 这里可能会存在内存泄漏
         setTimeout(() => {
             store.dispatch('setHistory', JSON.parse(data));
         }, 0);
@@ -113,7 +119,6 @@ export default class FrontendReceiver extends EventEmitter {
                 'bridge',
                 'settings',
                 'wsDisconnected',
-                'treeData',
                 'activeTab'
             ]
         });
