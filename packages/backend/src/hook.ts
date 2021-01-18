@@ -149,6 +149,10 @@ export class DevToolsHook<T> extends EventEmitter {
         return () => this.off(eventName, listener);
     }
     _flushReadyStack() {
+        // san 不存在则无法执行任务队列
+        if (!this.san || !this._frontendReady) {
+            return;
+        }
         if (this._readyStack.length !== 0) {
             let cb;
             while ((cb = this._readyStack.pop())) {
@@ -186,6 +190,8 @@ export function install(target: any) {
     sanHook.on('san', san => {
         if (!sanHook.san && san) {
             sanHook.san = san;
+            // 如果 san 准备好了，尝试执行任务队列
+            sanHook._flushReadyStack();
             if (__DEBUG__) {
                 console.log('San is hooked, version is ' + san.version);
             }
@@ -208,6 +214,7 @@ export function install(target: any) {
         set(value) {
             sanHook._frontendReady = !!value;
             if (!!value) {
+                // 如果 san 准备好了，尝试执行任务队列
                 sanHook._flushReadyStack();
             }
             if (__DEBUG__) {
