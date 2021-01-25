@@ -5,6 +5,7 @@
 const path = require('path');
 const CopyPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 const {createConfig} = require('build-tools');
 
 const WebpackExtensionManifestPlugin = require('webpack-extension-manifest-plugin');
@@ -28,6 +29,7 @@ module.exports = createConfig({
         filename: 'js/[name].js'
     },
     plugins: [
+        new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
             templateParameters: {
                 ...pkg
