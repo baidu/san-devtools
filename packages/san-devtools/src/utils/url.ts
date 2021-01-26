@@ -58,7 +58,7 @@ export function getSocketUrl(urlParts: url.UrlWithParsedQuery, wsPath: string, u
     let wsPort: string | null = (query.wsPort as string) || port;
 
     return url.format({
-        protocol: protocol === 'https:' ? 'wss:' : 'ws:',
+        protocol: protocol === 'https:' ? 'wss://' : 'ws://',
         hostname: wsHost,
         port: wsPort,
         query: urlQuery,
