@@ -13,6 +13,7 @@ const SanLoaderPlugin = require('san-loader/lib/plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const MiniCssExportPlugin = require('mini-css-extract-plugin');
+const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 
 const DefinePlugin = require('webpack/lib/DefinePlugin');
 const NamedModulesPlugin = require('webpack/lib/NamedModulesPlugin');
@@ -53,6 +54,7 @@ const baseConfig = {
                         loader: 'babel-loader',
                         options: {
                             plugins: [
+                                '@babel/plugin-transform-runtime',
                                 '@babel/plugin-proposal-export-default-from',
                                 '@babel/plugin-transform-modules-commonjs',
                                 '@babel/plugin-proposal-optional-chaining',
@@ -190,7 +192,7 @@ const baseConfig = {
 };
 
 if (isProd) {
-    baseConfig.plugins.push(new MiniCssExportPlugin());
+    baseConfig.plugins.push(new MiniCssExportPlugin(), new CleanWebpackPlugin());
     baseConfig.optimization = {
         splitChunks: {
             cacheGroups: {
