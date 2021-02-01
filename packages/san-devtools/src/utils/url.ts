@@ -58,8 +58,8 @@ export function getSocketUrl(urlParts: url.UrlWithParsedQuery, wsPath: string, u
     let wsPort: string | null = (query.wsPort as string) || port;
 
     return url.format({
-        protocol: protocol === 'https:' ? 'wss://' : 'ws://',
-        hostname: wsHost,
+        protocol: protocol === 'https:' ? 'wss:' : 'ws:',
+        hostname: window ? '//' + wsHost : wsHost,
         port: wsPort,
         query: urlQuery,
         // If sockPath is provided it'll be passed in via the resourceQuery as a
