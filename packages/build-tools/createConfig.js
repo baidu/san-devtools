@@ -54,6 +54,7 @@ const baseConfig = {
                         loader: 'babel-loader',
                         options: {
                             plugins: [
+                                '@babel/plugin-transform-runtime',
                                 '@babel/plugin-proposal-export-default-from',
                                 '@babel/plugin-transform-modules-commonjs',
                                 '@babel/plugin-proposal-optional-chaining',

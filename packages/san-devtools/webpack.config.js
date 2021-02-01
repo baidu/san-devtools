@@ -18,6 +18,7 @@ module.exports = createConfig({
         publicPath: isProd ? './' : '/',
         path: path.resolve(__dirname, 'dist'),
         filename: '[name].js',
+        library: 'SanDevtools',
         libraryTarget: 'umd'
     },
     plugins: [
