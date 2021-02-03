@@ -194,14 +194,28 @@ function getTimeRange(startTime: number | undefined, endTime: number | undefined
     return `${start}-${end}`;
 }
 
+/**
+ * 获取触发的 action 的原始数据，这里调用 san-store 实例属性与方法，注意版本兼容性处理
+ * @param data
+ * @param storeName store 名称
+ * @return targetStr 改变的 store 的 key
+ */
 function getActionInfo(data: any) {
     let actionId = data.actionId;
-    let actionCtrl = data.store.actionCtrl;
-    return actionCtrl.getById(+actionId);
+    let store = data.store;
+    if (store.actionCtrl) {
+        // san-store 2.0.3 以下 https://github.com/baidu/san-store/releases/tag/2.0.3
+        return store.actionCtrl.getById(+actionId);
+    }
+    else if (store.actionInfos && store._getActionInfo) {
+        // san-store 2.1.0+ https://github.com/baidu/san-store/commit/a8ade597cf8b00906c95adf9c628a9bded7d3d38
+        return store._getActionInfo(actionId);
+    }
+    return null;
 }
 
 /**
- * 获取触发的 action 的基本信息
+ * 获取此次 action 改变了哪些data
  * @param data
  * @param storeName store 名称
  * @return targetStr 改变的 store 的 key
