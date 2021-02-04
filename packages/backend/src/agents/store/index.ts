@@ -10,6 +10,8 @@ import {
     getStoreData
 } from './storeTree';
 import CircularJSON from '@shared/utils/circularJSON';
+import {storeDecorator} from './versionControl';
+
 
 export class StoreAgent extends Agent {
     setupHook() {
@@ -27,6 +29,8 @@ export class StoreAgent extends Agent {
              */
             case 'store-default-inited': {
                 let {store} = data;
+                // 装饰store
+                storeDecorator.handler(store);
                 if (store.name !== '__default__') {
                     console.warn('[SAN_DEVTOOLS]: there is must be something bad has happened in san-store');
                     return;
