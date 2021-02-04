@@ -12,7 +12,6 @@ export const storeDecorator = {
      */
     handler: function (store: Record<string, any>) {
         if (this.canDecorate(store)) {
-            console.log('canDecorate');
             let storeProto = Object.getPrototypeOf(store);
             let descs = Object.getOwnPropertyDescriptors(storeProto);
             this.hasDecorated = true;
