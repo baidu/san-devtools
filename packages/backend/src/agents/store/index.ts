@@ -10,8 +10,8 @@ import {
     getStoreData
 } from './storeTree';
 import CircularJSON from '@shared/utils/circularJSON';
+import {storeDecorator} from './versionControl';
 
-let hasChangeStore = false;
 
 export class StoreAgent extends Agent {
     setupHook() {
@@ -29,23 +29,8 @@ export class StoreAgent extends Agent {
              */
             case 'store-default-inited': {
                 let {store} = data;
-                if (!hasChangeStore && !store.log) {
-                    // 如果引入san-devtools则默认给用户的store.log设置为true
-                    let storeProto = Object.getPrototypeOf(store);
-                    let descs = Object.getOwnPropertyDescriptors(storeProto);
-                    hasChangeStore = true;
-                    // AOP handler
-                    for (let desc in descs) {
-                        let oldProtoFn = storeProto[desc];
-                        if (typeof storeProto[desc] !== 'function' || desc === 'constructor') {
-                            continue;
-                        }
-                        storeProto[desc] = function (...args: any) {
-                            !this.log && (this.log = true);
-                            return oldProtoFn.call(this, ...args);
-                        };
-                    }
-                }
+                // 装饰store
+                storeDecorator.handler(store);
                 if (store.name !== '__default__') {
                     console.warn('[SAN_DEVTOOLS]: there is must be something bad has happened in san-store');
                     return;
