@@ -195,9 +195,15 @@ function getTimeRange(startTime: number | undefined, endTime: number | undefined
 }
 
 function getActionInfo(data: any) {
-    let actionId = data.actionId;
-    let actionCtrl = data.store.actionCtrl;
-    return actionCtrl.getById(+actionId);
+    let {actionId, store} = data;
+    let actionInfo;
+    if (store._getActionInfo) {
+        // san-store@^2.1.0
+        actionInfo = store._getActionInfo(actionId);
+    } else {
+        actionInfo = store.actionCtrl.getById(+actionId);
+    }
+    return actionInfo;
 }
 
 /**
