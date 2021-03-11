@@ -38,7 +38,7 @@
 ## 安装
 目前支持以下几种安装途径
 
- - [Chrome 网上应用商店](https://chrome.google.com/webstore/detail/san-devtools/pjnngoafflflkagpebgfifjejlnfhahc?hl=zh-CN)
+ - [Chrome 网上应用商店](https://chrome.google.com/webstore/detail/san-devtool/fcjifbggoejmfnfcmnaobcppbfhlndad?hl=zh-CN)
  - NPM：`$ npm i -g san-devtools`，`san-devtools` 命令参见下面 *命令行工具* 一节。
  - 手动安装：请参见 https://medium.com/@FGrante/how-to-install-a-chrome-extension-without-using-the-chrome-web-store-31902c780034。
  - Source code：
