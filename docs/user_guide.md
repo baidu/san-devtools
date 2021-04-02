@@ -40,17 +40,16 @@
 
  - [Chrome 网上应用商店](https://chrome.google.com/webstore/detail/san-devtool/fcjifbggoejmfnfcmnaobcppbfhlndad?hl=zh-CN)
  - NPM：`$ npm i -g san-devtools`，`san-devtools` 命令参见下面 *命令行工具* 一节。
- - 手动安装：请参见 https://medium.com/@FGrante/how-to-install-a-chrome-extension-without-using-the-chrome-web-store-31902c780034。
+ - 手动安装：请自行搜索安装教程
  - Source code：
-
- ```
-$ git clone git@github.com:ecomfe/san-devtools.git
-$ cd san-devtools
-$ npm i
-$ npm run build:extensions
-$ cd packages/extensions/dist
-同手动安装
- ```
+    ```
+    $ git clone git@github.com:ecomfe/san-devtools.git
+    $ cd san-devtools
+    $ npm i
+    $ npm run build:extensions
+    $ cd packages/extensions/dist
+    同手动安装
+    ```
 
 ### 更新
 
@@ -66,10 +65,10 @@ $ cd packages/extensions/dist
 
 1. 启动本地Server，默认自动打开 Remote Inspector 工具页面；
 
-```bash
-# 启动本地server，自带WebSocket服务
-$ sand
-```
+    ```bash
+    # 启动本地server，自带WebSocket服务
+    $ sand
+    ```
 
 2. 根据提示将 `ws-backend.js` 添加到要调试页面的 `San.js` 之前；
 
@@ -89,7 +88,7 @@ $ sand
     </a>
 </p>
 
-## 开发者工具
+## san 开发者工具
 ### 图标
 <p>
     <a href="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/browser_action.png">
@@ -173,7 +172,7 @@ Component tab 右侧为详细信息显示区域，包含了五个功能块：
             <img src="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/basic_information_group.png" alt="basic_information_group" width="50%">
         </a>
     </p>
- - Data viewer：这是一个 JSON viewer，展示一个组件的 data。这个 viewer 是可以修改的，我们可以进行 CRUD 操作，以及修改 object 中的 key。所有的修改会自动同步到组件的 data 中。<br />**值得注意的是**：当组件的 data 发生改变时，viewer 不会自动刷新，需要重新选择该组件在组件结构树中的对应项目。<br />
+ - Data viewer：这是一个 JSON viewer，展示一个组件的 data。这个 viewer 是可以修改的，我们可以进行 CRUD 操作，以及修改 object 中的 key。所有的修改会自动同步到组件的 data 中。
      <p>
         <a href="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/component_data_group.png">
             <img src="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/component_data_group.png" alt="component_data_group" width="50%">
@@ -286,6 +285,31 @@ Component tab 右侧为详细信息显示区域，包含了五个功能块：
  - Receiver：消息接收方组件，以组件 ID 显示，点击会跳转并且 inspect 至浏览器开发者工具 *Element* 面板。
  - Action：`dispatch` 操作按钮，点击可以触发一次事件。
  - Payload：消息传递的值，该值可以被修改，当点击了 `dispatch` 按钮，新的值会作为此次消息的 payload。
+
+### profiler
+*Profiler tab* 主要提供了页面中各个组件生命周期的耗时数据，会以两种方式来呈现，一种是以饼图以及表格的方式呈现统计数据，一种是以火焰图方式呈现在某一段时间内各个生命周期的耗时详细数据。
+
+*表格加饼图*
+![profiler](https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/profiler1.png)
+
+*火焰图*
+![profiler](https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/profiler2.png)
+
+## 内置的chrome devtools
+在从`npm`仓库中获取的`standalone`版本中，我们内置了`chrome-devtools`检查面板，因此可以适用于任何页面。
+
+![chrome devtools](https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/chrome-devtools.png)
+
+- 对于一般的用户可以将 `<script src="http://x.x.x.x:8899/ws-backend.js"></script>` 添加到项目模版中。
+- 对于使用了 [esl](https://github.com/ecomfe/esl) 方案的项目或者其他`require.js`模块方案的项目，可以按照下面类似的方式接入远程调试
+```
+const host = 'xxx'; // 域名
+const port = '8899'; // 端口
+window.__san_devtool_ws_query__ = `?http://${host}:${port}/san-devtools.html&ws&wsHost=${host}&wsPort=${port}`;
+require(['yyy/ws-backend-v8'], () => {});
+```
+注意需要在`window`上挂在一个属性`__san_devtool_ws_query__`
+
 
 
 ## 控制台直接调试

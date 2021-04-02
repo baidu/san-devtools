@@ -7,7 +7,7 @@
                 class="logo"
                 href="https://github.com/baidu/san/releases/tag/{{sanVersion}}"
                 target="_blank"
-                style="background-color: rgba(0,0,0,0); border: 0px;height: 100%;display: flex;"
+                style="background-color: rgba(0,0,0,0); border: 0px;height: 100%;display: flex;justify-content: center;flex-direction: column;"
             >
                 <san-avatar
                     shape="square"

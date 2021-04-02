@@ -17,7 +17,10 @@ const SVG_NAME = [
     'RightOutlined',
     // double-left
     'DoubleLeftOutlined',
-    'DoubleRightOutlined'
+    'DoubleRightOutlined',
+    // InfoCircleOutlined
+    'InfoCircleOutlined',
+    'InfoCircleFilled'
 ];
 const SVG_USED_STR = SVG_NAME.map(item => {
     return `export { default as ${item} } from './asn/${item}';`;
