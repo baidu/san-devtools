@@ -28,7 +28,6 @@ const DEFAULT_PORT = 8899;
 // set process
 process.title = scriptName;
 
-
 // 1. 检测 node 版本
 checkNodeVersion(requiredNodeVersion, pkgName);
 // 2. 检测最新版本
@@ -48,6 +47,11 @@ require('yargs')
                 type: 'boolean',
                 describe: 'Open browser when server start'
             },
+            https: {
+                default: false,
+                type: 'boolean',
+                describe: 'Use HTTPS protocol.'
+            },
             port: {
                 alias: 'p',
                 type: 'number',
@@ -65,6 +69,7 @@ require('yargs')
             const {BACKENDJS_PATH} = require('../server/constants');
             let port = argv.port || parseInt(process.env.PORT, 10);
             const host = argv.address || '0.0.0.0';
+            const https = argv.https;
 
             if (!port) {
                 portfinder.basePort = DEFAULT_PORT;
@@ -75,13 +80,13 @@ require('yargs')
                     port = p;
                     startServer();
                 });
-            }
-            else {
+            } else {
                 startServer();
             }
             function startServer() {
                 const ifaces = os.networkInterfaces();
                 const options = {
+                    https: https ? {} : null,
                     port,
                     host,
                     root: path.join(__dirname, '../dist')
@@ -93,7 +98,7 @@ require('yargs')
                         throw err;
                     }
                     const canonicalHost = host === '0.0.0.0' ? '127.0.0.1' : host;
-                    const protocol = 'http://';
+                    const protocol = https ? 'https://' : 'http://';
 
                     console.log(
                         [
@@ -107,8 +112,7 @@ require('yargs')
                         const url = '  ' + protocol + canonicalHost + ':' + chalk.green(port.toString());
                         urls.push(url);
                         console.log(url);
-                    }
-                    else {
+                    } else {
                         Object.keys(ifaces).forEach(dev => {
                             /* eslint-disable max-nested-callbacks */
                             ifaces[dev].forEach(details => {
@@ -133,10 +137,12 @@ require('yargs')
 
                     const home = server.getUrl();
                     // 发送消息：告诉工具链的兄弟们端口等信息
-                    process.send && process.send({
-                        home,
-                        backend: home.replace(/\/$/, '') + BACKENDJS_PATH
-                    });
+                    // eslint-disable-next-line operator-linebreak
+                    process.send &&
+                        process.send({
+                            home,
+                            backend: home.replace(/\/$/, '') + BACKENDJS_PATH
+                        });
                     argv.open && require('opener')(home);
                 });
             }

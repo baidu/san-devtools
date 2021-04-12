@@ -1,7 +1,10 @@
 const os = require('os');
 const http = require('http');
+const https = require('https');
 const path = require('path');
 const url = require('url');
+const fs = require('fs');
+
 const parseURL = url.parse;
 
 const killable = require('killable');
@@ -14,6 +17,7 @@ const homeMiddleware = require('./middle/home');
 const staticMiddleware = require('./middle/static');
 const chiiMiddleware = require('./middle/chii');
 const aliveMiddleware = require('./middle/alive');
+const getCertificate = require('./getCertificate');
 
 const STATUS_READY = 'ready';
 const STATUS_INITIAL = 'pending';
@@ -44,16 +48,47 @@ module.exports = class Server {
         this.use(aliveMiddleware());
         this.use(staticMiddleware(this.root));
 
+        this.setupHttps();
         this.createServer();
         killable(this._server);
     }
+    setupHttps() {
+        if (this.options.https) {
+            for (const property of ['ca', 'pfx', 'key', 'cert']) {
+                const value = this.options.https[property];
+                const isBuffer = value instanceof Buffer;
 
+                if (value && !isBuffer) {
+                    let stats = null;
+
+                    try {
+                        stats = fs.lstatSync(fs.realpathSync(value)).isFile();
+                    } catch (error) {
+                        // ignore error
+                    }
+
+                    // It is file
+                    this.options.https[property] = stats ? fs.readFileSync(path.resolve(value)) : value;
+                }
+            }
+
+            let fakeCert;
+
+            if (!this.options.https.key || !this.options.https.cert) {
+                fakeCert = getCertificate(logger);
+            }
+
+            this.options.https.key = this.options.https.key || fakeCert;
+            this.options.https.cert = this.options.https.cert || fakeCert;
+        }
+    }
     createServer() {
         if (this._server) {
             // 保证执行一次
             return;
         }
-        this._server = http.createServer((req, res) => {
+
+        const app = (req, res) => {
             this._wrapRequest(req);
             this._wrapResponse(res);
             // response.sendResponse(500, '500 - Internal Server Error');
@@ -65,7 +100,12 @@ module.exports = class Server {
                 logger.error(err);
                 res.sendResponse(500, '500 - Internal Server Error');
             });
-        });
+        };
+        if (this.options.https) {
+            this._server = https.createServer(this.options.https, app);
+        } else {
+            this._server = http.createServer(app);
+        }
 
         this._server.on('error', err => {
             logger.error(err);
@@ -87,7 +127,7 @@ module.exports = class Server {
     getUrl(pathname = '/', query = '') {
         return url.format({
             hostname: this.getAddress(),
-            protocol: 'http:',
+            protocol: this.options.https ? 'https://' : 'http:',
             port: this.port,
             pathname: pathname,
             query: query
@@ -132,8 +172,7 @@ module.exports = class Server {
             idx++;
             if (idx < middlewares.length) {
                 run(middlewares[idx]);
-            }
-            else {
+            } else {
                 errorHandler(err);
             }
         }
@@ -141,8 +180,7 @@ module.exports = class Server {
         function run(fn) {
             try {
                 fn(req, res, next);
-            }
-            catch (err) {
+            } catch (err) {
                 next(err);
             }
         }
@@ -191,8 +229,7 @@ module.exports = class Server {
 
         if (Array.isArray(fn)) {
             fn.forEach(add);
-        }
-        else if (typeof fn === 'function') {
+        } else if (typeof fn === 'function') {
             add(fn);
         }
         function add(f) {
