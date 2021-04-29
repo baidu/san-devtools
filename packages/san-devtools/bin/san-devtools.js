@@ -68,7 +68,7 @@ require('yargs')
             const Server = require('../server/Server');
             const {BACKENDJS_PATH} = require('../server/constants');
             let port = argv.port || parseInt(process.env.PORT, 10);
-            const host = argv.address || '0.0.0.0';
+            const hostname = argv.address || '0.0.0.0';
             const https = argv.https;
 
             if (!port) {
@@ -88,7 +88,7 @@ require('yargs')
                 const options = {
                     https: https ? {} : null,
                     port,
-                    host,
+                    hostname,
                     root: path.join(__dirname, '../dist')
                 };
                 const server = new Server(options);

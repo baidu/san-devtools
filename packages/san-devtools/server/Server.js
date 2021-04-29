@@ -34,12 +34,12 @@ module.exports = class Server {
         this.root = options.root || process.cwd();
 
         this.status = STATUS_INITIAL;
-        this.host = options.host;
+        this.hostname = options.hostname;
         this.port = options.port;
         logger.debug('Server options: ', {
             root: this.root,
             port: this.port,
-            host: this.host
+            hostname: this.hostname
         });
         // 添加中间件
         this.use(magicBackend(this.root));
@@ -137,8 +137,8 @@ module.exports = class Server {
         if (this._realHost) {
             return this._realHost;
         }
-        if (this.host !== '0.0.0.0' && this.host !== '127.0.0.1' && this.host !== 'localhost') {
-            this._realHost = this.host;
+        if (this.hostname !== '0.0.0.0' && this.hostname !== '127.0.0.1' && this.hostname !== 'localhost') {
+            this._realHost = this.hostname;
             return this._realHost;
         }
         const ifaces = os.networkInterfaces();
@@ -153,7 +153,7 @@ module.exports = class Server {
                 }
             }
         }
-        return this.host;
+        return this.hostname;
     }
     _requestHandler(req, res, errorHandler) {
         let idx = 0;
