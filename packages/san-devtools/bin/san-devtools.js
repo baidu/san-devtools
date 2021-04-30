@@ -93,11 +93,11 @@ require('yargs')
                 };
                 const server = new Server(options);
 
-                server.listen(port, host, err => {
+                server.listen(port, hostname, err => {
                     if (err) {
                         throw err;
                     }
-                    const canonicalHost = host === '0.0.0.0' ? '127.0.0.1' : host;
+                    const canonicalHost = hostname === '0.0.0.0' ? '127.0.0.1' : hostname;
                     const protocol = https ? 'https://' : 'http://';
 
                     console.log(
@@ -108,7 +108,7 @@ require('yargs')
                         ].join('')
                     );
                     const urls = [];
-                    if (argv.address && host !== '0.0.0.0') {
+                    if (argv.address && hostname !== '0.0.0.0') {
                         const url = '  ' + protocol + canonicalHost + ':' + chalk.green(port.toString());
                         urls.push(url);
                         console.log(url);
