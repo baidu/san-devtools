@@ -89,7 +89,9 @@ if (resourceQuery !== '' && resourceQuery.includes('ws')) {
             window.parent.postMessage(data, '*');
         }
     });
-    initialize();
+    setTimeout(()=>{
+        initialize();
+    }, 30)
 }
 
 class Container extends san.Component {
