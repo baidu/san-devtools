@@ -1,0 +1,46 @@
+{
+    "name": "san-devtools-for-devtools-pro",
+    "version": "1.0.0",
+    "description": "San-DevTools plugin for DevTools-Pro",
+    "main": "index.js",
+    "author": "ksky521",
+    "license": "MIT",
+    "keywords": [
+        "san",
+        "san-devtools",
+        "devtools",
+        "san-devtool",
+        "chrome-devtools",
+        "devtools-pro"
+    ],
+    "files": [
+        "frontend",
+        "dist",
+        "middleware.js",
+        "package.json",
+        "README.md"
+    ],
+    "scripts": {
+        "start": "cross-env NODE_ENV=development webpack --mode development --progress --hide-modules",
+        "build": "cross-env NODE_ENV=production webpack --mode production --progress --hide-modules",
+        "prepublishOnly": "npm run build"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/baidu/san-devtools.git",
+        "directory": "packages/devtools-pro"
+    },
+    "devtools": {
+        "frontend": {
+            "name": "san_devtools",
+            "type": "autostart",
+            "dir": "frontend"
+        },
+        "middleware": "middleware.js",
+        "backend": "dist/backend.js"
+    },
+    "dependencies": {
+        "koa-send": "^5.0.1",
+        "san-devtools": "^3.1.3"
+    }
+}
