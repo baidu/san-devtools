@@ -26,10 +26,23 @@ if (sanHook) {
     // 3. init backend
     initBackend(hook, bridge, window);
 }
-
 function getWebSocketBridge(ws: any) {
     const messageListeners: Function[] = [];
 
+    const bridge = new Bridge({
+        listen(fn: Function) {
+            messageListeners.push(fn);
+            return () => {
+                const index = messageListeners.indexOf(fn);
+                if (index >= 0) {
+                    messageListeners.splice(index, 1);
+                }
+            };
+        },
+        send(data) {
+            ws.sendRawMessage(JSON.stringify(data));
+        }
+    });
     ws.on('message', (event: MessageEvent) => {
         let data: any;
         try {
@@ -56,18 +69,5 @@ function getWebSocketBridge(ws: any) {
         });
     });
 
-    return new Bridge({
-        listen(fn: Function) {
-            messageListeners.push(fn);
-            return () => {
-                const index = messageListeners.indexOf(fn);
-                if (index >= 0) {
-                    messageListeners.splice(index, 1);
-                }
-            };
-        },
-        send(data) {
-            ws.sendRawMessage(JSON.stringify(data));
-        }
-    });
+    return bridge;
 }

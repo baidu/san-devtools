@@ -58,7 +58,7 @@ function socket() {
             bridge && bridge.removeAllListeners();
             bridge = _bridge;
             // 确认建立链接之后，开始初始化 frontend
-            initialize();
+            initialize(_bridge);
         });
     });
     wss.on('close', () => {
@@ -66,6 +66,9 @@ function socket() {
         _bridge.emit('SYSTEM:backendDisconnected');
         // 开始重连
         setTimeout(socket, 1000);
+    });
+    wss.on('error', e => {
+        console.log(e);
     });
 }
 
@@ -89,7 +92,7 @@ if (resourceQuery !== '' && resourceQuery.includes('ws')) {
         }
     });
     setTimeout(() => {
-        initialize();
+        initialize(bridge);
     }, 30);
 }
 
@@ -112,7 +115,7 @@ class Container extends san.Component {
  * 初始化 san-devtool 页面
  * @param connection
  */
-function initialize() {
+function initialize(bridge) {
     if (app) {
         app.data.set('bridge', bridge);
     } else {
