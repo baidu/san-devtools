@@ -1,4 +1,5 @@
 import url from 'url';
+import querystring from 'querystring';
 import getCurrentScriptSource from './getCurrentScriptSource';
 import getSessionId from './getSessionId';
 
@@ -46,6 +47,10 @@ export function createFrontendUrl(resourceQuery: string | undefined, sessionId?:
     return `${url}&backendId=${sessionId ? sessionId : getSessionId()}`;
 }
 export function createFrontendSocketUrl(resourceQuery: string | undefined) {
+    const q = querystring.parse(resourceQuery?.replace(/^\??/, ''));
+    if (q.wsurl || q.wssurl) {
+        return q.wsurl ? 'ws://' + q.wsurl : 'wss://' + q.wssurl;
+    }
     let urlParts = getUrlPartsFromQuery(resourceQuery);
     return getSocketUrl(urlParts, '/frontend/san', {backendId: (urlParts.query as any).backendId});
 }

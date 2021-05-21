@@ -21,7 +21,7 @@
         "README.md"
     ],
     "scripts": {
-        "start": "cross-env NODE_ENV=development webpack --mode development --progress --hide-modules",
+        "start": "cross-env NODE_ENV=development webpack --mode development --progress --hide-modules --watch",
         "build": "cross-env NODE_ENV=production webpack --mode production --progress --hide-modules",
         "prepublishOnly": "npm run build"
     },

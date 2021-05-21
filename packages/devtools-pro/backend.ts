@@ -5,7 +5,6 @@ import initBackend from '@backend/initBackend';
 
 // 1. install hook
 let sanHook = install(window);
-
 if (sanHook) {
     const hook: DevToolsHook = window[SAN_DEVTOOL];
 
@@ -13,6 +12,10 @@ if (sanHook) {
     // 2.1 获取$devtools的wsurl
     // 计算url的channelId
     const channelId = $devtools.nanoid();
+    // 监听获取url的地址事件
+    $devtools.registerEvent('SanDevtools.getWebsocketUrl', () => {
+        return $devtools.createWebsocketUrl(`/frontend/${channelId}`);
+    });
     // -> 这里注意路径必须是/backend/开头
     const wsUrl = $devtools.createWebsocketUrl(`/backend/${channelId}`);
     // 2.2 创建通道

@@ -13,7 +13,6 @@ import createBridge from './utils/createBridge';
 // backend 所在页面刷新
 // 1. backend 会 disconnect，接着会触发 frontend disconnect，此时 frontend 需要重新创建 websocket 建立链接
 // 2. backend 重新创建 websocket 建立了链接
-
 if (__DEBUG__) {
     initLogger();
 }
@@ -89,9 +88,9 @@ if (resourceQuery !== '' && resourceQuery.includes('ws')) {
             window.parent.postMessage(data, '*');
         }
     });
-    setTimeout(()=>{
+    setTimeout(() => {
         initialize();
-    }, 30)
+    }, 30);
 }
 
 class Container extends san.Component {

@@ -3,6 +3,7 @@ export class SanDevtoolsPanel extends UI.VBox {
         super('san_devtools');
         this.registerRequiredCSS('san_devtools/san_devtools.css', {enableLegacyPatching: false});
         this.contentElement.classList.add('html', 'san-devtools');
+        this.iframeDom = null;
     }
 
     wasShown() {
@@ -11,6 +12,7 @@ export class SanDevtoolsPanel extends UI.VBox {
 
     willHide() {
         this.contentElement.removeChildren();
+        console.log(this.iframeDom.removeChildren());
     }
 
     // onResize(...args) {
@@ -27,14 +29,18 @@ export class SanDevtoolsPanel extends UI.VBox {
     //     console.log(args);
     // }
     _createIFrame() {
-        // We need to create iframe again each time because contentDocument
-        // is deleted when iframe is removed from its parent.
-        this.contentElement.removeChildren();
-        const iframe = document.createElement('iframe');
-        iframe.className = 'san-devtools-frame';
-        iframe.setAttribute('src', '/san-devtools/san-devtools.html');
-        iframe.tabIndex = -1;
-        UI.ARIAUtils.markAsPresentation(iframe);
-        this.contentElement.appendChild(iframe);
+        // 一开始如果进来就执行，那么会存在runtime bridge不存在的情况
+        runtime.getBridge().then(bridge => {
+            bridge.sendCommand('SanDevtools.getWebsocketUrl').then(a => {
+                this.contentElement.removeChildren();
+                const iframe = document.createElement('iframe');
+                this.iframeDom = iframe;
+                iframe.className = 'san-devtools-frame';
+                iframe.setAttribute('src', `/san-devtools/san-devtools.html?wsurl=${a.replace(/^ws:/, '')}`);
+                iframe.tabIndex = -1;
+                UI.ARIAUtils.markAsPresentation(iframe);
+                this.contentElement.appendChild(iframe);
+            });
+        });
     }
 }
