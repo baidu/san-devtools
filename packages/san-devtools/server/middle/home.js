@@ -1,7 +1,8 @@
 const {nanoid} = require('nanoid');
 const ejs = require('ejs');
 const {logger} = require('../utils');
-const {createFrontendUrl, createBackendjsUrl} = require('../utils');
+const {createBackendjsUrl} = require('../utils');
+const {SAN_DEVTOOLS_HTML} = require('../constants');
 
 module.exports = tplpath => {
     return (req, res, next) => {
@@ -16,7 +17,7 @@ module.exports = tplpath => {
         }
         const {address, port} = req;
         const sessionId = nanoid();
-        const frontendUrl = createFrontendUrl(address, port).replace('&', '?');
+        const frontendUrl = `http://${address}:${port}/${SAN_DEVTOOLS_HTML}`;
         const backends = req
             .getWebSocketServer()
             .getChannelManager()
