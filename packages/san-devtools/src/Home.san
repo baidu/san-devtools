@@ -74,7 +74,8 @@ import pkg from '../package.json';
         };
         openSanDevtools(item) {
             // eslint-disable-next-line max-len
-            window.open(`${__config__.frontendUrl}&backendId=${item.id}`, 'San Devtools');
+            const url = `${__config__.frontendUrl}?${location.protocol==='https:'?'wss':'ws'}=${__config__.wsHost}:${__config__.wsPort}/frontend/${item.id}`;
+            window.open(url, 'San Devtools');
         }
         openChii(item){
             // http://172.24.201.251:8899/chii/chii_app.html?ws=172.24.201.251:8899/chii/vnlcVD?target=y3gbZOi1kfqrKxJ4hm5qL

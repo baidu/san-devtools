@@ -35,7 +35,6 @@ if (sanHook) {
             ? __resourceQuery
             : '';
     let urlParts = getUrlPartsFromQuery(resourceQuery);
-
     let isSock = urlParts.query && 'ws' in urlParts.query;
 
     let popupUrl: string;
@@ -43,7 +42,7 @@ if (sanHook) {
     // 这里使用url的参数来定是ws还是window
     let bridge: Bridge;
     if (isSock) {
-        const {url, sessionId} = createBackendSocketUrl(resourceQuery, location, {
+        const {url} = createBackendSocketUrl(resourceQuery, location, {
             favicon: getFavicon(),
             title: document.title ? document.title : 'Untitled',
             url: location.href
@@ -57,7 +56,6 @@ if (sanHook) {
         bridge = createBridge(sanChannel);
         const chiiChannel = wss.registerChannel('chii');
 
-        popupUrl = createFrontendUrl(resourceQuery, sessionId);
         chiiChannel.on('message', event => {
             chobitsu.sendRawMessage(event.data);
         });
