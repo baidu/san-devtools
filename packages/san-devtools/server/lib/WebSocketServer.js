@@ -20,7 +20,7 @@ module.exports = class WebSocketServer {
                     this.channelManager.createBackendChannel(id, ws);
                     break;
                 case 'frontend':
-                    this.channelManager.createFrontendChannel(id, ws, ws.backend);
+                    this.channelManager.createFrontendChannel('san', ws, ws.backend);
                     break;
                 case 'home':
                     this.manager.createChannel(id, ws);
@@ -58,7 +58,7 @@ module.exports = class WebSocketServer {
                     }
                     else if (role === 'frontend') {
                         // 来自query的backendId
-                        ws.backend = q.backendId;
+                        ws.backend = id;
                     }
                     wss.emit('connection', ws, request);
                 });

@@ -7,6 +7,7 @@
         "d3-flame-graph": "^4.0.6",
         "echarts": "^5.0.0",
         "highlight.js": "~10.1.2",
+        "js-beautify": "^1.13.13",
         "json-tree-view": "0.4.12",
         "normalize.css": "~8.0.1",
         "san": "~3.9.2",
