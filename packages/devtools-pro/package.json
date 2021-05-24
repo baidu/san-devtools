@@ -33,7 +33,7 @@
     "devtools": {
         "frontend": {
             "name": "san_devtools",
-            "type": "autostart",
+            "type": "remote",
             "dir": "frontend"
         },
         "middleware": "middleware.js",
