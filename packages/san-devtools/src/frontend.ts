@@ -56,7 +56,6 @@ class Container extends san.Component {
  */
 function initialize(bridge: Bridge) {
     if (app) {
-        console.log('app', bridge, bridge === app.data.get('bridge'));
         app.data.set('bridge', bridge);
     } else {
         app = new Container(bridge);
@@ -96,7 +95,7 @@ function socket() {
             'background:transparent'
         );
     }
-    const url = resourceQuery.replace(/^\??(.*)?=/, '$1://');
+    const url = resourceQuery.replace(/^\?*(.*?)=/, '$1://');
     const wss = new WebSocket(url);
     let _bridge = createBridge(wss);
 
@@ -117,9 +116,6 @@ function socket() {
         hasWs = true;
         // 确认建立链接之后，开始初始化 frontend
         initialize(_bridge);
-    });
-    wss.on('error', e => {
-        console.log(e);
     });
 }
 

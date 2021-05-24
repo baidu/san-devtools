@@ -11,7 +11,7 @@ export class SanDevtoolsPanel extends UI.VBox {
                 const iframe = document.createElement('iframe');
                 this.iframeDom = iframe;
                 iframe.className = 'san-devtools-frame';
-                iframe.setAttribute('src', `/san-devtools/san-devtools.html?wsurl=${a.replace(/^ws:/, '')}`);
+                iframe.setAttribute('src', `/san-devtools/san-devtools.html?ws=${a.replace(/^ws:/, '')}`);
                 iframe.tabIndex = -1;
                 UI.ARIAUtils.markAsPresentation(iframe);
                 this.contentElement.appendChild(iframe);
