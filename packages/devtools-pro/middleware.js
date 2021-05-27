@@ -2,8 +2,7 @@
 const path = require('path');
 const send = require('koa-send');
 module.exports = router => {
-    const distPath = path.join(__dirname, '../san-devtools/dist');
-    // path.dirname(require.resolve('san-devtools/dist/'));
+    const distPath = path.dirname(require.resolve('san-devtools/dist/'));
 
     router.get('/san-devtools/(.+)', async ctx => {
         const relativePath = ctx.params[0];
