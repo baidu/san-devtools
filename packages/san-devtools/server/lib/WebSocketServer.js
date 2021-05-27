@@ -20,7 +20,7 @@ module.exports = class WebSocketServer {
                     this.channelManager.createBackendChannel(id, ws);
                     break;
                 case 'frontend':
-                    this.channelManager.createFrontendChannel('san', ws, ws.backend);
+                    this.channelManager.createFrontendChannel(id, ws, ws.backend);
                     break;
                 case 'home':
                     this.manager.createChannel(id, ws);
@@ -41,16 +41,16 @@ module.exports = class WebSocketServer {
         const socketPaths = ['backend', 'frontend', 'home', 'chii'];
         server.on('upgrade', function (request, socket, head) {
             const urlObj = url.parse(request.url);
-            const [_, role, id] = urlObj.pathname.split('/');
+            const [_, role, id, backendId] = urlObj.pathname.split('/');
 
             if (socketPaths.indexOf(role) !== -1) {
                 wss.handleUpgrade(request, socket, head, ws => {
                     ws.role = role;
                     ws.id = id;
-                    const q = querystring.parse(urlObj.query);
-                    logger.debug('upgrade', role, id, q);
+                    logger.debug('upgrade', role, id);
 
                     if (role === 'backend') {
+                        const q = querystring.parse(urlObj.query);
                         // 来自 query的参数
                         ws.url = q.url;
                         ws.title = q.title;
@@ -58,7 +58,7 @@ module.exports = class WebSocketServer {
                     }
                     else if (role === 'frontend') {
                         // 来自query的backendId
-                        ws.backend = id;
+                        ws.backend = backendId;
                     }
                     wss.emit('connection', ws, request);
                 });

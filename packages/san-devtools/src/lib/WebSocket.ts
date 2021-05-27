@@ -47,7 +47,7 @@ export default class WebSocketMultiplex extends EventEmitter {
             }
             if (event.data.startsWith('@')) {
                 const t = event.data.split('\n');
-                const channelName = t.shift() === 'chii' ? 'chii' : 'san';
+                const channelName = t.shift();
                 if (channelName) {
                     const channel = this._channelsMap.get(channelName.replace(/^@/, ''));
                     if (channel) {
