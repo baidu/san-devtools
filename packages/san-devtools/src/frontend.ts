@@ -9,6 +9,9 @@ import initLogger from '@frontend/utils/Logger';
 import WebSocket from './lib/WebSocket';
 import createBridge from './utils/createBridge';
 
+// backend 所在页面刷新
+// 1. backend 会 disconnect，接着会触发 frontend disconnect，此时 frontend 需要重新创建 websocket 建立链接
+// 2. backend 重新创建 websocket 建立了链接
 if (__DEBUG__) {
     initLogger();
 }
@@ -19,7 +22,7 @@ if (__DEBUG__) {
 let resourceQuery = location.search;
 let app: any = null;
 let hasWs: boolean = false;
-let timerId: null | ReturnType<typeof setTimeout>  = null;
+let timerId: null | ReturnType<typeof setTimeout> = null;
 
 class Container extends san.Component {
     static template = /* html */ `
@@ -53,7 +56,6 @@ class Container extends san.Component {
  */
 function initialize(bridge: Bridge) {
     if (app) {
-        console.log('app', bridge, bridge === app.data.get('bridge'));
         app.data.set('bridge', bridge);
     } else {
         app = new Container(bridge);
@@ -93,7 +95,7 @@ function socket() {
             'background:transparent'
         );
     }
-    const url = resourceQuery.replace(/^\??(.*)?=/, '$1://');
+    const url = resourceQuery.replace(/^\?*(.*?)=/, '$1://');
     const wss = new WebSocket(url);
     let _bridge = createBridge(wss);
 
@@ -110,7 +112,7 @@ function socket() {
     wss.on('close', next);
     wss.on('error', next);
     wss.on('open', () => {
-        console.log('initialize', _bridge.send);
+        // console.log('initialize', _bridge.send);
         hasWs = true;
         // 确认建立链接之后，开始初始化 frontend
         initialize(_bridge);
@@ -119,8 +121,7 @@ function socket() {
 
 if (resourceQuery !== '' && resourceQuery.includes('ws')) {
     socket();
-}
-else {
+} else {
     let bridge = new Bridge({
         listen(fn: Function) {
             window.addEventListener('message', ({data}) => {

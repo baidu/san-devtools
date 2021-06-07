@@ -15,7 +15,7 @@ module.exports = createConfig({
         index: './src/index.ts'
     },
     output: {
-        publicPath: isProd ? './' : '/',
+        publicPath: isProd ? './' : './',
         path: path.resolve(__dirname, 'dist'),
         filename: '[name].js',
         library: 'SanDevtools',
