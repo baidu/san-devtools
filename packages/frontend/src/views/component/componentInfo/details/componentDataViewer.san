@@ -15,6 +15,7 @@
 
 <script>
     import san, { DataTypes } from 'san';
+    import {COMPONENT_MODIFY_DATA} from '@shared/protocol';
     import JSONView from 'json-tree-view';
     import 'json-tree-view/devtools.css';
 
@@ -48,7 +49,7 @@
                     oldVal,
                     newVal
                 }
-                this.data.get('bridge').send('Component.modifyComponentData', message);
+                this.data.get('bridge').send(COMPONENT_MODIFY_DATA, message);
             },
 
             change({ path, oldVal, newVal }) {

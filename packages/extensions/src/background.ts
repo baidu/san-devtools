@@ -1,6 +1,7 @@
 /* global __DEBUG__ chrome */
 import {portManager} from '../utils/portManager';
 import {relay} from './contentScript/relay';
+import {BACKEND_CONNECTED, INSPECT_COMPONENT} from '@shared/protocol';
 let localStorage = window.localStorage;
 type Port = chrome.runtime.Port;
 interface Ports {[key: string]: Port}
@@ -64,7 +65,7 @@ chrome.runtime.onConnect.addListener(function (port: chrome.runtime.Port) {
                             // 当 content_script 建立链接之后，通知 frontend
                             port.postMessage([
                                 {
-                                    event: 'SYSTEM:backendConnected',
+                                    event: BACKEND_CONNECTED,
                                     payload: ''
                                 }
                             ]);
@@ -160,6 +161,6 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     if (tab && tab.active && tab.id && info && info.menuItemId) {
         let id = tab.id + '';
         let targetPort = portManager.getPortFromRoom(id, SAN_DEVTOOLS_PANEL);
-        targetPort && targetPort.postMessage('Inspector.component');
+        targetPort && targetPort.postMessage(INSPECT_COMPONENT);
     }
 });

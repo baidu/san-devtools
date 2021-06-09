@@ -30,7 +30,7 @@
         "http-server": "^0.12.3",
         "less-loader": "^6.1.0",
         "mini-css-extract-plugin": "^0.9.0",
-        "san": "~3.9.0",
+        "san": "^3.10.3",
         "san-hot-loader": "^0.1.1",
         "san-loader": "0.0.7",
         "style-loader": "^0.23.1",

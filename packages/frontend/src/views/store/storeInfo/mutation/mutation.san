@@ -112,6 +112,7 @@
 
 <script>
     import san, { DataTypes } from 'san';
+    import {STORE_DISPATCH} from '@shared/protocol';
     import { connectStore, store } from '@frontend/store/index';
     import JSONView from 'json-tree-view';
     import 'json-tree-view/devtools.css';
@@ -174,7 +175,7 @@
                     actionName,
                     payload
                 }
-                bridge.send('Store.dispatchAction', message);
+                bridge.send(STORE_DISPATCH, message);
             },
             components: {
                 'san-divider': Divider,

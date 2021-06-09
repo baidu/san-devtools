@@ -1,4 +1,12 @@
 import Bridge from '@shared/Bridge';
+import {
+    PROFILER_SET_DATA,
+    PROFILER_SET_INFO,
+    PROFILER_GET_INFO,
+    PROFILER_SET_FIRST_RENDER_DATA,
+    PROFILER_GET_FIRST_RENDER_DATA,
+    PROFILER_RECORD
+} from '@shared/protocol';
 import {SAN_COMPONENT_HOOK} from '../../constants';
 import {DevToolsHook, Component} from '../../hook';
 import Agent from '../Agent';
@@ -22,18 +30,18 @@ export class ProfilerAgent extends Agent {
             if (getFirstReanderProfilerData) {
                 // 处理在组件还没挂载完成的之前获取首屏数据，这里重新发送一下
                 let firstRenderList = generateProfilerDataList(this.hook.profilerData);
-                this.sendToFrontend('Profiler.setFirstReanderProfilerData', JSON.stringify(firstRenderList));
+                this.sendToFrontend(PROFILER_SET_FIRST_RENDER_DATA, JSON.stringify(firstRenderList));
             }
         }
         // 是否 profiler 面板在记录数据
         if (this.hook.profilerRecording) {
             if (profilerData) {
-                this.sendToFrontend('Profiler.setProfilerData', JSON.stringify(profilerData));
+                this.sendToFrontend(PROFILER_SET_DATA, JSON.stringify(profilerData));
             }
             // 如果选中的组件的数组更新了，直接发送 info
             if (component.id + '' === this.hook.profilerComponentId) {
                 let profilerInfo = this.hook.profilerData.get(component.id + '');
-                this.sendToFrontend('Profiler.setProfilerInfo', JSON.stringify(profilerInfo));
+                this.sendToFrontend(PROFILER_SET_INFO, JSON.stringify(profilerInfo));
             }
         }
     }
@@ -51,24 +59,24 @@ export class ProfilerAgent extends Agent {
     }
 
     addListener() {
-        this.bridge.on('Profiler.getProfilerInfo', profilerComponentId => {
+        this.bridge.on(PROFILER_GET_INFO, profilerComponentId => {
             this.hook.profilerComponentId = profilerComponentId + '';
             if (!profilerComponentId) {
                 return;
             }
             let profilerInfo = this.hook.profilerData.get(profilerComponentId + '');
-            this.sendToFrontend('Profiler.setProfilerInfo', JSON.stringify(profilerInfo));
+            this.sendToFrontend(PROFILER_SET_INFO, JSON.stringify(profilerInfo));
         });
 
-        this.bridge.on('Profiler.profilerRecording', message => {
+        this.bridge.on(PROFILER_RECORD, message => {
             this.hook.profilerRecording = message.recording;
         });
 
-        this.bridge.on('Profiler.getFirstReanderProfilerData', () => {
+        this.bridge.on(PROFILER_GET_FIRST_RENDER_DATA, () => {
             if (firstRender) {
                 getFirstReanderProfilerData = false;
                 let firstRenderList = generateProfilerDataList(this.hook.profilerData);
-                this.sendToFrontend('Profiler.setFirstReanderProfilerData', JSON.stringify(firstRenderList));
+                this.sendToFrontend(PROFILER_SET_FIRST_RENDER_DATA, JSON.stringify(firstRenderList));
             }
             else {
                 getFirstReanderProfilerData = true;

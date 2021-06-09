@@ -10,6 +10,12 @@ import {
     getStoreData
 } from './storeTree';
 import CircularJSON from '@shared/utils/circularJSON';
+import {
+    STORE_SET_MUTATION_INFO,
+    STORE_SET_DATA, STORE_GET_DATA,
+    STORE_DATA_CHANGED,
+    STORE_DISPATCH
+} from '@shared/protocol';
 import {storeDecorator} from './versionControl';
 
 
@@ -69,7 +75,7 @@ export class StoreAgent extends Agent {
                     component,
                 } = data;
                 let storeData = setStore(this.hook, store, false, {componentId: component.id, type: 'add'});
-                this.sendToFrontend('Store.storeChanged', '');
+                this.sendToFrontend(STORE_DATA_CHANGED, '');
                 // 更新 component 信息
                 setStoreComponentData(this.hook, component, false, mapStates, mapActions, storeData.storeName);
                 break;
@@ -87,7 +93,7 @@ export class StoreAgent extends Agent {
                 let storeData = setStore(this.hook, store, false);
                 // 发送 mutation 数据
                 let mutation = getMutationData(data, storeData.storeName);
-                this.sendToFrontend('Store.setMutationTreeData', CircularJSON.stringify(mutation));
+                this.sendToFrontend(STORE_SET_MUTATION_INFO, CircularJSON.stringify(mutation));
                 break;
             }
             /**
@@ -108,7 +114,7 @@ export class StoreAgent extends Agent {
                     component
                 } = data;
                 setStore(this.hook, store, false, {componentId: component.id, type: 'delete'});
-                this.sendToFrontend('Store.storeChanged', '');
+                this.sendToFrontend(STORE_DATA_CHANGED, '');
                 setStoreComponentData(this.hook, component, true);
                 break;
             }
@@ -120,19 +126,19 @@ export class StoreAgent extends Agent {
                 // 需要更新 store 实例
                 let {store} = data;
                 setStore(this.hook, store, true);
-                this.sendToFrontend('Store.storeChanged', '');
+                this.sendToFrontend(STORE_DATA_CHANGED, '');
                 break;
             }
             default: break;
         }
     }
     addListener() {
-        this.bridge.on('Store.dispatchAction', message => {
+        this.bridge.on(STORE_DISPATCH, message => {
             dispatchAction(this.hook, message);
         });
-        this.bridge.on('Store.getStoreData', message => {
+        this.bridge.on(STORE_GET_DATA, message => {
             let storeData = getStoreData(this.hook, message);
-            this.sendToFrontend('Store.setStoreData', CircularJSON.stringify(storeData));
+            this.sendToFrontend(STORE_SET_DATA, CircularJSON.stringify(storeData));
         });
     }
 }
