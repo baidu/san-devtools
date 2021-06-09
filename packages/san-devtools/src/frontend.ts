@@ -2,6 +2,7 @@
 
 import san from 'san';
 import Bridge from '@shared/Bridge';
+import {BACKEND_DISCONNECTED} from '@shared/protocol';
 
 import DevTools from '@frontend/DevTools.san';
 import {initFrontend} from '@frontend/initFrontend';
@@ -102,7 +103,7 @@ function socket() {
     function next() {
         hasWs = false;
         // frontend 关闭的时候，触发 SYSTEM:backendDisconnected 清理 store
-        _bridge.emit('SYSTEM:backendDisconnected');
+        _bridge.emit(BACKEND_DISCONNECTED);
         if (timerId) {
             clearTimeout(timerId);
         }

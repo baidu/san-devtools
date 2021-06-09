@@ -1,4 +1,5 @@
 import Bridge from '@shared/Bridge';
+import {HANDSHAKE_FRONTEND_READY, SAN_SET_VERSION} from '@shared/protocol';
 import {DevToolsHook} from './hook';
 import {getAgents, AgentCreator} from './agentController';
 import setupHighlighter from './highlighter';
@@ -25,13 +26,13 @@ export default function initBackend(hook: DevToolsHook<{}>, bridge: Bridge, glob
         setupHighlighter(hook, bridge, global);
     });
     // 监听 frontend 是否已经准备就绪
-    bridge.on('HandShake.frontendReady', () => {
+    bridge.on(HANDSHAKE_FRONTEND_READY, () => {
         initHookData(hook);
         hook.devtoolReady = true;
         // 发送san版本
         // 这里放到ready里面，就是假如hook.san这时候事件没有接收到，san是空的，所以应该压入一个栈
         hook.ready((hook: DevToolsHook<{}>) => {
-            bridge.send('San.setSanVersion', hook.san && hook.san.version);
+            bridge.send(SAN_SET_VERSION, hook.san && hook.san.version);
         });
     });
 }

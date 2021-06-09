@@ -30,6 +30,7 @@
     import { Spin } from 'santd';
     import { connectStore, store } from '@frontend/store/index';
     import TreeView from '@frontend/components/treeView/treeView.san';
+    import {COMPONENT_GET_INFO, INSPECT_HIGHLIGHT} from '@shared/protocol';
 
     import '@frontend/components/treeView/custom.less';
 
@@ -80,11 +81,11 @@
         },
 
         getComponentInfo({ id: componentId }) {
-            this.data.get('bridge') && this.data.get('bridge').send('Component.getComponentInfo', componentId);
+            this.data.get('bridge') && this.data.get('bridge').send(COMPONENT_GET_INFO, componentId);
         },
 
         highlightNativeNode({ id: componentId }) {
-            this.data.get('bridge') && this.data.get('bridge').send('Inspect.highlight', componentId);
+            this.data.get('bridge') && this.data.get('bridge').send(INSPECT_HIGHLIGHT, componentId);
         },
 
         initData() {

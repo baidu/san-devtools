@@ -57,6 +57,7 @@
 
 <script>
     import san, { DataTypes } from 'san';
+    import {STORE_GET_DATA, INSPECT_HIGHLIGHT, INSPECT_UNHIGHLIGHT} from '@shared//protocol';
     import { connectStore, store } from '@frontend/store/index';
     import JSONView from 'json-tree-view';
     import 'json-tree-view/devtools.css';
@@ -88,15 +89,15 @@
             },
 
             refreshStoreData() {
-                this.data.get('bridge') && this.data.get('bridge').send('Store.getStoreData', this.data.get('storeName'));
+                this.data.get('bridge') && this.data.get('bridge').send(STORE_GET_DATA, this.data.get('storeName'));
             },
 
             highlightNativeNode(componentId) {
-                this.data.get('bridge') && this.data.get('bridge').send('Inspect.highlight', componentId);
+                this.data.get('bridge') && this.data.get('bridge').send(INSPECT_HIGHLIGHT, componentId);
             },
 
             unhighlightNativeNode() {
-                this.data.get('bridge') && this.data.get('bridge').send('Inspect.unhighlight', '');
+                this.data.get('bridge') && this.data.get('bridge').send(INSPECT_UNHIGHLIGHT, '');
             },
 
             computed: {

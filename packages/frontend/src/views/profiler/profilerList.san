@@ -24,6 +24,7 @@
 
 <script>
     import san, { DataTypes } from 'san';
+    import {PROFILER_GET_INFO, INSPECT_HIGHLIGHT} from '@shared/protocol';
     import { connectStore, store } from '@frontend/store/index';
 
     import { Button, Table } from 'santd';
@@ -74,7 +75,7 @@
                 this.watch('currentTime', currentTime => {
                     this.data.set('selectedId', '');
                     // 通知 backend 清除选中的 id
-                    this.data.get('bridge') && this.data.get('bridge').send('Profiler.getProfilerInfo', '');
+                    this.data.get('bridge') && this.data.get('bridge').send(PROFILER_GET_INFO, '');
                     // 触发 setProfilerInfo 
                     store.dispatch('setProfilerInfo', {});
                 });
@@ -94,8 +95,8 @@
             onClick(e, item) {
                 let componentId = item[0];
                 this.data.set('selectedId', componentId);
-                this.data.get('bridge') && this.data.get('bridge').send('Inspect.highlight', componentId);
-                this.data.get('bridge') && this.data.get('bridge').send('Profiler.getProfilerInfo', componentId);
+                this.data.get('bridge') && this.data.get('bridge').send(INSPECT_HIGHLIGHT, componentId);
+                this.data.get('bridge') && this.data.get('bridge').send(PROFILER_GET_INFO, componentId);
             }
         }
     )

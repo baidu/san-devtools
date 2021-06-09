@@ -1,4 +1,5 @@
 import Bridge from '@shared/Bridge';
+import {INSPECT_HIGHLIGHT, INSPECT_UNHIGHLIGHT} from '@shared/protocol';
 import {DevToolsHook} from './hook';
 import ready from '@shared/utils/ready';
 
@@ -88,13 +89,13 @@ export function highlighter(hook: DevToolsHook<{}>, componentId: string, highlig
 export default function setupHighlighter(hook: DevToolsHook<any>, bridge: Bridge, global: any) {
     let highlighterBubble = new HighlighterBubble(global);
     // 组件高亮
-    bridge.on('Inspect.highlight', message => {
+    bridge.on(INSPECT_HIGHLIGHT, message => {
         if (!hook.devtoolReady) {
             return;
         }
         highlighter(hook, message, highlighterBubble);
     });
-    bridge.on('Inspect.unhighlight', () => {
+    bridge.on(INSPECT_UNHIGHLIGHT, () => {
         if (!hook.devtoolReady) {
             return;
         }

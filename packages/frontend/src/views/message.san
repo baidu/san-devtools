@@ -14,6 +14,7 @@
 
 <script>
     import san, { DataTypes } from 'san';
+    import { MESSAGE_DISPATCH, MESSAGE_RECORD } from '@shared/protocol';
     import { connectStore, store } from '@frontend/store/index';
     import DevtoolsTable from '@frontend/components/misc/devtoolsTable.san';
 
@@ -81,9 +82,9 @@
                     filterText: '',
                     bridgeOptions: {
                         targetName: 'sender',
-                        bridgeName: 'Message',
+                        bridgeAction: 'Message.dispatch',
                         bridgeActionName: 'dispatch',
-                        bridgeRecording: 'messageRecording'
+                        bridgeRecording: 'Message.messageRecording'
                     },
                     columns: [
                         {

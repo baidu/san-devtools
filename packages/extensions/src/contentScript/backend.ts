@@ -2,6 +2,7 @@
 import initBackend from '@backend/initBackend';
 import {install, DevToolsHook} from '@backend/hook';
 import Bridge from '@shared/Bridge';
+import {BACKEND_CONNECTED} from '@shared/protocol';
 
 // 向 san 页面注入 hook
 let sanHook = install(window);
@@ -49,6 +50,6 @@ if (sanHook) {
 
     // 通知 frontend 刷新 store
     document.addEventListener('DOMContentLoaded', () => {
-        bridge.send('SYSTEM:backendConnected', '');
+        bridge.send(BACKEND_CONNECTED, '');
     });
 }

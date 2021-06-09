@@ -108,6 +108,7 @@
 
 <script>
     import san, { DataTypes } from 'san';
+    import {INSPECT_HIGHLIGHT} from '@shared/protocol'
     import { connectStore } from '@frontend/store/index';
     import { optimizedResize } from '@frontend/utils/index';
 
@@ -177,10 +178,10 @@
             },
 
             record() {
-                let { bridgeRecording, bridgeName } = this.data.get('bridgeOptions');
+                let { bridgeRecording } = this.data.get('bridgeOptions');
                 let recording = !this.data.get('recording');
                 this.data.set('recording', recording);
-                this.data.get('bridge').send(`${bridgeName}.${bridgeRecording}`, { recording });
+                this.data.get('bridge').send(`${bridgeRecording}`, { recording });
             },
 
             clear() {
@@ -188,11 +189,11 @@
             },
 
             actionHandler(index) {
-                let { bridgeActionName, bridgeName, targetName } = this.data.get('bridgeOptions');
+                let { bridgeAction, targetName } = this.data.get('bridgeOptions');
                 let item = this.data.get('data')[index];
                 let id = item[targetName].id;
                 let eventName = item.event;
-                this.data.get('bridge').send(`${bridgeName}.${bridgeActionName}`, { componentId: id, payload: item.payload, eventName });
+                this.data.get('bridge').send(`${bridgeAction}`, { componentId: id, payload: item.payload, eventName });
             },
 
             computeTableHeight() {
@@ -222,7 +223,7 @@
                 this.data.set(`data[${index}].payload`, changedData);
             },
             highlightNativeNode(componentId) {
-                this.data.get('bridge') && this.data.get('bridge').send('Inspect.highlight', componentId);
+                this.data.get('bridge') && this.data.get('bridge').send(INSPECT_HIGHLIGHT, componentId);
             }
         }
     )

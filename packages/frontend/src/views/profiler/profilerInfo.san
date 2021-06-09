@@ -104,6 +104,7 @@
 <script>
     import san, { DataTypes } from 'san';
     import { connectStore, store } from '@frontend/store/index';
+    import {PROFILER_RECORD, INSPECT_HIGHLIGHT, PROFILER_GET_INFO} from '@shared/protocol';
 
     import { Table, Menu, Icon as StandIcon, Tooltip, Spin } from 'santd';
     import DropDown from 'santd/es/dropdown';
@@ -365,8 +366,8 @@
                 this.data.set('showFlame', false);
                 this.data.set('flameOptions.fill', '#999999');
                 // 重置选中的组件
-                this.data.get('bridge').send('Profiler.getProfilerInfo', '');
-                this.data.get('bridge').send('Profiler.profilerRecording', { recording });
+                this.data.get('bridge').send(PROFILER_GET_INFO, '');
+                this.data.get('bridge').send(PROFILER_RECORD, { recording });
             },
 
             // 选择 menu 查看对应的性能数据 
@@ -426,7 +427,7 @@
                 if (!d || !d.data || !d.data.componentId) {
                     return;
                 }
-                this.data.get('bridge') && this.data.get('bridge').send('Inspect.highlight', d.data.componentId);
+                this.data.get('bridge') && this.data.get('bridge').send(INSPECT_HIGHLIGHT, d.data.componentId);
             },
 
             /**

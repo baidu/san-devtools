@@ -2,6 +2,7 @@
 
 import san from 'san';
 import Bridge from '@shared/Bridge';
+import {BACKEND_DISCONNECTED} from '@shared/protocol';
 
 // import {DevTools} from '@frontend/index';
 // import 'santd/dist/santd.less';
@@ -41,7 +42,7 @@ function initialize(bridge: Bridge) {
     initFrontend(bridge);
     // 监听san-app页面重新加载，重新加载则清除 store，并卸载组件
     chrome.devtools.network.onNavigated.addListener(() => {
-        bridge.emit('SYSTEM:backendDisconnected');
+        bridge.emit(BACKEND_DISCONNECTED);
     });
     // 渲染 frontend 页面
     class Container extends san.Component {

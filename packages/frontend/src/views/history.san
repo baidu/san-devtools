@@ -21,6 +21,7 @@
 </template>
 <script>
     import san, { DataTypes } from 'san';
+    import { HISTORY_RECORD } from '@shared/protocol';
     import { Spin } from 'santd';
     import { connectStore, store } from '@frontend/store/index';
     import DevtoolsTable from '@frontend/components/misc/devtoolsTable.san';
@@ -88,9 +89,7 @@
                     loading: false,
                     filterText: '',
                     bridgeOptions: {
-                        bridgeName: 'History',
-                        bridgeActionName: 'fire',
-                        bridgeRecording: 'historyRecording'
+                        bridgeRecording: HISTORY_RECORD
                     },
                     columns: [
                         {
