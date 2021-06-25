@@ -19,6 +19,7 @@ import {
 import CircularJSON from '@shared/utils/circularJSON';
 
 export class ComponentAgent extends Agent {
+    hasGotTreeData: boolean = false;
     onHookEvent(evtName: string, component: Component): void {
         switch (evtName) {
             case 'comp-compiled':
@@ -41,7 +42,8 @@ export class ComponentAgent extends Agent {
                 this.hook.data.treeData.set(String(component.id), data);
                 // inspector，更新 dom 上的 idPath
                 inspectSanInstance(component, data.idPath);
-                this.sendToFrontend(COMPONENT_SET_TREE_DATA, JSON.stringify({type: 'add', data}));
+                this.hasGotTreeData
+                    && this.sendToFrontend(COMPONENT_SET_TREE_DATA, JSON.stringify({type: 'add', data}));
                 break;
             }
             case 'comp-detached': {
@@ -95,6 +97,7 @@ export class ComponentAgent extends Agent {
     /* eslint-disable  @typescript-eslint/no-empty-function */
     addListener() {
         this.bridge.on(COMPONENT_GET_TREE_DATA, () => {
+            this.hasGotTreeData = true;
             let treeData = getAllComponentTree(this.hook);
             this.sendToFrontend(COMPONENT_SET_TREE_DATA, JSON.stringify(treeData));
         });

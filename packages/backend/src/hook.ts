@@ -144,10 +144,6 @@ export class DevToolsHook<T> extends EventEmitter {
     // Stores 对象及相关信息，与 devtool 保持同步的 mutation list。
     storeMap: Map<string, any> = new Map();
     storeComponentMap: Map<string, any> = new Map();
-    sub(eventName: EventType, listener: Listener) {
-        this.on(eventName, listener);
-        return () => this.off(eventName, listener);
-    }
     _flushReadyStack() {
         // san 不存在则无法执行任务队列
         if (!this.san || !this._frontendReady) {
