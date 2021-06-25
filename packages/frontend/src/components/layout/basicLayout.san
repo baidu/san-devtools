@@ -24,7 +24,7 @@
             let width = document.body.clientWidth || document.documentElement.clientWidth;
             let status = +width < H_WIDTH ? 'vertical' : 'horizontal';
             return {
-                status: status,
+                status: status
             }
         },
         attached() {
