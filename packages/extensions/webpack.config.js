@@ -29,7 +29,7 @@ module.exports = createConfig({
         filename: 'js/[name].js'
     },
     plugins: [
-        new CleanWebpackPlugin(),
+        process.env.NODE_ENV === 'production' ? new CleanWebpackPlugin() : null,
         new HtmlWebpackPlugin({
             templateParameters: {
                 ...pkg
@@ -62,5 +62,5 @@ module.exports = createConfig({
                 extend: {version: pkg.version}
             }
         })
-    ]
+    ].filter(Boolean)
 });

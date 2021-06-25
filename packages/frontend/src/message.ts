@@ -46,7 +46,7 @@ export default class FrontendReceiver extends EventEmitter {
         bridge.on(INSPECT_COMPONENT, this.onInspectComponent.bind(this)); // inspect component
         bridge.on(BACKEND_CONNECTED, this.onBackendConnected.bind(this)); // 后端链接
         bridge.on(BACKEND_DISCONNECTED, this.onBackendDisconnected.bind(this)); // 后端断开
-        this.frontendReady();
+        !isChromePanel && this.frontendReady();
     }
     frontendReady() {
         this._bridge.send(HANDSHAKE_FRONTEND_READY, 'I am FrontEnd, I am standby!');

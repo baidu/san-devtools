@@ -92,12 +92,9 @@ export function deleteFromTreeData(rootTreeData: ComponentTreeData[], data: Comp
 }
 
 function generateTreeData(rootTreeData: ComponentTreeData[], info: ComponentTreeInfo) {
-    if (info.type === 'add') {
-        return addToTreeData(rootTreeData, info.data) ? +1 : 0;
-    }
-    else {
-        return deleteFromTreeData(rootTreeData, info.data) ? -1 : 0;
-    }
+    return info.type === 'add'
+        ? addToTreeData(rootTreeData, info.data) ? +1 : 0
+        : deleteFromTreeData(rootTreeData, info.data) ? -1 : 0;
 }
 
 export const setTreeData = {
@@ -109,9 +106,7 @@ export const setTreeData = {
     actions: {
         setTreeData(info: ComponentTreeInfo | ComponentTreeInfo[], {dispatch}: any) {
             dispatch('setGenerateTreeData', true);
-            setTimeout(() => {
-                dispatch('generateTreeData', info);
-            }, 60);
+            dispatch('generateTreeData', info);
         },
         generateTreeData(info: ComponentTreeInfo | ComponentTreeInfo[], {getState}: any) {
             let oldTreeData = getState('treeData');

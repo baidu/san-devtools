@@ -1,6 +1,10 @@
 ChangeLog
 ========
-
+3.1.5
+-------
+ - [Bugfix]
+    - Fix incorrect number of components.
+    - Fix incoreect layout of the san-devtools pannel(chrome extensions) in some special scenes.
 
 1.1.4
 -------
