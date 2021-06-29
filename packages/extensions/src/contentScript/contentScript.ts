@@ -9,5 +9,5 @@ if (__DEBUG__) {
     console.log('content_script');
 }
 
-injector.fromExtensionUrlSync(chrome.runtime.getURL('js/san_devtools_backend.js'));
+chrome.runtime && injector.fromExtensionUrlSync(chrome.runtime.getURL('js/san_devtools_backend.js'));
 relay();

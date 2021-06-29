@@ -125,8 +125,9 @@ function timeFragementCacheHandler(children: TimeFragement[], timeFragment: Time
                 default: break;
             }
         }
-        // 如果数组遍历完了，还是没有找到 case 0 的情况，则直接 push 到 curChildren，并结束深度遍历
-        if (index === len) {
+        // 1. 如果数组遍历完了，还是没有找到 case 0 的情况，则直接 push 到 curChildren
+        // 2. 如果找到了 case 0，并且当前位置的 children 为空，则直接添加到 children 中
+        if (index === len || curChildren.length === 0) {
             curChildren.push(timeFragment);
             return;
         }
@@ -145,6 +146,12 @@ function getTimeSlotsRelation(timeSlotA: TimeFragement, timeSlotB: TimeFragement
     let endDiff = timeSlotA.end - timeSlotB.end;
     if (startDiff * endDiff < 0) {
         // 包含关系: startDiff > 0 为 B 包含 A，startDiff < 0 为 A 包含 B
+        return startDiff < 0 ? 1 : 0;
+    }
+    else if (startDiff === 0) {
+        return endDiff < 0 ? 0 : 1;
+    }
+    else if (endDiff === 0) {
         return startDiff < 0 ? 1 : 0;
     }
     else {

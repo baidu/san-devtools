@@ -17,7 +17,7 @@ function createDevtoolPanelIfNeeded() {
             return;
         }
         clearInterval(createdCheckInterval);
-        chrome.devtools.panels.create(
+        chrome.runtime && chrome.devtools.panels.create(
             'San',
             chrome.runtime.getURL('/icons/logo128.png'),
             'panel.html'

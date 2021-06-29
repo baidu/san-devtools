@@ -5,6 +5,7 @@ ChangeLog
  - [Bugfix]
     - Fix incorrect number of components.
     - Fix incoreect layout of the san-devtools pannel(chrome extensions) in some special scenes.
+    - Fix data error in profiler pannel.
 
 1.1.4
 -------

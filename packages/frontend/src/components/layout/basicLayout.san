@@ -71,7 +71,7 @@
             document.querySelector(`.${prefix}-right`).style = 'width: 100%';
             let parent = document.querySelector(`.${prefix}-wrapper`);
             let child = document.querySelector(`.gutter-${status}-wrapper`);
-            parent.removeChild(child);
+            child && parent && parent.removeChild(child);
         }
     }
 </script>
