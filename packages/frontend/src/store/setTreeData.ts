@@ -14,12 +14,11 @@ interface ComponentTreeInfo{
  */
 function getIDListFromTreeData(treeData: ComponentTreeData[]) {
     let ids: string[] = [];
-    if (!treeData) {
-        return ids;
+    if (treeData) {
+        treeData.forEach((data: any) => {
+            data.id && ids.push(data.id);
+        });
     }
-    treeData.forEach((data: any) => {
-        data.id && ids.push(data.id);
-    });
     return ids;
 }
 
