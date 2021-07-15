@@ -34,6 +34,9 @@ OR
 
 Navigate to chrome://extensions in Chrome/Chromium to load the unpacked extension from dist directory.
 
+## 📖 Document
+[中文文档](./docs/user_guide.md)
+
 ## 🤝 Quick Start
 
 ### standalone
