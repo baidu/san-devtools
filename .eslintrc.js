@@ -7,6 +7,7 @@ module.exports = {
         '@typescript-eslint/no-use-before-define': 'off',
         'comma-dangle': 'off',
         'no-useless-constructor': 'off',
-        '@typescript-eslint/no-useless-constructor': 'error'
+        '@typescript-eslint/no-useless-constructor': 'error',
+        '@typescript-eslint/member-ordering': 'off'
     }
 };

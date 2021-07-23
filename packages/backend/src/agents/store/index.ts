@@ -1,25 +1,30 @@
 import Bridge from '@shared/Bridge';
-import {DevToolsHook} from '../../hook';
+import {DevToolsHook, Component} from '../../hook';
 import Agent from '../Agent';
 import {SAN_STORE_HOOK} from '../../constants';
-import {
-    setStore,
-    getMutationData,
-    dispatchAction,
-    setStoreComponentData,
-    getStoreData
-} from './storeTree';
 import CircularJSON from '@shared/utils/circularJSON';
 import {
     STORE_SET_MUTATION_INFO,
     STORE_SET_DATA, STORE_GET_DATA,
     STORE_DATA_CHANGED,
-    STORE_DISPATCH
+    STORE_DISPATCH,
+    STORE_TIME_TRAVEL,
+    STORE_GET_PARENTACTION,
+    STORE_SET_PARENTACTION
 } from '@shared/protocol';
-import {storeDecorator} from './versionControl';
+import {storeDecorator} from './storeDecorator';
+import {IStore} from './types';
+import {getStrFromObject} from './utils';
+import {StoreService} from './store';
 
 
 export class StoreAgent extends Agent {
+    guidIndex: number;
+    constructor(hook: DevToolsHook<any>, bridge: Bridge) {
+        super(hook, bridge);
+        this.guidIndex = 0;
+    }
+
     setupHook() {
         // 生命周期监听
         SAN_STORE_HOOK.map(evtName => {
@@ -35,23 +40,20 @@ export class StoreAgent extends Agent {
              */
             case 'store-default-inited': {
                 let {store} = data;
-                // 装饰store
                 storeDecorator.handler(store);
                 if (store.name !== '__default__') {
                     console.warn('[SAN_DEVTOOLS]: there is must be something bad has happened in san-store');
                     return;
                 }
-                setStore(this.hook, store, true);
+                this.setStore(store);
                 break;
             }
             /**
              * connectStore(store) 调用：与 store 创建链接
              */
             case 'store-connected': {
-                // 存储 store 实例
-                // mapStates, mapActions 在这没啥用
                 let {store} = data;
-                setStore(this.hook, store, true);
+                this.setStore(store);
                 break;
             }
             /**
@@ -62,38 +64,38 @@ export class StoreAgent extends Agent {
              * 3. 组件生命周期初始化触发: inited
              */
             case 'store-listened': {
-                // 选择静默，否则更新 store 实例，因为后续立马会执行 store-comp-inited
+                // 后续立马会执行 store-comp-inited
                 break;
             }
             case 'store-comp-inited': {
-                // actions 函数不需要更新
-                // 展示到组件上
                 let {
                     mapStates,
                     mapActions,
                     store,
                     component,
                 } = data;
-                let storeData = setStore(this.hook, store, false, {componentId: component.id, type: 'add'});
+                let storeService = this.setStore(store);
+                storeService.collectMapStatePath(mapStates);
                 this.sendToFrontend(STORE_DATA_CHANGED, '');
-                // 更新 component 信息
-                setStoreComponentData(this.hook, component, false, mapStates, mapActions, storeData.storeName);
+                this.setStoreComponentData(component, false, mapStates, mapActions, storeService.storeName);
                 break;
             }
             /**
              * 调用 store.dispatch 触发 store 的值的改变
              * 需要记录下来，作为 store tree 的展示内容，但是当变动频繁的时候
              */
-            case 'store-dispatch':
-            case 'store-dispatched': {
-                // actions 函数不需要更新
-                // 构建一个 storetree
+            case 'store-dispatch': {
                 let {store} = data;
-                // 更新 store
-                let storeData = setStore(this.hook, store, false);
-                // 发送 mutation 数据
-                let mutation = getMutationData(data, storeData.storeName);
-                this.sendToFrontend(STORE_SET_MUTATION_INFO, CircularJSON.stringify(mutation));
+                this.setStore(store);
+                break;
+            }
+            case 'store-dispatched': {
+                let {store} = data;
+                let storeService = this.setStore(store);
+                let mutation = storeService.getMutationData(data.actionId, data.diff);
+                if (mutation !== null) {
+                    this.sendToFrontend(STORE_SET_MUTATION_INFO, CircularJSON.stringify(mutation));
+                }
                 break;
             }
             /**
@@ -104,29 +106,17 @@ export class StoreAgent extends Agent {
              * 3. 组件生命周期初始化触发: disposed
              */
             case 'store-unlistened': {
-                // 选择静默，否则更新 store 实例，因为后续立马会执行 store-comp-disposed
+                // 后续立马会执行 store-comp-disposed
                 break;
             }
             case 'store-comp-disposed': {
-                // 需要更新 store 实例
                 let {
                     store,
                     component
                 } = data;
-                setStore(this.hook, store, false, {componentId: component.id, type: 'delete'});
+                this.setStore(store);
                 this.sendToFrontend(STORE_DATA_CHANGED, '');
-                setStoreComponentData(this.hook, component, true);
-                break;
-            }
-            /**
-             * 调用 store.addAction 触发 store 的值的改变
-             */
-            case 'store-action-added': {
-                // 更新 actions 函数
-                // 需要更新 store 实例
-                let {store} = data;
-                setStore(this.hook, store, true);
-                this.sendToFrontend(STORE_DATA_CHANGED, '');
+                this.setStoreComponentData(component, true);
                 break;
             }
             default: break;
@@ -134,12 +124,112 @@ export class StoreAgent extends Agent {
     }
     addListener() {
         this.bridge.on(STORE_DISPATCH, message => {
-            dispatchAction(this.hook, message);
+            const {actionName, storeName, payload} = message;
+            const store = this.storeMap.get(storeName);
+            store.dispatchAction(actionName, payload);
         });
         this.bridge.on(STORE_GET_DATA, message => {
-            let storeData = getStoreData(this.hook, message);
+            const {id, storeName} = message || {};
+            if (!id || !storeName) {
+                return;
+            }
+            const store = this.storeMap.get(storeName);
+            let storeData = store.getStoreStateById(id);
             this.sendToFrontend(STORE_SET_DATA, CircularJSON.stringify(storeData));
         });
+        this.bridge.on(STORE_TIME_TRAVEL, message => {
+            if (message && message.id && message.storeName) {
+                const {id, storeName} = message;
+                const store = this.storeMap.get(storeName);
+                store.travelTo(id);
+            }
+        });
+        this.bridge.on(STORE_GET_PARENTACTION, message => {
+            if (message && message.id && message.storeName) {
+                const {id, storeName} = message;
+                const store = this.storeMap.get(storeName);
+                const actions = store.getAsyncActionData(id);
+                this.sendToFrontend(STORE_SET_PARENTACTION, CircularJSON.stringify(actions));
+            }
+        });
+    }
+
+    private get storeMap() {
+        return this.hook && this.hook.storeMap;
+    }
+
+    /**
+     * 获取 store 对应的名字
+     * @param store store 实例
+     */
+    private getStoreName(store: IStore) {
+        let {name} = store;
+        let fakeName = '';
+        for (let [key, storeData] of this.storeMap.entries()) {
+            if (storeData.store === store) {
+                fakeName = key;
+                break;
+            }
+        }
+        fakeName = fakeName || name;
+        if (!fakeName) {
+            fakeName = `Store${++this.guidIndex}-NamedBySanDevtools`;
+        }
+        return fakeName;
+    }
+
+    /**
+     * 更新 componentId，store 实例，存储 storeData
+     * @param store store 实例
+     */
+    private setStore(store: IStore) {
+        let fakeName = this.getStoreName(store);
+        let storeService = this.storeMap.get(fakeName);
+        if (!storeService) {
+            storeService = new StoreService(store, fakeName);
+            // 构建 data
+            this.storeMap.set(fakeName, storeService);
+        }
+        else {
+            storeService.store = store;
+        }
+        return storeService;
+    }
+
+    /* -------------------------------------------------------------------------- */
+    /*                         handle action and mutation                         */
+    /* -------------------------------------------------------------------------- */
+    /**
+     * 由于 component inited 在 attach 之前，所以可以先存下来，用于构建 componentTree 的阶段
+     * 构造并存储 storeComponentData
+     * @param mapStates 组件对应的 state
+     * @param mapActions 组件对应的 actions
+     * @param component 组件实例
+     */
+    private setStoreComponentData(
+        component: Component,
+        del: boolean,
+        mapStates?: Record<string, any>,
+        mapActions?: Record<string, any>,
+        storeName?: string
+    ) {
+        const hook = this.hook;
+        let {id} = component;
+        if (del) {
+            hook.storeComponentMap.delete(id + '');
+            return;
+        }
+        let mapActionsKeys = mapActions && getStrFromObject(mapActions);
+        let mapStatesArr = mapStates ? getStrFromObject(mapStates) : undefined;
+        let componentData = {
+            mapStates: mapStatesArr,
+            mapActionsKeys,
+            storeName,
+            extra: {
+                text: 'connected'
+            }
+        };
+        hook.storeComponentMap.set(id + '', componentData);
     }
 }
 
