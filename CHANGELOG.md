@@ -1,5 +1,12 @@
 ChangeLog
 ========
+3.1.6
+-------
+ - [Feat]]
+    - Time travel corresponding to selected mutation on Store pannel. 
+    - Call stack corresponding to selected mutation on Store pannel.
+    - Current state corresponding to selected mutation on Store pannel.  
+
 3.1.5
 -------
  - [Bugfix]

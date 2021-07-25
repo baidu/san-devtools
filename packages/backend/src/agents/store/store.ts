@@ -16,12 +16,10 @@ interface IStoreService {
 export class StoreService implements IStoreService {
     _store: IStore;
     storeName: string;
-    components: Record<string, any>;
     paths: Record<string, any>;
     constructor(store: IStore, storeName?: string) {
         this.store = this._store = store;
         this.storeName = storeName || store.name;
-        this.components = {};
         this.paths = {};
     }
 
@@ -157,9 +155,7 @@ export class StoreService implements IStoreService {
      */
     private decorateStore() {
         const store = this.store;
-        console.log('store decorateStore');
         if ('sanDevtoolsRaw' in store) {
-            console.log('store decorateStore');
             return;
         }
         let storeProto = Object.getPrototypeOf(store);
