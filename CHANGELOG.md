@@ -2,10 +2,12 @@ ChangeLog
 ========
 3.1.6
 -------
- - [Feat]]
+ - [Add]
     - Time travel corresponding to selected mutation on Store pannel. 
     - Call stack corresponding to selected mutation on Store pannel.
-    - Current state corresponding to selected mutation on Store pannel.  
+    - Current state corresponding to selected mutation on Store pannel.
+ - [Update]
+    - Keep two decimal places for the duration of life-cycle on flame-graph.
 
 3.1.5
 -------

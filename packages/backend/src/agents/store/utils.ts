@@ -1,5 +1,5 @@
 import {toLocaleDatetime} from '@shared/utils/dateFormator';
-import {getValueByPath} from '../../utils/utils';
+import {getValueByPath} from '@shared/utils/dataProcess';
 import {IDiffItem} from './types';
 
 /**
