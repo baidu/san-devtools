@@ -52,11 +52,16 @@
             this.chart.update(data);
         },
 
-        // 创建 flame graph 
+        // 创建 flame graph
         createFlame(options) {
             options = options || this.data.get();
             let {
-                tipFn = (d) => {return `${d.data.name}:${d.data.value}`;},
+                tipFn = (d) => {
+                    let name = getValueByPath(d, 'data.name', '');
+                    let value = getValueByPath(d, 'data.value', '-');
+                    typeof value === 'number' && !isNaN(value) && (value = value.toFixed(2))
+                    return `${name}:${value}`;
+                },
                 flameWidth,
                 inverted,
                 theme = 'warm',
@@ -99,7 +104,7 @@
                 // 开始创建新的 flame graph
                 this.createFlame();
                 // 开始渲染数据
-                this.renderFlame(data);                
+                this.renderFlame(data);
             }
             // 搜索火焰图数据
             this.watch('filterText', value => {

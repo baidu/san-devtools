@@ -51,9 +51,9 @@
             <div class="sand-pie-wrap" style="visibility: {{data.length > 0 ? 'visible' : 'hidden'}}">
                 <div class="sand-pie-title">生命周期平均耗时(average time)</div>
                 <div id="sand-pie" class="sand-pie"></div>
-            </div>  
+            </div>
         </div>
-        <div class="sand-d3-flame-wrapper {{showFlame ? '' : 'sand-d3-flame-wrapper-hide'}}">
+        <div class="{{showFlame ? 'sand-d3-flame-wrapper' : 'sand-d3-flame-wrapper-hide'}}">
             <div class="sand-d3-flame-header">
                 <div class="sand-d3-flame-header-title">FLAME GRAPH for {{currentTime}}</div>
                 <div class="sand-d3-flame-header-filter">
@@ -78,7 +78,7 @@
                     inverted="{{true}}"
                     flameSearchMatch="{{flameSearchMatch}}"
                     data="{{flameData}}"
-                    highlightColor="#1968fa"             
+                    highlightColor="#1968fa"
                     filterText="{{flameTerm}}"
                     on-click="flameHighlight"
                 />
@@ -115,6 +115,7 @@
     import Flame from '@frontend/components/flame/flame.san';
 
     import { toLocaleDatetime } from '@shared/utils/dateFormator';
+    import {getValueByPath} from '@shared/utils/dataProcess';
     import { flameJsonGenerator } from '@frontend/utils/flameJsonGenerator';
 
     import * as echarts from 'echarts/lib/echarts';
@@ -318,11 +319,13 @@
                         return reg.test(text);
                     },
                     flameTipFn: (d) => {
+                        let value = getValueByPath(d, 'data.value', '-');
+                        typeof value === 'number' && !isNaN(value) && (value = value.toFixed(2))
                         if ('componentId' in d.data && 'hookName' in d.data) {
-                            return `${d.data.name}:${d.data.componentId}:${d.data.hookName}:${d.data.value}`;
+                            return `${d.data.name}:${d.data.componentId}:${d.data.hookName}:${value}`;
                         }
                         else {
-                            return `生命周期总耗时:${d.data.value}`;
+                            return `生命周期总耗时:${value}`;
                         }
                     }
                 }
@@ -370,7 +373,7 @@
                 this.data.get('bridge').send(PROFILER_RECORD, { recording });
             },
 
-            // 选择 menu 查看对应的性能数据 
+            // 选择 menu 查看对应的性能数据
             menuClick({ key }) {
                 let profilerTime = this.data.get('profilerTime');
                 store.dispatch('setCurrentTime', profilerTime[key]);
@@ -489,6 +492,10 @@
             display: none;
         }
         .sand-d3-flame-wrapper {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 180px;
             height: 50%;
             width: 80%;
             overflow: auto;
@@ -510,8 +517,9 @@
             .sand-d3-flame-footer {
                 display: flex;
                 justify-content: center;
-                padding-bottom: 10px;
+                user-select: none;
                 .sand-flame-action-icon {
+                    cursor: pointer;
                     font-size: 30px;
                     padding: 0 10px;
                 }
@@ -583,7 +591,7 @@
             height: calc(100% - 36px);
             overflow: auto;
             padding-bottom: 10px;
-            box-sizing: border-box; 
+            box-sizing: border-box;
             .sand-profiler-info-table {
                 width: 100%;
                 background-color: @color-white;

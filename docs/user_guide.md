@@ -23,6 +23,7 @@
     - [设置](#设置)
     - [Component](#component)
     - [Store](#store)
+    - [Store time travel](#timetravel)
     - [History](#history)
     - [Event](#event)
     - [Message](#message)
@@ -204,6 +205,8 @@ Component tab 右侧为详细信息显示区域，包含了五个功能块：
 ### Store
 *Store tab* 反映了在使用了 **San 框架的官方应用状态管理套件** 即 **san-store** 后，页面应用的状态及状态的变更。与 *Component tab* 类似，*Store tab* 由左右两个部分组成，中间通过一个可以拖动的分隔条隔开。左侧为页面加载至今的状态变更快照。
 
+> 在 vuex 以及 react-redux 等这些状态管理库中，有对 action 与 mutation 的区分。但是在 san 中你不需要在代码中明确的声明 action 以及 mutation，因为一切都被看成 action，并且并非所有的 action 都会去改变 state。而在 san-devtools 中我们将修改 state 的action 称之为 mutation。
+
 
 <p>
     <a href="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/mutation_list.png">
@@ -211,12 +214,11 @@ Component tab 右侧为详细信息显示区域，包含了五个功能块：
     </a>
 </p>
 
-无论是否打开开发者工具，页面从初始加载时刻起的所有状态的变化都会被记录。在左侧的列表中，每个项目包含了四个内容：
+左侧的中每个项目包含了四个内容：
 
  - Action name：触发此状态变更的 action 的名字。
  - Action Id：触发此状态变更的 action 的 id。
- - 状态变化时刻的时间戳：格式为 **分:秒:毫秒**。
- - 状态：**done** 为完成, **pending** 为正在执行。
+ - 额外的标记：如果标记为 **useless** 则表示这次 mutation 没有改变 state
 
 <p>
     <a href="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/store_group.png">
@@ -234,8 +236,10 @@ Component tab 右侧为详细信息显示区域，包含了五个功能块：
     - actionId：action 的唯一标识
     - parentActionId：触发该 action 的父 action id
     - childsId：该 action 触发的其他的子 action id
-    - payload：该 action接收到的数据，支持修改该数据，点击 dispatch 按钮可以触发该 action
- - Diff：可以查看该 action dispatch 时， data 变化前后的所有差异。**⚠️ 注意：** 当没有用 san-update 来修改数据以及没有正确的 return 的时候，则无法查看 data 变化前后的差异。
+    - payload：该 action接收到的数据，支持修改该数据，点击 dispatch 按钮可以触发该 action，点击 time travel 按钮可以触发时间旅行，将页面回退到当前 mutation 触发之后的状态。
+ - Diff：可以查看该 action dispatch 时， data 变化前后的所有差异。**⚠️ 注意：** 在 action 中使用 san-update 来修改数据的时候，需要将类似 builder().set(...) 的操作返回，这样 san-store 才能够获取到更新之后的 state。
+ - Call stack：该部分是当前选中的 mutation 对应的 action 调用栈。每一个 action 部分都有对应的标题，接收的 payload 数据，点击右侧的三个小点你会看到有个 dispatch 操作按钮，你可以修改 payload 数据之后再点击 dispatch 操作按钮来触发一个新的 action。
+ - Store state：表示当前 muattion 触发之后对应的 state。
 
 > 提示：当使用了非官方的 connector 时，要确保在必要的时刻向 san-devtools 发送 `store-connected` `store-comp-inited` `store-comp-disposed` 事件，这样 san-devtools 才可以更好的生成 Store tab 中所需要状态变更快照。虽然已对无法收到上述事件做了替代方案，但这样可能会导致 Store tab 中某些地方为空。
 
