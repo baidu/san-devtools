@@ -52,7 +52,7 @@ export const setMutationTreeData = {
                     index: {[id]: 1} // key 是 actionId， value 是在数组中的位置
                 });
                 return arr;
-            }).set('storeChanged', true);
+            });
         }
     }
 };
