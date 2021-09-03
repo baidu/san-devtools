@@ -243,6 +243,19 @@ Component tab 右侧为详细信息显示区域，包含了五个功能块：
 
 > 提示：当使用了非官方的 connector 时，要确保在必要的时刻向 san-devtools 发送 `store-connected` `store-comp-inited` `store-comp-disposed` 事件，这样 san-devtools 才可以更好的生成 Store tab 中所需要状态变更快照。虽然已对无法收到上述事件做了替代方案，但这样可能会导致 Store tab 中某些地方为空。
 
+如果你想删除某个 mutation，可以 hover 到某个 mutation 上，点击删除图表删除对应项。
+<p>
+    <a href="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/store-delete2.png">
+        <img src="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/store-delete2.png" alt="store-delete2" width="80%">
+    </a>
+</p>
+
+当然也可以删除一组 mutation，你只需要 hover 到某个 store 选项上，然后点击删除图表删除一组数据。
+<p>
+    <a href="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/store-delete1.png">
+        <img src="https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/store-delete1.png" alt="store-delete1" width="80%">
+    </a>
+</p>
 
 ### History
 ![history_list](https://raw.githubusercontent.com/baidu/san-devtools/master/docs/images/history_list.png)

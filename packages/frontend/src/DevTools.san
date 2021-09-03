@@ -152,5 +152,5 @@
                 background-color: @dark-content-bg-color;
             }
         }
-    }    
+    }
 </style>
