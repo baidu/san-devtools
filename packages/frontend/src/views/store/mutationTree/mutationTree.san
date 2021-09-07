@@ -1,6 +1,7 @@
 <template>
     <div class="state-list-wrapper custom">
         <san-tree-view
+            delete
             searchTip="{{searchTip}}"
             s-ref="tv"
             ref="tv"
@@ -33,6 +34,9 @@
                 'UI:tree-view-item-click'({ value }) {
                     this.setSelectedMutationInfo(value);
                     this.setSelectedStoreData(value);
+                },
+                'UI:clearTreeData'({value}) {
+                    store.dispatch('clearTreeData', value);
                 }
             },
             initData() {

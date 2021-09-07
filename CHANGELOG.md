@@ -1,5 +1,12 @@
 ChangeLog
 ========
+3.1.7
+-------
+ - [Add]
+    - Make the mutation or a group of mutations removable in store panel.
+ - [Bugfix]
+    - Fix a bug that mutation increased but the selected item is not focused.
+
 3.1.6
 -------
  - [Add]

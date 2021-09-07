@@ -8,7 +8,11 @@
             <div s-if="{{!disableRipple && !disabled}}"
                 style="{{touchRippleStyle}}"
                 class="sm-touch-ripple {{selectedClass}} {{hiddenClass}}"
-            ></div>
+            >
+                <div s-if="delete" on-click="deleteItem" class="sm-tree-view-item-del">
+                    <san-icon type="delete"></san-icon>
+                </div>
+            </div>
             <div class="sm-tree-view-item-content {{selectedClass}}
                         {{hiddenClass}}"
                 style="{{itemContentStyle}}"
@@ -40,7 +44,8 @@
                 </div>
                 <p class="sm-tree-view-item-secondary-text"
                     s-if="treeData.id"
-                >{{treeData.id | raw}}
+                >
+                    {{treeData.id | raw}}
                 </p>
             </div>
             <div
@@ -59,6 +64,7 @@
             >
                 <slot name="nested" s-if="dataSource!=='JSON'"></slot>
                 <san-tree-view-item
+                    delete="{{delete}}"
                     type="{{type}}"
                     defaultSelectedIdPath="{{defaultSelectedIdPath}}"
                     s-else
@@ -71,6 +77,7 @@
                     filterText="{{filterText}}"
                     initiallyOpen="{{initiallyOpen}}"
                     dataSource="JSON"
+                    selectedId="{{selectedId}}"
                 >
                 </san-tree-view-item>
             </div>
@@ -109,7 +116,16 @@
             secondaryText: DataTypes.oneOfType([DataTypes.string, DataTypes.number]),
             extras: DataTypes.arrayOf(DataTypes.objectOf(DataTypes.string))
         },
-
+        deleteItem(e) {
+            e.stopPropagation();
+            this.dispatch(
+                'UI:clearTreeData',
+                {
+                    id: this.data.get('treeData.id'),
+                    displayName: this.data.get('displayName')
+                }
+            );
+        },
         components: {
             'san-checkbox': Checkbox,
             'san-icon': Icon,
@@ -257,6 +273,15 @@
                 return (this.data.get('disabled') ? 'disabled ' : '')
                     + (this.data.get('toggleNested') ? 'nested ' : '')
                     + (this.data.get('compact') ? 'compact' : '');
+            }
+        },
+
+        updated() {
+            const selectedId = this.data.get('selectedId');
+            const shouldSelected = selectedId === this.data.get('treeData.id');
+            const isSelected = this.data.get('selected');
+            if (shouldSelected !== isSelected) {
+                this.data.set('selected', !isSelected);
             }
         },
 
@@ -434,7 +459,7 @@
             if (!isNaN(+id)) {
                 return id >= lowId && id <= highId;
             }
-            return true; 
+            return true;
         },
 
         storeChangedTargetFilter(value) {
@@ -634,6 +659,7 @@
                 }
                 this.clearSelectedClass(true);
                 this.data.set('selected', true);
+                this.dispatch('UI:selectedid-change', this.data.get('treeData.id'));
                 this.dispatch('UI:record-selected-item');
             }
         },
@@ -863,6 +889,10 @@
     .sm-tree-view-item {
         position: relative;
         cursor: pointer;
+        &-del {
+            display: none;
+            width: 20px;
+        }
         &.disabled {
             cursor: not-allowed;
             color: #e0e0e0;
@@ -948,6 +978,16 @@
         &.nested .sm-touch-ripple {
             height: @one-line-height;
         }
+        .sm-tree-view-item-action {
+            position: absolute;
+            top: 0;
+            width: 20px;
+            right: 50px;
+            bottom: 0;
+            overflow: hidden;
+            z-index: 0;
+            border-radius: 6px;
+        }
         .sm-touch-ripple {
             position: absolute;
             top: 0;
@@ -957,6 +997,18 @@
             overflow: hidden;
             z-index: 0;
             border-radius: 6px;
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-end;
+            align-items: center;
+            &:hover {
+                .sm-tree-view-item-del {
+                    position: relative;
+                    display: block;
+                    right: 60px;
+                    color: #adadad;
+                }
+            }
         }
         .sm-tree-view-item-primary-text {
             font-size: 16px;
@@ -968,6 +1020,7 @@
             text-overflow: ellipsis;
             white-space: nowrap;
             -webkit-box-orient: vertical;
+            cursor: pointer;
         }
     }
     .show {

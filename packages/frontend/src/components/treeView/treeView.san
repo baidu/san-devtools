@@ -20,6 +20,8 @@
         <div class="sm-tree-view-item-wrapper">
             <slot s-if="dataSource!=='JSON'"></slot>
             <san-tree-view-item
+                delete="{{delete}}"
+                selectedId="{{selectedId}}"
                 type="{{type}}"
                 defaultSelectedIdPath="{{defaultSelectedIdPath}}"
                 s-else
@@ -76,7 +78,9 @@
                 dataSource: 'ATTRIBUTE',
                 highlighted: false,
                 rootTreeView: true,
-                filterText: ''
+                filterText: '',
+                selectedId: -1,
+                delete: false
             };
         },
 
@@ -92,6 +96,9 @@
         },
 
         messages: {
+            'UI:selectedid-change'(arg) {
+                this.data.set('selectedId', arg.value);
+            },
             'UI:query-compact-attribute'(arg) {
                 let compact = this.data.get('compact');
                 let target = arg.target;
