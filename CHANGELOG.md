@@ -1,5 +1,9 @@
 ChangeLog
 ========
+3.1.8
+-------
+ - [Bugfix]
+    - Fix bug introduced by san-store 2.2.0
 3.1.7
 -------
  - [Add]

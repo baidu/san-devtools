@@ -39,13 +39,15 @@ export class StoreAgent extends Agent {
              * 页面 import san-store: 创建默认的 store，new Store({name: '__default__'})
              */
             case 'store-default-inited': {
-                let {store} = data;
-                storeDecorator.handler(store);
-                if (store.name !== '__default__') {
-                    console.warn('[SAN_DEVTOOLS]: there is must be something bad has happened in san-store');
-                    return;
+                let store = data.store || data.defaultStore;
+                if (store) {
+                    storeDecorator.handler(store);
+                    if (store.name !== '__default__') {
+                        console.warn('[SAN_DEVTOOLS]: there is must be something bad has happened in san-store');
+                        return;
+                    }
+                    this.setStore(store);
                 }
-                this.setStore(store);
                 break;
             }
             /**
