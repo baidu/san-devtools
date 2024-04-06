@@ -195,9 +195,13 @@ export class StoreService implements IStoreService {
                 key = cur.join('.');
                 value = cur;
             }
-            else {
+            else if (typeof cur === 'string') {
                 value = parseName(cur);
                 key = value.join('.');
+            }
+            else if (typeof cur === 'function') {
+                // TODO：处理 mapState 的 value 为函数
+                return prev;
             }
             prev[key] = value;
             return prev;
